@@ -2,7 +2,6 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 
 export interface AppHeaderConfig {
   title: string
-  icon: string
   to: string
   /** Voci allineate a destra nella navbar */
   links: NavigationMenuItem[]
@@ -10,7 +9,6 @@ export interface AppHeaderConfig {
 
 export const appHeader: AppHeaderConfig = {
   title: 'Clash Realm',
-  icon: 'i-lucide-swords',
   to: '/',
   links: []
 }
@@ -31,6 +29,46 @@ export const sideMenu: NavigationMenuItem[][] = sideMenuDecorator([
         { label: 'Nuovo torneo', icon: 'i-lucide-plus', to: '/tournaments/new' }
       ]
     }
+  ],
+  [
+    {
+      label: 'Community',
+      icon: 'i-lucide-globe',
+      defaultOpen: true,
+      children: [
+        {
+          label: 'News feed',
+          icon: 'i-lucide-megaphone'
+        }
+      ]
+    }
+  ],
+  [
+    {
+      label: 'Admin',
+      icon: 'i-lucide-shield-alert',
+      defaultOpen: true,
+      children: [
+        {
+          label: 'Utenti',
+          icon: 'i-lucide-users'
+        },
+        {
+          label: 'Permessi',
+          icon: 'i-lucide-key-round'
+        }
+      ]
+    }
+  ],
+  [{
+    label: 'Dev',
+    icon: 'i-lucide-wrench',
+    defaultOpen: true,
+    children: [
+      { label: 'Componenti', icon: 'i-lucide-cog', to: '' },
+      { label: 'Tabelle', icon: 'i-lucide-columns-3-cog', to: '/dev/tables' },
+    ]
+  }
   ]
 ]);
 

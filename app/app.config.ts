@@ -14,6 +14,9 @@ export default defineAppConfig({
       loser: 'loser'
     },
     button: {
+      slots: {
+        base: 'rounded-xs',
+      },
       defaultVariants: { size: 'md' }
     },
     card: {
