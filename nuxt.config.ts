@@ -17,7 +17,7 @@ export default defineNuxtConfig({
         'winner',
         'loser'
       ]
-    }
+    },
   },
   runtimeConfig: {
     apiSecret: '', // can be overridden by NUXT_API_SECRET environment variable

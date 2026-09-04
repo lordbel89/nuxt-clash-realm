@@ -20,7 +20,7 @@ export const appHeader: AppHeaderConfig = {
  * Ogni voce ha `label` e `icon`; `to` è opzionale.
  * Una voce senza `to` ma con `children` apre un sottomenu.
  */
-export const sideMenu: NavigationMenuItem[][] = [
+export const sideMenu: NavigationMenuItem[][] = sideMenuDecorator([
   [
     {
       label: 'Tornei',
@@ -32,7 +32,7 @@ export const sideMenu: NavigationMenuItem[][] = [
       ]
     }
   ]
-]
+]);
 
 /** Voci ancorate in fondo alla sidebar */
 export const sideMenuFooter: NavigationMenuItem[] = [

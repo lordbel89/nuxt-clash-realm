@@ -18,6 +18,32 @@ export default defineAppConfig({
     },
     card: {
       slots: { root: 'ring-default' }
+    },
+    navigationMenu: {
+      // slots: {
+      //   // linkLeadingIcon: 'bg-accent',
+      //   // childLinkIcon: 'bg-primary',
+      // },
+      // active: {
+      //   true: {
+      //     childLink: 'before:bg-elevated text-highlighted',
+      //     childLinkIcon: 'bg-accent'
+      //   },
+      //   false: {
+      //     childLinkIcon: 'text-accent'
+      //   }
+      // },
+      // compoundVariants: [
+      //   {
+      //     color: 'primary',
+      //     variant: 'pill',
+      //     active: true,
+      //     class: {
+      //       link: 'text-primary',
+      //       linkLeadingIcon: 'text-primary group-data-[state=open]:text-accent'
+      //     }
+      //   },
+      // ]
     }
   }
 })
