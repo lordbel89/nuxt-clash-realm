@@ -1,0 +1,11 @@
+/* ── Tema scuro ──────────────────────────────────────────────────────────
+ * Stessi token di light.css, valori per la dark mode.
+ * `.dark` sta sull'<html> (color-mode) ma anche sul root del layout
+ * `projector`, così la proiezione resta scura con l'app in chiaro.
+ */
+.dark {
+  --app-gradient: linear-gradient(344deg,
+      var(--color-indigo-950) 0%,
+      var(--color-zinc-950) 55%,
+      var(--color-black) 100%);
+}

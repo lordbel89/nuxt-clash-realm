@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* Primitive e token indipendenti dal tema */
+@import "./tokens/color.css";
+@import "./tokens/typography.css";
+@import "./tokens/layout.css";
+
+@import "./tokens/palette.css";
+/* Valori per tema. `:root` e `.dark` hanno la stessa specificità:
+ * dark.css deve restare l'ultimo import o non sovrascrive light.css. */
+@import "./tokens/light.css";
+@import "./tokens/dark.css";

@@ -1,16 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devServer: { port: 3000 },
-  devtools: { enabled: true },
   modules: ['@nuxt/eslint', '@nuxt/ui'],
-  eslint: {
-    config: {
-      stylistic: true,
-    },
-  },
+  devtools: { enabled: true },
+  css: ['~/assets/css/main.css'],
   ui: {
     theme: {
+      // Alias di colore risolti in app/app.config.ts
       colors: [
         'primary',
         'secondary',
@@ -19,10 +14,6 @@ export default defineNuxtConfig({
         'error',
         'warning',
         'neutral',
-        'slate',
-        'background',
-        'white',
-        'black',
         'winner',
         'loser'
       ]
@@ -33,5 +24,23 @@ export default defineNuxtConfig({
     public: {
       environment: '',
     },
+  },
+  devServer: { port: 3000 },
+  compatibilityDate: '2025-07-15',
+  eslint: {
+    config: {
+      stylistic: true,
+    },
+  },
+  fonts: {
+    // Lato è servito dai file in public/fonts/, non da un CDN
+    families: [
+      {
+        name: 'Lato',
+        provider: 'local',
+        weights: [100, 300, 400, 700, 900],
+        styles: ['normal', 'italic']
+      }
+    ]
   },
 })

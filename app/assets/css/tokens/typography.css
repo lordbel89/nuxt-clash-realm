@@ -1,0 +1,15 @@
+/* ── Tipografia ──────────────────────────────────────────────────────────
+ * Lato è servito da public/fonts/ via @nuxt/fonts (provider `local`):
+ * le @font-face vengono generate dai nomi dei file, non scritte a mano.
+ * Le scale `screen` servono alla pagina di proiezione: devono restare
+ * leggibili a diversi metri di distanza.
+ */
+@theme static {
+  --font-sans: 'Lato', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --text-screen: 3rem;
+  --text-screen--line-height: 1.1;
+  --text-screen-lg: 6rem;
+  --text-screen-lg--line-height: 1;
+}

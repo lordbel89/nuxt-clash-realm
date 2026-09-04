@@ -1,0 +1,5 @@
+@theme static {
+
+    --color-primary: var(--color-sky-400);
+    --color-accent: var(--color-yellow-400);
+}

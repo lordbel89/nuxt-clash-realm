@@ -1,0 +1,8 @@
+/* ── Layout ──────────────────────────────────────────────────────────────
+ * Override delle variabili di ruolo Nuxt UI che governano forma e ingombri.
+ */
+:root {
+  --ui-radius: 0.5rem;
+  /* Altezza di header dashboard e sidebar */
+  --ui-header-height: 4rem;
+}

@@ -1,0 +1,10 @@
+/* ── Tema chiaro ─────────────────────────────────────────────────────────
+ * Valori di ruolo validi quando l'app NON è in dark mode.
+ * Solo token che cambiano fra i due temi: le primitive stanno in color.css.
+ */
+:root {
+  --app-gradient: linear-gradient(344deg,
+      var(--color-indigo-100) 0%,
+      var(--color-slate-50) 45%,
+      var(--color-white) 100%);
+}

@@ -1,0 +1,44 @@
+/* ── Colore ──────────────────────────────────────────────────────────────
+ * Primitive: palette 50→950 non presenti in Tailwind.
+ * Alias semantici (primary, secondary, winner, …) → app/app.config.ts
+ * Nuxt UI genera da qui le variabili di ruolo --ui-<alias>.
+ */
+@theme static {
+  /* Esito match: vincitore */
+  --color-winner-50: oklch(0.979 0.021 166.113);
+  --color-winner-100: oklch(0.95 0.052 163.051);
+  --color-winner-200: oklch(0.905 0.093 164.15);
+  --color-winner-300: oklch(0.845 0.143 164.978);
+  --color-winner-400: oklch(0.765 0.177 163.223);
+  --color-winner-500: oklch(0.696 0.17 162.48);
+  --color-winner-600: oklch(0.596 0.145 163.225);
+  --color-winner-700: oklch(0.508 0.118 165.612);
+  --color-winner-800: oklch(0.432 0.095 166.913);
+  --color-winner-900: oklch(0.378 0.077 168.94);
+  --color-winner-950: oklch(0.262 0.051 172.552);
+
+  /* Esito match: perdente */
+  --color-loser-50: oklch(0.969 0.015 12.422);
+  --color-loser-100: oklch(0.941 0.03 12.58);
+  --color-loser-200: oklch(0.892 0.058 10.001);
+  --color-loser-300: oklch(0.81 0.117 11.638);
+  --color-loser-400: oklch(0.712 0.194 13.428);
+  --color-loser-500: oklch(0.645 0.246 16.439);
+  --color-loser-600: oklch(0.586 0.253 17.585);
+  --color-loser-700: oklch(0.514 0.222 16.935);
+  --color-loser-800: oklch(0.455 0.188 13.697);
+  --color-loser-900: oklch(0.41 0.159 10.272);
+  --color-loser-950: oklch(0.271 0.105 12.094);
+
+  --color-blue-ribbon-50: #eef4ff;
+  --color-blue-ribbon-100: #dae7ff;
+  --color-blue-ribbon-200: #bcd4ff;
+  --color-blue-ribbon-300: #8ebaff;
+  --color-blue-ribbon-400: #5996ff;
+  --color-blue-ribbon-500: #3974fe;
+  --color-blue-ribbon-600: #1d4ff3;
+  --color-blue-ribbon-700: #153ae0;
+  --color-blue-ribbon-800: #1830b5;
+  --color-blue-ribbon-900: #192e8f;
+  --color-blue-ribbon-950: #141e57;
+}
