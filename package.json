@@ -7,7 +7,11 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node server/database/migrate.ts",
+    "db:seed": "node server/database/seed.ts",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.17.0",
@@ -29,14 +33,19 @@
     "@tiptap/starter-kit": "^3.31.3",
     "@tiptap/suggestion": "^3.31.3",
     "@tiptap/vue-3": "^3.31.3",
+    "drizzle-orm": "^1.0.0-rc.4",
     "eslint": "^10.9.1",
     "nuxt": "^4.5.2",
+    "postgres": "^3.4.9",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
+    "valibot": "^1.4.2",
     "vue": "^3.5.42",
     "vue-router": "^5.3.0"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.129"
+    "@electric-sql/pglite": "^0.5.8",
+    "@iconify-json/lucide": "^1.2.129",
+    "drizzle-kit": "^1.0.0-rc.4"
   }
 }

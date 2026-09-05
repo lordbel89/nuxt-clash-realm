@@ -1,3 +1,5 @@
+import { DATABASE_DEFAULTS } from './server/database/env.ts'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/ui'],
@@ -21,6 +23,12 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     apiSecret: '', // can be overridden by NUXT_API_SECRET environment variable
+    // Sovrascrivibile con NUXT_DATABASE_DIALECT / _URL / _PGLITE_PATH
+    database: {
+      dialect: DATABASE_DEFAULTS.dialect as string,
+      url: DATABASE_DEFAULTS.url as string,
+      pglitePath: DATABASE_DEFAULTS.pglitePath as string,
+    },
     public: {
       environment: '',
     },
