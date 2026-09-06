@@ -11,11 +11,21 @@ export function useDatabase(): Promise<Database> {
   if (!instance) {
     const { database } = useRuntimeConfig();
 
-    instance = createDatabase({
+    // Una connessione fallita non deve restare in cache: la promise rifiutata
+    // varrebbe per tutte le richieste successive e il server non si riprenderebbe
+    // più nemmeno a database tornato disponibile. Il confronto di identità evita
+    // di azzerare un tentativo più recente, se nel frattempo ne è partito uno.
+    const pending: Promise<Database> = createDatabase({
       dialect: database.dialect as DatabaseDialect,
       url: database.url,
       pglitePath: database.pglitePath,
+    }).catch((error) => {
+      if (instance === pending) instance = undefined;
+
+      throw error;
     });
+
+    instance = pending;
   }
 
   return instance;

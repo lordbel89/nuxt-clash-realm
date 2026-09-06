@@ -1,4 +1,6 @@
+import type { UserId } from '../types/ids';
 import * as v from 'valibot';
+import { Uuid } from './common';
 
 /**
  * Contratto d'ingresso per la creazione di un utente.
@@ -29,3 +31,14 @@ export const CreateUserInput = v.object({
  * tipi, `InferOutput` ne estrae la forma. Così la definizione resta una sola.
  */
 export type CreateUserInput = v.InferOutput<typeof CreateUserInput>;
+
+/**
+ * Parametri di rotta di `/api/users/:id`. Il marchio si applica qui, all'unico
+ * confine in cui un id entra nel backend come stringa nuda: da questo punto in
+ * poi è un `UserId` e il compilatore non lo confonde con altri identificativi.
+ */
+export const UserIdParams = v.object({
+  id: v.pipe(Uuid, v.transform(id => id as UserId)),
+});
+
+export type UserIdParams = v.InferOutput<typeof UserIdParams>;

@@ -1,10 +1,12 @@
+import type { UserId } from './ids';
+
 /**
  * Contratto dell'API per l'utente: è questo che il frontend consuma, non la
  * riga del database. I campi sono elencati uno a uno (allowlist): una colonna
  * nuova in `users` non finisce qui da sola.
  */
 export interface User {
-  id: string;
+  id: UserId;
   name: string;
   email: string;
   isActive: boolean;
