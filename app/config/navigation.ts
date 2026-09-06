@@ -1,10 +1,10 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 export interface AppHeaderConfig {
-  title: string
-  to: string
+  title: string;
+  to: string;
   /** Voci allineate a destra nella navbar */
-  links: NavigationMenuItem[]
+  links: NavigationMenuItem[];
 }
 
 export const appHeader: AppHeaderConfig = {

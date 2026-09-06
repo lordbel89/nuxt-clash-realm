@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Standing } from '~/types/tournament'
 
-defineProps<{ standings: Standing[] }>()
+defineProps<{ standings: Standing[]; }>()
 
 const columns = [
   { accessorKey: 'participant.name', header: 'Partecipante' },

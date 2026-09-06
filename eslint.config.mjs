@@ -7,7 +7,10 @@ export default withNuxt(
       '@stylistic/comma-dangle': 'error',
       '@stylistic/semi': 'error',
       '@stylistic/eol-last': 'off',
-      '@stylistic/member-delimiter-style': 'off',
+      '@stylistic/member-delimiter-style': ['error', {
+        multiline: { delimiter: 'semi', requireLast: true },
+        singleline: { delimiter: 'semi', requireLast: true },
+      }],
       '@stylistic/arrow-parens': 'off',
       'vue/block-tag-newline': 'off',
       'vue/no-v-html': 'off',

@@ -1,5 +1,10 @@
+<script>
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { it } from '@nuxt/ui/locale'
+</script>
+
 <template>
-  <UApp>
+  <UApp :locale="it">
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />

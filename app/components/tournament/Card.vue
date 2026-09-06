@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Tournament } from '~/types/tournament'
 
-defineProps<{ tournament: Tournament }>()
+defineProps<{ tournament: Tournament; }>()
 
 const statusColor = {
   draft: 'neutral',

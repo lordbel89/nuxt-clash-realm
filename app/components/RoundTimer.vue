@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const props = defineProps<{
   /** ISO date di fine round */
-  endsAt?: string
-  huge?: boolean
+  endsAt?: string;
+  huge?: boolean;
 }>()
 
 // null finché non montato: evita mismatch di idratazione fra server e client

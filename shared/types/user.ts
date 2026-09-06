@@ -4,10 +4,10 @@
  * nuova in `users` non finisce qui da sola.
  */
 export interface User {
-  id: string
-  name: string
-  email: string
-  isActive: boolean
+  id: string;
+  name: string;
+  email: string;
+  isActive: boolean;
   /** ISO 8601: le date non sopravvivono a JSON, la conversione a Date spetta al frontend */
-  createdAt: string
+  createdAt: string;
 }

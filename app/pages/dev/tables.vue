@@ -4,12 +4,12 @@ import type { TableColumn } from '@nuxt/ui'
 definePageMeta({ title: 'Tabelle' })
 
 type FieldType = 'text' | 'number' | 'boolean' | 'date'
-interface Field { key: string, label: string, type: FieldType }
-type Row = Record<string, unknown> & { id: string }
+interface Field { key: string; label: string; type: FieldType; }
+type Row = Record<string, unknown> & { id: string; }
 
 // ponytail: schema e righe finti, in memoria. Sostituire con le API del collega
 // (GET /api/dev/tables per l'elenco+schema, CRUD su /api/dev/tables/:table[/:id]).
-const tables: Record<string, { label: string, fields: Field[], rows: Row[] }> = reactive({
+const tables: Record<string, { label: string; fields: Field[]; rows: Row[]; }> = reactive({
   tournaments: {
     label: 'Tornei',
     fields: [

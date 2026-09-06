@@ -15,20 +15,20 @@ const title = computed(() => (route.meta.title as string | undefined) ?? appHead
       :ui="{ footer: 'border-t border-default' }"
     >
       <template #header="{ collapsed }">
-        <img
-          src="/assets/Logo%20Placeholder.png"
-          alt=""
-          width="400"
-          height="500"
-          class="mx-auto h-12 w-auto"
-        >
         <NuxtLink
           :to="appHeader.to"
           class="flex items-center gap-2 font-bold text-accent">
-
+          <img
+            src="/assets/Logo%20Placeholder.png"
+            alt=""
+            width="400"
+            height="500"
+            class="mx-auto h-12 w-auto"
+          >
           <span v-if="!collapsed">{{ appHeader.title }}</span>
         </NuxtLink>
-        <UDashboardSidebarCollapse class="ms-auto" />
+
+        <UDashboardSidebarCollapse class="ms-auto z-50" />
       </template>
 
       <template #default="{ collapsed }">

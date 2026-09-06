@@ -4,9 +4,9 @@ import type { TournamentConfig } from '~/types/tournament'
 
 const model = defineModel<TournamentConfig>({ required: true })
 
-const emit = defineEmits<{ submit: [TournamentConfig] }>()
+const emit = defineEmits<{ submit: [TournamentConfig]; }>()
 
-defineProps<{ submitLabel?: string, loading?: boolean }>()
+defineProps<{ submitLabel?: string; loading?: boolean; }>()
 
 const games: USelectItem<string>[] = [
   { label: 'BeyBlade X', value: 'bbx' },

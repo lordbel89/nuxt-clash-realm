@@ -6,11 +6,11 @@ import { relations } from './relations.ts'
 export type DatabaseDialect = 'pglite' | 'postgres'
 
 export interface DatabaseOptions {
-  dialect: DatabaseDialect
+  dialect: DatabaseDialect;
   /** Stringa di connessione Postgres (usata solo dal dialetto postgres) */
-  url: string
+  url: string;
   /** Cartella dati di PGlite (usata solo dal dialetto pglite) */
-  pglitePath: string
+  pglitePath: string;
 }
 
 function createPostgresDatabase(url: string) {
@@ -61,10 +61,10 @@ export async function createDatabase(options: DatabaseOptions): Promise<Database
 export async function closeDatabase(db: Database) {
   const client = db.$client as unknown
 
-  if (typeof (client as { end?: () => Promise<void> }).end === 'function') {
-    await (client as { end: () => Promise<void> }).end()
+  if (typeof (client as { end?: () => Promise<void>; }).end === 'function') {
+    await (client as { end: () => Promise<void>; }).end()
   }
-  else if (typeof (client as { close?: () => Promise<void> }).close === 'function') {
-    await (client as { close: () => Promise<void> }).close()
+  else if (typeof (client as { close?: () => Promise<void>; }).close === 'function') {
+    await (client as { close: () => Promise<void>; }).close()
   }
 }

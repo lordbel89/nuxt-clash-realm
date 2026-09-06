@@ -2,9 +2,9 @@
 import type { Match } from '~/types/tournament'
 
 defineProps<{
-  match: Match
+  match: Match;
   /** Variante ingrandita per la pagina di proiezione */
-  screen?: boolean
+  screen?: boolean;
 }>()
 
 const statusColor = {

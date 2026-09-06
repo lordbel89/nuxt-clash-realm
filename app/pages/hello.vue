@@ -24,7 +24,7 @@ async function creaUtente() {
   }
   catch (e) {
     // Il messaggio arriva dal backend: 409 email duplicata, 400 dati non validi
-    toast.add({ title: (e as { statusMessage?: string }).statusMessage ?? 'Errore', color: 'error' })
+    toast.add({ title: (e as { statusMessage?: string; }).statusMessage ?? 'Errore', color: 'error' })
   }
   finally {
     inviando.value = false
