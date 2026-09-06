@@ -15,6 +15,7 @@
     "format": "eslint --fix ."
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.7.3",
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/ui": "^4.11.0",
     "@nuxtjs/i18n": "^10.6.0",
@@ -35,6 +36,7 @@
     "@tiptap/starter-kit": "^3.31.3",
     "@tiptap/suggestion": "^3.31.3",
     "@tiptap/vue-3": "^3.31.3",
+    "better-auth": "^1.7.3",
     "drizzle-orm": "^1.0.0-rc.4",
     "eslint": "^10.9.1",
     "nuxt": "^4.5.2",
@@ -48,6 +50,7 @@
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
     "@iconify-json/lucide": "^1.2.129",
-    "drizzle-kit": "^1.0.0-rc.4"
+    "drizzle-kit": "^1.0.0-rc.4",
+    "vue-tsc": "^3.3.11"
   }
 }

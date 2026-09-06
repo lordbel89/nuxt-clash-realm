@@ -3,8 +3,26 @@ import * as schema from './schema/index.ts';
 
 /**
  * Relational Queries v2: le relazioni vivono qui, separate dallo schema.
- * Con una sola tabella non c'è ancora nulla da collegare, ma passare l'oggetto
- * a drizzle() è ciò che abilita `db.query.users`.
- * Quando arriveranno tornei/round/match: defineRelations(schema, (r) => ({ ... })).
+ * Passare l'oggetto a drizzle() è ciò che abilita `db.query.<tabella>`.
+ * Quando arriveranno tornei/round/match si aggiungono qui.
  */
-export const relations = defineRelations(schema);
+export const relations = defineRelations(schema, r => ({
+  users: {
+    sessions: r.many.sessions(),
+    accounts: r.many.accounts(),
+  },
+  sessions: {
+    user: r.one.users({
+      from: r.sessions.userId,
+      to: r.users.id,
+      optional: false,
+    }),
+  },
+  accounts: {
+    user: r.one.users({
+      from: r.accounts.userId,
+      to: r.users.id,
+      optional: false,
+    }),
+  },
+}));

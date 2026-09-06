@@ -9,6 +9,8 @@ export interface User {
   id: UserId;
   name: string;
   email: string;
+  /** Verificata via email: resta false finché non ci sarà un mailer */
+  emailVerified: boolean;
   isActive: boolean;
   /** ISO 8601: le date non sopravvivono a JSON, la conversione a Date spetta al frontend */
   createdAt: string;

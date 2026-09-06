@@ -1,3 +1,4 @@
+import { AUTH_DEFAULTS } from './server/auth/env.ts';
 import { DATABASE_DEFAULTS } from './server/database/env.ts';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -23,6 +24,11 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     apiSecret: '', // can be overridden by NUXT_API_SECRET environment variable
+    // Sovrascrivibile con NUXT_AUTH_SECRET / _URL
+    auth: {
+      secret: AUTH_DEFAULTS.secret as string,
+      url: AUTH_DEFAULTS.url as string,
+    },
     // Sovrascrivibile con NUXT_DATABASE_DIALECT / _URL / _PGLITE_PATH
     database: {
       dialect: DATABASE_DEFAULTS.dialect as string,

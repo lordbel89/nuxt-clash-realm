@@ -6,6 +6,8 @@ import { toUser } from '../mappers/user.ts';
 
 /** GET /api/users — elenco paginato degli utenti */
 export default defineEventHandler(async (event): Promise<Paginated<User>> => {
+  await requireSession(event);
+
   const { limit, offset } = readQuery(event, ListQuery);
 
   const db = await useDatabase();

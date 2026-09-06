@@ -4,6 +4,8 @@ import { toUser } from '../../mappers/user.ts';
 
 /** GET /api/users/:id — singolo utente */
 export default defineEventHandler(async (event): Promise<User> => {
+  await requireSession(event);
+
   const { id } = readParams(event, UserIdParams);
 
   const db = await useDatabase();

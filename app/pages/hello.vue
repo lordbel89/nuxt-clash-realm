@@ -1,43 +1,15 @@
 <script setup lang="ts">
-import type { CreateUserInput } from '#shared/schemas/user';
-import type { FetchError } from 'ofetch';
-import { CreateUserInput as CreateUserSchema } from '#shared/schemas/user';
-
-definePageMeta({ title: 'Hello' });
+// La pagina interroga /api/users, che ora richiede una sessione: senza
+// middleware mostrerebbe un 401 invece di portare al login
+definePageMeta({ title: 'Hello', middleware: 'auth' });
 
 // Pagina di verifica: prima connessione reale tra frontend e database.
 // Niente generico su useFetch: annotarlo a mano disattiva l'inferenza da Nitro,
 // che è proprio ciò che tiene allineati handler e pagina. L'endpoint risponde
 // con un `Paginated<User>`, quindi le righe stanno in `items`.
-const { data, status, error, refresh } = await useFetch('/api/users');
+const { data, status, error } = await useFetch('/api/users');
 
 const users = computed(() => data.value?.items ?? []);
-
-const toast = useToast();
-const inviando = ref(false);
-const nuovoUtente = reactive<CreateUserInput>({ name: '', email: '' });
-
-async function creaUtente() {
-  inviando.value = true;
-
-  try {
-    await $fetch('/api/users', { method: 'POST', body: nuovoUtente });
-    nuovoUtente.name = '';
-    nuovoUtente.email = '';
-    await refresh();
-    toast.add({ title: 'Utente creato', color: 'success' });
-  }
-  catch (e) {
-    // Il messaggio arriva dal backend: 409 email duplicata, 400 dati non validi.
-    // Si legge da `message` e non da `statusMessage`, che h3 priva degli accenti
-    const errore = e as FetchError<{ message?: string; }>;
-
-    toast.add({ title: errore.data?.message ?? 'Errore', color: 'error' });
-  }
-  finally {
-    inviando.value = false;
-  }
-}
 
 function formatDate(isoDate: string) {
   // Il contratto trasporta stringhe ISO: la conversione a Date spetta a noi
@@ -99,39 +71,5 @@ function formatDate(isoDate: string) {
         </div>
       </li>
     </ul>
-
-    <USeparator />
-
-    <!-- Stesso schema che valida il body lato server: una definizione sola -->
-    <UForm
-      :schema="CreateUserSchema"
-      :state="nuovoUtente"
-      class="flex items-start gap-3"
-      @submit="creaUtente"
-    >
-      <UFormField
-        name="name"
-        label="Nome">
-        <UInput
-          v-model="nuovoUtente.name"
-          placeholder="Anna Conti" />
-      </UFormField>
-
-      <UFormField
-        name="email"
-        label="Email">
-        <UInput
-          v-model="nuovoUtente.email"
-          placeholder="anna.conti@example.com" />
-      </UFormField>
-
-      <UButton
-        type="submit"
-        class="mt-6"
-        :loading="inviando"
-      >
-        Aggiungi
-      </UButton>
-    </UForm>
   </div>
 </template>
