@@ -10,6 +10,10 @@ const config = ref<TournamentConfig>({
   roundDurationMinutes: 50,
   maxParticipants: 16,
   description: '',
+  location: {
+    name: '',
+    position: '',
+  },
 });
 
 const loading = ref(false);

@@ -14,6 +14,11 @@ const games: USelectItem<string>[] = [
   { label: 'Altro', value: 'other' },
 ];
 
+const leagues: USelectItem<string>[] = [
+  { label: 'Andycards Local', value: 'andylocal' },
+  { label: 'Lega del male', value: 'badleague' },
+];
+
 // ponytail: nessuno schema di validazione finché i campi non sono definitivi.
 // Aggiungere uno schema zod su `:schema` di UForm quando il modello dati è stabile.
 </script>
@@ -40,6 +45,23 @@ const games: USelectItem<string>[] = [
         v-model="model.game"
         :items="games"
         class="w-full" />
+    </UFormField>
+
+    <UFormField
+      label="Lega"
+      name="league">
+      <div class="flex gap-2">
+        <USelect
+          v-model="model.leagueId"
+          :items="leagues"
+          class="w-full" />
+        <UButton
+          v-if="model.leagueId"
+          variant="outline"
+          icon="i-lucide-trash"
+          size="sm"
+          @click="model.leagueId = undefined" />
+      </div>
     </UFormField>
 
     <div class="grid gap-4 sm:grid-cols-4">
@@ -79,6 +101,26 @@ const games: USelectItem<string>[] = [
         v-model="model.startDate"
         class="w-full" />
     </UFormField>
+
+    <div class="flex gap-4">
+      <UFormField
+        label="Nome location"
+        name="locationName"
+      >
+        <UInput
+          v-model="model.location.name"
+          class="w-full" />
+      </UFormField>
+      <UFormField
+        label="Posizione location (TODO Maps Widget)"
+        name="locationPosition"
+      >
+        <UInput
+          v-model="model.location.position"
+          disabled
+          class="w-full" />
+      </UFormField>
+    </div>
 
     <slot />
     <div class="flex justify-end">

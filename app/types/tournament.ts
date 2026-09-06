@@ -65,4 +65,8 @@ export interface Standing {
 export type TournamentConfig = Omit<Tournament, 'id' | 'status' | 'participants' | 'rounds' | 'currentRound'> & {
   roundDurationMinutes: number;
   maxParticipants: number;
+  location: {
+    name?: string;
+    position?: string;
+  };
 };

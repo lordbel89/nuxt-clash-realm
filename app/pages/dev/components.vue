@@ -3,7 +3,10 @@
     <UAccordion :items="slots">
       <template #datepicker="{ item }">
         <div>Data selezionata: {{ formatDate(item.model) }}</div>
-        <FormDatePicker v-model="item.model" />
+        <div class="flex gap-4 my-4">
+          <FormDatePicker v-model="item.model" />
+          <FormDatePicker v-model="item.model" />
+        </div>
       </template>
     </UAccordion>
   </div>
