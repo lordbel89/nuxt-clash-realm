@@ -1,11 +1,11 @@
 // @ts-check
-import withNuxt from './.nuxt/eslint.config.mjs'
+import withNuxt from './.nuxt/eslint.config.mjs';
 
 export default withNuxt(
   {
     rules: {
       '@stylistic/comma-dangle': 'error',
-      '@stylistic/semi': 'error',
+      '@stylistic/semi': ['error', 'always'],
       '@stylistic/eol-last': 'off',
       '@stylistic/member-delimiter-style': ['error', {
         multiline: { delimiter: 'semi', requireLast: true },
@@ -18,4 +18,4 @@ export default withNuxt(
       'vue/html-closing-bracket-newline': 'off',
     },
   },
-)
+);

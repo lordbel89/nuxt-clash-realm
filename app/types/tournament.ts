@@ -1,5 +1,5 @@
-export type TournamentStatus = 'draft' | 'ready' | 'running' | 'paused' | 'finished'
-export type MatchStatus = 'pending' | 'running' | 'finished'
+export type TournamentStatus = 'draft' | 'ready' | 'running' | 'paused' | 'finished';
+export type MatchStatus = 'pending' | 'running' | 'finished';
 
 export interface Participant {
   id: string;
@@ -29,15 +29,24 @@ export interface Round {
 }
 
 export interface Tournament {
-  // Config fields
+  // Data fields
   id: string;
+
+  // Config fields
   name: string;
   game: string;
-  status: TournamentStatus;
   isTeam: boolean;
-  startDate: Date;
+  maxParticipants?: number;
+  startDate?: Date;
+  description?: string;
+  location?: {
+    name?: string;
+    position?: string; // TODO: capire qual'è il dato utile per il widget di maps
+  };
+  leagueId?: string;
 
   // Running fields
+  status: TournamentStatus;
   participants: Participant[];
   rounds: Round[];
   currentRound: number;
@@ -53,7 +62,7 @@ export interface Standing {
 }
 
 /** Payload di creazione/configurazione torneo */
-export type TournamentConfig = Pick<Tournament, 'name' | 'game' | 'isTeam'> & {
+export type TournamentConfig = Omit<Tournament, 'id' | 'status' | 'participants' | 'rounds' | 'currentRound'> & {
   roundDurationMinutes: number;
   maxParticipants: number;
-}
+};

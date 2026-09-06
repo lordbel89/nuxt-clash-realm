@@ -1,4 +1,4 @@
-import type { NavigationMenuItem } from '@nuxt/ui'
+import type { NavigationMenuItem } from '@nuxt/ui';
 
 export interface AppHeaderConfig {
   title: string;
@@ -11,7 +11,7 @@ export const appHeader: AppHeaderConfig = {
   title: 'Clash Realm',
   to: '/',
   links: [],
-}
+};
 
 /**
  * Voci del menu laterale, raggruppate: ogni array interno è una sezione.
@@ -100,14 +100,14 @@ export const sideMenu: NavigationMenuItem[][] = sideMenuDecorator([
     icon: 'i-lucide-wrench',
     defaultOpen: true,
     children: [
-      { label: 'Componenti', icon: 'i-lucide-cog', to: '' },
+      { label: 'Componenti', icon: 'i-lucide-cog', to: '/dev/components' },
       { label: 'Tabelle', icon: 'i-lucide-columns-3-cog', to: '/dev/tables' },
     ],
   },
   ],
-])
+]);
 
 /** Voci ancorate in fondo alla sidebar */
 export const sideMenuFooter: NavigationMenuItem[] = [
   { label: 'Esci', icon: 'i-lucide-log-out', to: '/login' },
-]
+];

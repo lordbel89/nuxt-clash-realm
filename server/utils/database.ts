@@ -1,7 +1,7 @@
-import type { Database, DatabaseDialect } from '../database/client.ts'
-import { createDatabase } from '../database/client.ts'
+import type { Database, DatabaseDialect } from '../database/client.ts';
+import { createDatabase } from '../database/client.ts';
 
-let instance: Promise<Database> | undefined
+let instance: Promise<Database> | undefined;
 
 /**
  * Istanza condivisa del database, creata alla prima richiesta.
@@ -9,19 +9,19 @@ let instance: Promise<Database> | undefined
  */
 export function useDatabase(): Promise<Database> {
   if (!instance) {
-    const { database } = useRuntimeConfig()
+    const { database } = useRuntimeConfig();
 
     instance = createDatabase({
       dialect: database.dialect as DatabaseDialect,
       url: database.url,
       pglitePath: database.pglitePath,
-    })
+    });
   }
 
-  return instance
+  return instance;
 }
 
 /** Ritorna l'istanza solo se già creata, senza aprire una connessione. */
 export function getDatabaseInstance() {
-  return instance
+  return instance;
 }

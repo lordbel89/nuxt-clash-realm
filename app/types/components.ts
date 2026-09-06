@@ -2,4 +2,4 @@
 export type USelectItem<T = any> = {
   label: string;
   value: T;
-}
+};

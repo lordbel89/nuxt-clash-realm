@@ -1,5 +1,5 @@
-import { defineRelations } from 'drizzle-orm'
-import * as schema from './schema/index.ts'
+import { defineRelations } from 'drizzle-orm';
+import * as schema from './schema/index.ts';
 
 /**
  * Relational Queries v2: le relazioni vivono qui, separate dallo schema.
@@ -7,4 +7,4 @@ import * as schema from './schema/index.ts'
  * a drizzle() è ciò che abilita `db.query.users`.
  * Quando arriveranno tornei/round/match: defineRelations(schema, (r) => ({ ... })).
  */
-export const relations = defineRelations(schema)
+export const relations = defineRelations(schema);

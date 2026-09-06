@@ -1,5 +1,5 @@
-import type { User } from '#shared/types/user'
-import type { UserRow } from '../database/schema/users.ts'
+import type { User } from '#shared/types/user';
+import type { UserRow } from '../database/schema/users.ts';
 
 /**
  * Unico punto in cui la riga del database diventa contratto dell'API.
@@ -14,5 +14,5 @@ export function toUser(row: UserRow): User {
     email: row.email,
     isActive: row.isActive,
     createdAt: row.createdAt.toISOString(),
-  }
+  };
 }

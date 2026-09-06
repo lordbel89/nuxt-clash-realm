@@ -1,17 +1,17 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'auth' })
+definePageMeta({ layout: 'auth' });
 
-const state = reactive({ email: '', password: '' })
-const loading = ref(false)
+const state = reactive({ email: '', password: '' });
+const loading = ref(false);
 
 // ponytail: autenticazione lato backend (collega). Qui solo il form.
 async function onSubmit() {
-  loading.value = true
+  loading.value = true;
   try {
-    await navigateTo('/tournaments')
+    await navigateTo('/tournaments');
   }
   finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>

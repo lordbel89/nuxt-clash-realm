@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { TournamentConfig } from '~/types/tournament'
+import type { TournamentConfig } from '~/types/tournament';
 
-definePageMeta({ title: 'Configurazione torneo' })
+definePageMeta({ title: 'Configurazione torneo' });
 
-const route = useRoute()
-const id = route.params.id as string
+const route = useRoute();
+const id = route.params.id as string;
 
 // ponytail: caricamento e salvataggio lato backend (collega).
 const config = ref<TournamentConfig>({
@@ -13,17 +13,17 @@ const config = ref<TournamentConfig>({
   format: 'single-elimination',
   roundDurationMinutes: 50,
   maxParticipants: 16,
-})
+});
 
-const loading = ref(false)
+const loading = ref(false);
 
 async function onSubmit(_payload: TournamentConfig) {
-  loading.value = true
+  loading.value = true;
   try {
-    await navigateTo(`/tournaments/${id}`)
+    await navigateTo(`/tournaments/${id}`);
   }
   finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>

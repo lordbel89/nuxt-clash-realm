@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { Match } from '~/types/tournament'
+import type { Match } from '~/types/tournament';
 
 defineProps<{
   match: Match;
   /** Variante ingrandita per la pagina di proiezione */
   screen?: boolean;
-}>()
+}>();
 
 const statusColor = {
   pending: 'neutral',
   running: 'primary',
   finished: 'success',
-} as const
+} as const;
 </script>
 
 <template>

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { Match, Standing, Tournament } from '~/types/tournament'
+import type { Match, Standing, Tournament } from '~/types/tournament';
 
-definePageMeta({ title: 'Torneo' })
+definePageMeta({ title: 'Torneo' });
 
-const route = useRoute()
-const id = route.params.id as string
+const route = useRoute();
+const id = route.params.id as string;
 
 // ponytail: dati dal backend (collega). Sostituire con useFetch(`/api/tournaments/${id}`).
-const tournament = ref<Tournament | null>(null)
-const currentMatches = ref<Match[]>([])
-const standings = ref<Standing[]>([])
-const roundEndsAt = ref<string | undefined>()
+const tournament = ref<Tournament | null>(null);
+const currentMatches = ref<Match[]>([]);
+const standings = ref<Standing[]>([]);
+const roundEndsAt = ref<string | undefined>();
 </script>
 
 <template>

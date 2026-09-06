@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Tournament } from '~/types/tournament'
+import type { Tournament } from '~/types/tournament';
 
-definePageMeta({ title: 'Tornei' })
+definePageMeta({ title: 'Tornei' });
 
 // ponytail: dati dal backend (collega). Sostituire con useFetch<Tournament[]>('/api/tournaments').
-const tournaments = ref<Tournament[]>([])
+const tournaments = ref<Tournament[]>([]);
 </script>
 
 <template>

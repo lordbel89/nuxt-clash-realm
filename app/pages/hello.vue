@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import type { User } from '#shared/types/user'
-import type { CreateUserInput } from '#shared/schemas/user'
-import { CreateUserInput as CreateUserSchema } from '#shared/schemas/user'
+import type { User } from '#shared/types/user';
+import type { CreateUserInput } from '#shared/schemas/user';
+import { CreateUserInput as CreateUserSchema } from '#shared/schemas/user';
 
-definePageMeta({ title: 'Hello' })
+definePageMeta({ title: 'Hello' });
 
 // Pagina di verifica: prima connessione reale tra frontend e database
-const { data: users, status, error, refresh } = await useFetch<User[]>('/api/users')
+const { data: users, status, error, refresh } = await useFetch<User[]>('/api/users');
 
-const toast = useToast()
-const inviando = ref(false)
-const nuovoUtente = reactive<CreateUserInput>({ name: '', email: '' })
+const toast = useToast();
+const inviando = ref(false);
+const nuovoUtente = reactive<CreateUserInput>({ name: '', email: '' });
 
 async function creaUtente() {
-  inviando.value = true
+  inviando.value = true;
 
   try {
-    await $fetch('/api/users', { method: 'POST', body: nuovoUtente })
-    nuovoUtente.name = ''
-    nuovoUtente.email = ''
-    await refresh()
-    toast.add({ title: 'Utente creato', color: 'success' })
+    await $fetch('/api/users', { method: 'POST', body: nuovoUtente });
+    nuovoUtente.name = '';
+    nuovoUtente.email = '';
+    await refresh();
+    toast.add({ title: 'Utente creato', color: 'success' });
   }
   catch (e) {
     // Il messaggio arriva dal backend: 409 email duplicata, 400 dati non validi
-    toast.add({ title: (e as { statusMessage?: string; }).statusMessage ?? 'Errore', color: 'error' })
+    toast.add({ title: (e as { statusMessage?: string; }).statusMessage ?? 'Errore', color: 'error' });
   }
   finally {
-    inviando.value = false
+    inviando.value = false;
   }
 }
 
 function formatDate(isoDate: string) {
   // Il contratto trasporta stringhe ISO: la conversione a Date spetta a noi
-  return new Date(isoDate).toLocaleDateString('it-IT', { dateStyle: 'medium' })
+  return new Date(isoDate).toLocaleDateString('it-IT', { dateStyle: 'medium' });
 }
 </script>
 

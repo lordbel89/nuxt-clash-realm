@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
+import type { TableColumn } from '@nuxt/ui';
 
-definePageMeta({ title: 'Tabelle' })
+definePageMeta({ title: 'Tabelle' });
 
-type FieldType = 'text' | 'number' | 'boolean' | 'date'
+type FieldType = 'text' | 'number' | 'boolean' | 'date';
 interface Field { key: string; label: string; type: FieldType; }
-type Row = Record<string, unknown> & { id: string; }
+type Row = Record<string, unknown> & { id: string; };
 
 // ponytail: schema e righe finti, in memoria. Sostituire con le API del collega
 // (GET /api/dev/tables per l'elenco+schema, CRUD su /api/dev/tables/:table[/:id]).
@@ -29,65 +29,65 @@ const tables: Record<string, { label: string; fields: Field[]; rows: Row[]; }> =
     ],
     rows: [],
   },
-})
+});
 
-const tableItems = Object.entries(tables).map(([value, t]) => ({ label: t.label, value }))
-const selected = ref<string>(tableItems[0]!.value)
-const table = computed(() => tables[selected.value]!)
+const tableItems = Object.entries(tables).map(([value, t]) => ({ label: t.label, value }));
+const selected = ref<string>(tableItems[0]!.value);
+const table = computed(() => tables[selected.value]!);
 
 const columns = computed<TableColumn<Row>[]>(() => [
   { accessorKey: 'id', header: 'ID' },
   ...table.value.fields.map(f => ({ accessorKey: f.key, header: f.label })),
   { id: 'actions', header: '' },
-])
+]);
 
-const search = ref('')
+const search = ref('');
 const rows = computed(() => {
-  const q = search.value.trim().toLowerCase()
-  if (!q) return table.value.rows
-  return table.value.rows.filter(r => JSON.stringify(r).toLowerCase().includes(q))
-})
+  const q = search.value.trim().toLowerCase();
+  if (!q) return table.value.rows;
+  return table.value.rows.filter(r => JSON.stringify(r).toLowerCase().includes(q));
+});
 
-const open = ref(false)
-const editing = ref<Row | null>(null)
-const draft = ref<Record<string, unknown>>({})
+const open = ref(false);
+const editing = ref<Row | null>(null);
+const draft = ref<Record<string, unknown>>({});
 
 function emptyDraft() {
-  return Object.fromEntries(table.value.fields.map(f => [f.key, f.type === 'boolean' ? false : '']))
+  return Object.fromEntries(table.value.fields.map(f => [f.key, f.type === 'boolean' ? false : '']));
 }
 
 function onCreate() {
-  editing.value = null
-  draft.value = emptyDraft()
-  open.value = true
+  editing.value = null;
+  draft.value = emptyDraft();
+  open.value = true;
 }
 
 function onEdit(row: Row) {
-  editing.value = row
-  draft.value = { ...row }
-  open.value = true
+  editing.value = row;
+  draft.value = { ...row };
+  open.value = true;
 }
 
 function onSave() {
   if (editing.value) {
-    Object.assign(editing.value, draft.value)
+    Object.assign(editing.value, draft.value);
   }
   else {
-    table.value.rows.push({ ...draft.value, id: crypto.randomUUID().slice(0, 8) } as Row)
+    table.value.rows.push({ ...draft.value, id: crypto.randomUUID().slice(0, 8) } as Row);
   }
-  open.value = false
+  open.value = false;
 }
 
 function onDelete(row: Row) {
   // ponytail: niente conferma finché è una pagina di dev
-  table.value.rows = table.value.rows.filter(r => r.id !== row.id)
+  table.value.rows = table.value.rows.filter(r => r.id !== row.id);
 }
 
-const inputTypes: Record<FieldType, string> = { text: 'text', number: 'number', boolean: 'text', date: 'date' }
+const inputTypes: Record<FieldType, string> = { text: 'text', number: 'number', boolean: 'text', date: 'date' };
 
 watch(selected, () => {
-  search.value = ''
-})
+  search.value = '';
+});
 </script>
 
 <template>

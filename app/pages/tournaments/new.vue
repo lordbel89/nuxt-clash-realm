@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { TournamentConfig } from '~/types/tournament'
+import type { TournamentConfig } from '~/types/tournament';
 
-definePageMeta({ title: 'Nuovo torneo' })
+definePageMeta({ title: 'Nuovo torneo' });
 
 const config = ref<TournamentConfig>({
   name: '',
@@ -9,18 +9,19 @@ const config = ref<TournamentConfig>({
   isTeam: false,
   roundDurationMinutes: 50,
   maxParticipants: 16,
-})
+  description: '',
+});
 
-const loading = ref(false)
+const loading = ref(false);
 
 // ponytail: creazione lato backend (collega).
 async function onSubmit(_payload: TournamentConfig) {
-  loading.value = true
+  loading.value = true;
   try {
-    await navigateTo('/tournaments')
+    await navigateTo('/tournaments');
   }
   finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>

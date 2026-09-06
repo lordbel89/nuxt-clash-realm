@@ -1,4 +1,4 @@
-import * as v from 'valibot'
+import * as v from 'valibot';
 
 /**
  * Contratto d'ingresso per la creazione di un utente.
@@ -22,10 +22,10 @@ export const CreateUserInput = v.object({
     v.toLowerCase(),
     v.email('Indirizzo email non valido'),
   ),
-})
+});
 
 /**
  * Il tipo derivato dallo schema: `typeof` porta la costante nello spazio dei
  * tipi, `InferOutput` ne estrae la forma. Così la definizione resta una sola.
  */
-export type CreateUserInput = v.InferOutput<typeof CreateUserInput>
+export type CreateUserInput = v.InferOutput<typeof CreateUserInput>;

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { Match, Tournament } from '~/types/tournament'
+import type { Match, Tournament } from '~/types/tournament';
 
-definePageMeta({ layout: 'projector' })
+definePageMeta({ layout: 'projector' });
 
-const route = useRoute()
-const _id = route.params.id as string
+const route = useRoute();
+const _id = route.params.id as string;
 
 // ponytail: dati in tempo reale dal backend (collega) — polling o SSE.
-const tournament = ref<Tournament | null>(null)
-const liveMatches = ref<Match[]>([])
-const upcomingMatches = ref<Match[]>([])
-const roundEndsAt = ref<string | undefined>()
+const tournament = ref<Tournament | null>(null);
+const liveMatches = ref<Match[]>([]);
+const upcomingMatches = ref<Match[]>([]);
+const roundEndsAt = ref<string | undefined>();
 </script>
 
 <template>

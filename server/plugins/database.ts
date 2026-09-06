@@ -1,13 +1,13 @@
-import { closeDatabase } from '../database/client.ts'
+import { closeDatabase } from '../database/client.ts';
 
 /** Chiude la connessione allo spegnimento del server. */
 export default defineNitroPlugin((nitro) => {
   nitro.hooks.hook('close', async () => {
-    const pending = getDatabaseInstance()
+    const pending = getDatabaseInstance();
 
-    if (!pending) return
+    if (!pending) return;
 
     // Se la connessione non è mai riuscita ad aprirsi non c'è nulla da chiudere
-    await pending.then(closeDatabase).catch(() => {})
-  })
-})
+    await pending.then(closeDatabase).catch(() => {});
+  });
+});

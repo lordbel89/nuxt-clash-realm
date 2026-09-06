@@ -8,19 +8,19 @@ export const DATABASE_DEFAULTS = {
   dialect: 'pglite',
   url: '',
   pglitePath: '.data/pglite',
-} as const
+} as const;
 
-export const MIGRATIONS_DIR = 'server/database/migrations'
+export const MIGRATIONS_DIR = 'server/database/migrations';
 
-let envLoaded = false
+let envLoaded = false;
 
 function loadEnvFile() {
-  if (envLoaded) return
-  envLoaded = true
+  if (envLoaded) return;
+  envLoaded = true;
 
   try {
     // Node >= 20.12: carica .env senza dipendenze esterne
-    process.loadEnvFile('.env')
+    process.loadEnvFile('.env');
   }
   catch {
     // Nessun .env in locale: si usano i default
@@ -28,11 +28,11 @@ function loadEnvFile() {
 }
 
 export function readDatabaseEnv() {
-  loadEnvFile()
+  loadEnvFile();
 
   return {
     dialect: (process.env.NUXT_DATABASE_DIALECT ?? DATABASE_DEFAULTS.dialect) as 'pglite' | 'postgres',
     url: process.env.NUXT_DATABASE_URL ?? DATABASE_DEFAULTS.url,
     pglitePath: process.env.NUXT_DATABASE_PGLITE_PATH ?? DATABASE_DEFAULTS.pglitePath,
-  }
+  };
 }

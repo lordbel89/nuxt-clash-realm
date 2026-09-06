@@ -1,9 +1,9 @@
-import { mkdirSync } from 'node:fs'
-import { drizzle as drizzlePostgres } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
-import { relations } from './relations.ts'
+import { mkdirSync } from 'node:fs';
+import { drizzle as drizzlePostgres } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { relations } from './relations.ts';
 
-export type DatabaseDialect = 'pglite' | 'postgres'
+export type DatabaseDialect = 'pglite' | 'postgres';
 
 export interface DatabaseOptions {
   dialect: DatabaseDialect;
@@ -15,13 +15,13 @@ export interface DatabaseOptions {
 
 function createPostgresDatabase(url: string) {
   if (!url) {
-    throw new Error('Connessione Postgres non configurata: valorizza NUXT_DATABASE_URL')
+    throw new Error('Connessione Postgres non configurata: valorizza NUXT_DATABASE_URL');
   }
 
   return drizzlePostgres({
     client: postgres(url),
     relations,
-  })
+  });
 }
 
 /**
@@ -31,15 +31,15 @@ function createPostgresDatabase(url: string) {
  * di 29 MB). Riportarlo a un import normale quadruplica il build.
  */
 async function createPgliteDatabase(dataDir: string) {
-  const pgliteDriver = 'drizzle-orm/pglite'
-  const { drizzle } = await import(/* @vite-ignore */ pgliteDriver) as typeof import('drizzle-orm/pglite')
+  const pgliteDriver = 'drizzle-orm/pglite';
+  const { drizzle } = await import(/* @vite-ignore */ pgliteDriver) as typeof import('drizzle-orm/pglite');
 
-  mkdirSync(dataDir, { recursive: true })
+  mkdirSync(dataDir, { recursive: true });
 
   return drizzle({
     connection: { dataDir },
     relations,
-  })
+  });
 }
 
 /**
@@ -47,24 +47,24 @@ async function createPgliteDatabase(dataDir: string) {
  * PGlite è lo stesso Postgres compilato in WASM e parla lo stesso SQL, quindi
  * le query scritte contro questo tipo valgono per entrambi gli ambienti.
  */
-export type Database = ReturnType<typeof createPostgresDatabase>
+export type Database = ReturnType<typeof createPostgresDatabase>;
 
 export async function createDatabase(options: DatabaseOptions): Promise<Database> {
   if (options.dialect === 'postgres') {
-    return createPostgresDatabase(options.url)
+    return createPostgresDatabase(options.url);
   }
 
-  return await createPgliteDatabase(options.pglitePath) as unknown as Database
+  return await createPgliteDatabase(options.pglitePath) as unknown as Database;
 }
 
 /** Chiude la connessione sottostante: il pool di rete o l'istanza WASM. */
 export async function closeDatabase(db: Database) {
-  const client = db.$client as unknown
+  const client = db.$client as unknown;
 
   if (typeof (client as { end?: () => Promise<void>; }).end === 'function') {
-    await (client as { end: () => Promise<void>; }).end()
+    await (client as { end: () => Promise<void>; }).end();
   }
   else if (typeof (client as { close?: () => Promise<void>; }).close === 'function') {
-    await (client as { close: () => Promise<void>; }).close()
+    await (client as { close: () => Promise<void>; }).close();
   }
 }

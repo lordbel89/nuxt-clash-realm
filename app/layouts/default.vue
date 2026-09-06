@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { appHeader, sideMenu, sideMenuFooter } from '~/config/navigation'
+import { appHeader, sideMenu, sideMenuFooter } from '~/config/navigation';
 
-const route = useRoute()
+const route = useRoute();
 
 // Titolo dell'header: definito dalla pagina con definePageMeta({ title }).
-const title = computed(() => (route.meta.title as string | undefined) ?? appHeader.title)
+const title = computed(() => (route.meta.title as string | undefined) ?? appHeader.title);
 </script>
 
 <template>
