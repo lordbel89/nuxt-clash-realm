@@ -12,7 +12,11 @@ export default defineEventHandler(async (event): Promise<Paginated<User>> => {
 
   const [rows, total] = await Promise.all([
     db.query.users.findMany({
-      orderBy: { createdAt: 'asc' },
+      // `createdAt` da solo non basta a ordinare: `defaultNow()` è il timestamp
+      // della transazione, quindi righe inserite dallo stesso statement lo
+      // condividono e l'ordine fra pagine non sarebbe deterministico (una riga
+      // può ripetersi o sparire). `id` fa da spareggio.
+      orderBy: { createdAt: 'asc', id: 'asc' },
       limit,
       offset,
     }),

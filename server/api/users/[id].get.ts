@@ -15,7 +15,11 @@ export default defineEventHandler(async (event): Promise<User> => {
   });
 
   if (!row) {
-    throw createError({ statusCode: 404, statusMessage: 'Utente non trovato' });
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Not Found',
+      message: 'Utente non trovato',
+    });
   }
 
   return toUser(row);

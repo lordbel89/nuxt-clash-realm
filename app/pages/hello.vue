@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import type { User } from '#shared/types/user';
 import type { CreateUserInput } from '#shared/schemas/user';
+import type { FetchError } from 'ofetch';
 import { CreateUserInput as CreateUserSchema } from '#shared/schemas/user';
 
 definePageMeta({ title: 'Hello' });
 
-// Pagina di verifica: prima connessione reale tra frontend e database
-const { data: users, status, error, refresh } = await useFetch<User[]>('/api/users');
+// Pagina di verifica: prima connessione reale tra frontend e database.
+// Niente generico su useFetch: annotarlo a mano disattiva l'inferenza da Nitro,
+// che è proprio ciò che tiene allineati handler e pagina. L'endpoint risponde
+// con un `Paginated<User>`, quindi le righe stanno in `items`.
+const { data, status, error, refresh } = await useFetch('/api/users');
+
+const users = computed(() => data.value?.items ?? []);
 
 const toast = useToast();
 const inviando = ref(false);
@@ -23,8 +28,11 @@ async function creaUtente() {
     toast.add({ title: 'Utente creato', color: 'success' });
   }
   catch (e) {
-    // Il messaggio arriva dal backend: 409 email duplicata, 400 dati non validi
-    toast.add({ title: (e as { statusMessage?: string; }).statusMessage ?? 'Errore', color: 'error' });
+    // Il messaggio arriva dal backend: 409 email duplicata, 400 dati non validi.
+    // Si legge da `message` e non da `statusMessage`, che h3 priva degli accenti
+    const errore = e as FetchError<{ message?: string; }>;
+
+    toast.add({ title: errore.data?.message ?? 'Errore', color: 'error' });
   }
   finally {
     inviando.value = false;
@@ -58,7 +66,7 @@ function formatDate(isoDate: string) {
     />
 
     <p
-      v-else-if="!users?.length"
+      v-else-if="!users.length"
       class="text-muted">
       Nessun utente. Esegui <code>npm run db:seed</code>.
     </p>

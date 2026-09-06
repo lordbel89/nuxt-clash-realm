@@ -19,4 +19,10 @@ export interface Paginated<T> {
 export interface ApiErrorData {
   /** Messaggi per campo, nella forma `{ email: ['Indirizzo email non valido'] }` */
   fields?: Record<string, readonly string[] | undefined>;
+  /**
+   * Messaggi che non appartengono a nessun campo: body vuoto, non-oggetto o
+   * array. Senza di questi il client riceverebbe un 400 con `fields` vuoto e
+   * non avrebbe niente da mostrare.
+   */
+  messages?: readonly string[];
 }

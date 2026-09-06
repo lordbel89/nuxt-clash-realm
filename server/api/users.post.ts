@@ -18,7 +18,13 @@ export default defineEventHandler(async (event): Promise<User> => {
     .returning();
 
   if (!row) {
-    throw createError({ statusCode: 409, statusMessage: 'Email già registrata' });
+    // Il testo accentato sta in `message`: h3 ripulisce `statusMessage` dei
+    // caratteri fuori ASCII, e al client arriverebbe "Email gi registrata"
+    throw createError({
+      statusCode: 409,
+      statusMessage: 'Conflict',
+      message: 'Email già registrata',
+    });
   }
 
   setResponseStatus(event, 201);

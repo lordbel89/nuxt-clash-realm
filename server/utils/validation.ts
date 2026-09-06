@@ -10,6 +10,12 @@ import * as v from 'valibot';
  * `data.data`): la forma della risposta non sarebbe più quella di `ApiErrorData`.
  * Leggiamo quindi da soli e validiamo, così l'errore che lanciamo è quello che
  * arriva al client.
+ *
+ * Sui due campi di testo di `createError`, qui e in ogni handler:
+ * `statusMessage` è la reason phrase HTTP e h3 la ripulisce dei caratteri fuori
+ * ASCII (`H3Error.toJSON`), quindi "già" ci arriverebbe come "gi". Resta in
+ * inglese, breve e standard; il testo italiano per l'utente viaggia in
+ * `message`, che Nitro inoltra intatto per tutti i 4xx.
  */
 
 /** Trasforma gli issue di Valibot nell'unico 400 di validazione dell'API. */
@@ -17,11 +23,22 @@ export function validate<TSchema extends v.GenericSchema>(schema: TSchema, input
   const result = v.safeParse(schema, input);
 
   if (!result.success) {
-    const data: ApiErrorData = { fields: v.flatten(result.issues).nested };
+    const flat = v.flatten(result.issues);
+
+    // `nested` raccoglie solo gli issue che hanno un percorso. Quando il body
+    // non è nemmeno un oggetto (vuoto, null, un array) l'issue finisce in
+    // `root`/`other`: senza questi il 400 uscirebbe senza un solo messaggio.
+    const messages = [...flat.root ?? [], ...flat.other ?? []];
+
+    const data: ApiErrorData = {
+      fields: flat.nested,
+      ...(messages.length > 0 && { messages }),
+    };
 
     throw createError({
       statusCode: 400,
-      statusMessage: 'Dati non validi',
+      statusMessage: 'Bad Request',
+      message: 'Dati non validi',
       data,
     });
   }

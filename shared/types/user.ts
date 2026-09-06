@@ -1,4 +1,4 @@
-import type { UserId } from './ids';
+import type { UserId } from '#shared/types/ids';
 
 /**
  * Contratto dell'API per l'utente: è questo che il frontend consuma, non la
