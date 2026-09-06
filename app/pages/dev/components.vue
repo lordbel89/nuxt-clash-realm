@@ -2,7 +2,7 @@
   <div>
     <UAccordion :items="slots">
       <template #datepicker="{ item }">
-        <div>Data selezionata: {{ item.model }}</div>
+        <div>Data selezionata: {{ formatDate(item.model) }}</div>
         <FormDatePicker v-model="item.model" />
       </template>
     </UAccordion>

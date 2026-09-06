@@ -17,6 +17,7 @@
   "dependencies": {
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/ui": "^4.11.0",
+    "@nuxtjs/i18n": "^10.6.0",
     "@tiptap/core": "^3.31.3",
     "@tiptap/extension-bubble-menu": "^3.31.3",
     "@tiptap/extension-code": "^3.31.3",
