@@ -1,5 +1,5 @@
 <script setup lang="ts">
-await navigateTo('/tournaments', { replace: true })
+await navigateTo('/community/news-feed', { replace: true })
 </script>
 
 <template>

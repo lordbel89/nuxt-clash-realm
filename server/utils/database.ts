@@ -14,7 +14,7 @@ export function useDatabase(): Promise<Database> {
     instance = createDatabase({
       dialect: database.dialect as DatabaseDialect,
       url: database.url,
-      pglitePath: database.pglitePath
+      pglitePath: database.pglitePath,
     })
   }
 

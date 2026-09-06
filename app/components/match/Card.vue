@@ -10,7 +10,7 @@ defineProps<{
 const statusColor = {
   pending: 'neutral',
   running: 'primary',
-  finished: 'success'
+  finished: 'success',
 } as const
 </script>
 

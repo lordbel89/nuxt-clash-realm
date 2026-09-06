@@ -9,7 +9,7 @@ const columns = [
   { accessorKey: 'wins', header: 'V' },
   { accessorKey: 'draws', header: 'P' },
   { accessorKey: 'losses', header: 'S' },
-  { accessorKey: 'points', header: 'Punti' }
+  { accessorKey: 'points', header: 'Punti' },
 ]
 </script>
 

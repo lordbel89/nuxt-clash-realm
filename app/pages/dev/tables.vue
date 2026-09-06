@@ -16,19 +16,19 @@ const tables: Record<string, { label: string, fields: Field[], rows: Row[] }> = 
       { key: 'name', label: 'Nome', type: 'text' },
       { key: 'game', label: 'Gioco', type: 'text' },
       { key: 'maxParticipants', label: 'Max partecipanti', type: 'number' },
-      { key: 'published', label: 'Pubblicato', type: 'boolean' }
+      { key: 'published', label: 'Pubblicato', type: 'boolean' },
     ],
-    rows: []
+    rows: [],
   },
   participants: {
     label: 'Partecipanti',
     fields: [
       { key: 'name', label: 'Nome', type: 'text' },
       { key: 'seed', label: 'Seed', type: 'number' },
-      { key: 'joinedAt', label: 'Iscritto il', type: 'date' }
+      { key: 'joinedAt', label: 'Iscritto il', type: 'date' },
     ],
-    rows: []
-  }
+    rows: [],
+  },
 })
 
 const tableItems = Object.entries(tables).map(([value, t]) => ({ label: t.label, value }))
@@ -38,7 +38,7 @@ const table = computed(() => tables[selected.value]!)
 const columns = computed<TableColumn<Row>[]>(() => [
   { accessorKey: 'id', header: 'ID' },
   ...table.value.fields.map(f => ({ accessorKey: f.key, header: f.label })),
-  { id: 'actions', header: '' }
+  { id: 'actions', header: '' },
 ])
 
 const search = ref('')

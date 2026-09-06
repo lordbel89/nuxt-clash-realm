@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { TournamentConfig, TournamentFormat } from '~/types/tournament'
+import type { USelectItem } from '~/types/components'
+import type { TournamentConfig } from '~/types/tournament'
 
 const model = defineModel<TournamentConfig>({ required: true })
 
@@ -7,11 +8,10 @@ const emit = defineEmits<{ submit: [TournamentConfig] }>()
 
 defineProps<{ submitLabel?: string, loading?: boolean }>()
 
-const formats: { label: string, value: TournamentFormat }[] = [
-  { label: 'Eliminazione diretta', value: 'single-elimination' },
-  { label: 'Doppia eliminazione', value: 'double-elimination' },
-  { label: 'Girone all\'italiana', value: 'round-robin' },
-  { label: 'Svizzero', value: 'swiss' }
+const games: USelectItem<string>[] = [
+  { label: 'BeyBlade X', value: 'bbx' },
+  { label: 'Cyberpunk TCG', value: 'cyberpunk-tcg' },
+  { label: 'Altro', value: 'other' },
 ]
 
 // ponytail: nessuno schema di validazione finché i campi non sono definitivi.
@@ -36,35 +36,25 @@ const formats: { label: string, value: TournamentFormat }[] = [
       label="Gioco"
       name="game"
       required>
-      <UInput
-        v-model="model.game"
-        class="w-full" />
-    </UFormField>
-
-    <UFormField
-      label="Formato"
-      name="format"
-      required>
       <USelect
-        v-model="model.format"
-        :items="formats"
+        v-model="model.game"
+        :items="games"
         class="w-full" />
     </UFormField>
 
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div class="grid gap-4 sm:grid-cols-4">
       <UFormField
-        label="Durata round (minuti)"
-        name="roundDurationMinutes">
-        <UInput
-          v-model.number="model.roundDurationMinutes"
-          type="number"
-          min="1"
-          class="w-full" />
+        label="A Squadre"
+        name="isTeam"
+        required>
+        <USwitch
+          v-model="model.isTeam"
+        />
       </UFormField>
-
       <UFormField
         label="Partecipanti max"
-        name="maxParticipants">
+        name="maxParticipants"
+      >
         <UInput
           v-model.number="model.maxParticipants"
           type="number"
@@ -74,11 +64,12 @@ const formats: { label: string, value: TournamentFormat }[] = [
     </div>
 
     <slot />
-
-    <UButton
-      type="submit"
-      :loading="loading">
-      {{ submitLabel ?? 'Salva' }}
-    </UButton>
+    <div class="flex justify-end">
+      <UButton
+        type="submit"
+        :loading="loading">
+        {{ submitLabel ?? 'Salva' }}
+      </UButton>
+    </div>
   </UForm>
 </template>

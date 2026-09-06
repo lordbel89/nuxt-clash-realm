@@ -11,5 +11,5 @@ export default defineConfig({
   out: MIGRATIONS_DIR,
   ...(env.dialect === 'pglite'
     ? { driver: 'pglite' as const, dbCredentials: { url: env.pglitePath } }
-    : { dbCredentials: { url: env.url } })
+    : { dbCredentials: { url: env.url } }),
 })

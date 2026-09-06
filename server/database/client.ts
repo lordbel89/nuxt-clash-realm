@@ -20,7 +20,7 @@ function createPostgresDatabase(url: string) {
 
   return drizzlePostgres({
     client: postgres(url),
-    relations
+    relations,
   })
 }
 
@@ -38,7 +38,7 @@ async function createPgliteDatabase(dataDir: string) {
 
   return drizzle({
     connection: { dataDir },
-    relations
+    relations,
   })
 }
 

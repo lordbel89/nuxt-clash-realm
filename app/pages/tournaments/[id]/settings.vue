@@ -12,7 +12,7 @@ const config = ref<TournamentConfig>({
   game: '',
   format: 'single-elimination',
   roundDurationMinutes: 50,
-  maxParticipants: 16
+  maxParticipants: 16,
 })
 
 const loading = ref(false)

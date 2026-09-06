@@ -14,14 +14,14 @@ export const CreateUserInput = v.object({
     v.string(),
     v.trim(),
     v.minLength(2, 'Il nome deve avere almeno 2 caratteri'),
-    v.maxLength(80, 'Il nome non può superare gli 80 caratteri')
+    v.maxLength(80, 'Il nome non può superare gli 80 caratteri'),
   ),
   email: v.pipe(
     v.string(),
     v.trim(),
     v.toLowerCase(),
-    v.email('Indirizzo email non valido')
-  )
+    v.email('Indirizzo email non valido'),
+  ),
 })
 
 /**

@@ -36,6 +36,7 @@ export interface Tournament {
   format: TournamentFormat
   status: TournamentStatus
   currentRound: number
+  isTeam: boolean
   participants: Participant[]
   rounds: Round[]
 }
@@ -50,7 +51,7 @@ export interface Standing {
 }
 
 /** Payload di creazione/configurazione torneo */
-export type TournamentConfig = Pick<Tournament, 'name' | 'game' | 'format'> & {
+export type TournamentConfig = Pick<Tournament, 'name' | 'game' | 'isTeam'> & {
   roundDurationMinutes: number
   maxParticipants: number
 }

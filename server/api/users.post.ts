@@ -12,7 +12,7 @@ export default defineEventHandler(async (event): Promise<User> => {
     throw createError({
       statusCode: 400,
       statusMessage: 'Dati non validi',
-      data: { errori: v.flatten(result.issues).nested }
+      data: { errori: v.flatten(result.issues).nested },
     })
   }
 

@@ -11,7 +11,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node server/database/migrate.ts",
     "db:seed": "node server/database/seed.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "format": "eslint --fix ."
   },
   "dependencies": {
     "@nuxt/eslint": "^1.17.0",

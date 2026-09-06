@@ -7,7 +7,7 @@
 export const DATABASE_DEFAULTS = {
   dialect: 'pglite',
   url: '',
-  pglitePath: '.data/pglite'
+  pglitePath: '.data/pglite',
 } as const
 
 export const MIGRATIONS_DIR = 'server/database/migrations'
@@ -33,6 +33,6 @@ export function readDatabaseEnv() {
   return {
     dialect: (process.env.NUXT_DATABASE_DIALECT ?? DATABASE_DEFAULTS.dialect) as 'pglite' | 'postgres',
     url: process.env.NUXT_DATABASE_URL ?? DATABASE_DEFAULTS.url,
-    pglitePath: process.env.NUXT_DATABASE_PGLITE_PATH ?? DATABASE_DEFAULTS.pglitePath
+    pglitePath: process.env.NUXT_DATABASE_PGLITE_PATH ?? DATABASE_DEFAULTS.pglitePath,
   }
 }

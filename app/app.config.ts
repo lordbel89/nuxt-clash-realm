@@ -11,16 +11,22 @@ export default defineAppConfig({
       error: 'red',
       neutral: 'zinc',
       winner: 'winner',
-      loser: 'loser'
+      loser: 'loser',
     },
     button: {
       slots: {
         base: 'rounded-xs',
       },
-      defaultVariants: { size: 'md' }
+      defaultVariants: { size: 'md' },
+    },
+    input: {
+      defaultVariants: { color: 'accent' },
+    },
+    switch: {
+      defaultVariants: { color: 'accent' },
     },
     card: {
-      slots: { root: 'ring-default' }
+      slots: { root: 'ring-default' },
     },
     navigationMenu: {
       // slots: {
@@ -47,6 +53,6 @@ export default defineAppConfig({
       //     }
       //   },
       // ]
-    }
-  }
+    },
+  },
 })

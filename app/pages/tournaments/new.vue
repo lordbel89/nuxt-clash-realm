@@ -6,9 +6,9 @@ definePageMeta({ title: 'Nuovo torneo' })
 const config = ref<TournamentConfig>({
   name: '',
   game: '',
-  format: 'single-elimination',
+  isTeam: false,
   roundDurationMinutes: 50,
-  maxParticipants: 16
+  maxParticipants: 16,
 })
 
 const loading = ref(false)
@@ -27,13 +27,11 @@ async function onSubmit(_payload: TournamentConfig) {
 
 <template>
   <div class="max-w-xl space-y-6">
-    <UCard>
-      <TournamentForm
-        v-model="config"
-        submit-label="Crea torneo"
-        :loading="loading"
-        @submit="onSubmit"
-      />
-    </UCard>
+    <TournamentForm
+      v-model="config"
+      submit-label="Crea torneo"
+      :loading="loading"
+      @submit="onSubmit"
+    />
   </div>
 </template>

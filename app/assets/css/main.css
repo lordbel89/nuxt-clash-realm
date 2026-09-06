@@ -11,3 +11,5 @@
  * dark.css deve restare l'ultimo import o non sovrascrive light.css. */
 @import "./tokens/light.css";
 @import "./tokens/dark.css";
+
+@import "./tokens/components.css"

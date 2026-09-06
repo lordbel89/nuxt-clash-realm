@@ -8,7 +8,7 @@ const statusColor = {
   ready: 'secondary',
   running: 'primary',
   paused: 'warning',
-  finished: 'success'
+  finished: 'success',
 } as const
 </script>
 

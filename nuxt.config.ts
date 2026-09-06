@@ -17,8 +17,8 @@ export default defineNuxtConfig({
         'warning',
         'neutral',
         'winner',
-        'loser'
-      ]
+        'loser',
+      ],
     },
   },
   runtimeConfig: {
@@ -47,8 +47,8 @@ export default defineNuxtConfig({
         name: 'Lato',
         provider: 'local',
         weights: [100, 300, 400, 700, 900],
-        styles: ['normal', 'italic']
-      }
-    ]
+        styles: ['normal', 'italic'],
+      },
+    ],
   },
 })

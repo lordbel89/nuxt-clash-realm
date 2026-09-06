@@ -13,6 +13,6 @@ export function toUser(row: UserRow): User {
     name: row.name,
     email: row.email,
     isActive: row.isActive,
-    createdAt: row.createdAt.toISOString()
+    createdAt: row.createdAt.toISOString(),
   }
 }

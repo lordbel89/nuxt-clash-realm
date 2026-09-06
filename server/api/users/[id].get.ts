@@ -16,7 +16,7 @@ export default defineEventHandler(async (event): Promise<User> => {
   const db = await useDatabase()
 
   const row = await db.query.users.findFirst({
-    where: { id }
+    where: { id },
   })
 
   if (!row) {

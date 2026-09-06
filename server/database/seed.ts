@@ -6,7 +6,7 @@ import { users } from './schema/users.ts'
 const SEED_USERS: NewUserRow[] = [
   { name: 'Giulia Bianchi', email: 'giulia.bianchi@example.com' },
   { name: 'Marco Ferrari', email: 'marco.ferrari@example.com' },
-  { name: 'Sofia Greco', email: 'sofia.greco@example.com', isActive: false }
+  { name: 'Sofia Greco', email: 'sofia.greco@example.com', isActive: false },
 ]
 
 /**
