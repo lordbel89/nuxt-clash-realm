@@ -14,7 +14,8 @@ export const MIGRATIONS_DIR = 'server/database/migrations';
 
 let envLoaded = false;
 
-function loadEnvFile() {
+/** Esportata perché serve anche alla configurazione di autenticazione. */
+export function loadEnvFile() {
   if (envLoaded) return;
   envLoaded = true;
 
