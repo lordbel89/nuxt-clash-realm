@@ -1,28 +1,14 @@
-import type { User } from '#shared/types/user';
+import type { UserSummary } from '#shared/types/user';
 import { UserIdParams } from '#shared/schemas/user';
-import { toUser } from '../../mappers/user.ts';
+import { findUserSummary } from '../../services/users.ts';
 
-/** GET /api/users/:id — singolo utente */
-export default defineEventHandler(async (event): Promise<User> => {
+/** GET /api/users/:id — non espone i dati privati, neppure per il proprio ID. */
+export default defineEventHandler(async (event): Promise<UserSummary> => {
   await requireSession(event);
-
   const { id } = readParams(event, UserIdParams);
-
-  const db = await useDatabase();
-
-  // `{ eq: id }` e non `{ id }`: la forma abbreviata di Drizzle è disattivata
-  // per le colonne di tipo oggetto, e un id marchiato conta come tale
-  const row = await db.query.users.findFirst({
-    where: { id: { eq: id } },
-  });
-
-  if (!row) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Not Found',
-      message: 'Utente non trovato',
-    });
+  const user = await findUserSummary(await useDatabase(), id);
+  if (!user) {
+    throw createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Utente non trovato' });
   }
-
-  return toUser(row);
+  return user;
 });

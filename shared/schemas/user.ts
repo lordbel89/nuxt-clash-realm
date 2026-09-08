@@ -1,11 +1,11 @@
 import type { UserId } from '#shared/types/ids';
 import * as v from 'valibot';
-import { brandedUuid } from './common';
+import { brandedUuid } from './common.ts';
 
 /**
  * Contratti d'ingresso dell'utente.
  *
- * Qui stanno le regole di business, non i vincoli del database, e i messaggi
+ * Qui si valida la forma del contratto; permessi e stato spettano ai servizi. I messaggi
  * si scrivono per esteso: i default di Valibot sono in inglese e, viaggiando
  * in `ApiErrorData`, finirebbero sotto gli occhi dell'utente.
  *
@@ -20,6 +20,6 @@ import { brandedUuid } from './common';
  */
 export const UserIdParams = v.object({
   id: brandedUuid<UserId>(),
-});
+}, 'Identificativo utente richiesto');
 
 export type UserIdParams = v.InferOutput<typeof UserIdParams>;

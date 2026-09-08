@@ -1,6 +1,7 @@
 import type { ApiErrorData } from '#shared/types/api';
 import type { H3Event } from 'h3';
 import * as v from 'valibot';
+import { createError, getQuery, getRouterParams, readBody } from 'h3';
 
 /**
  * Validazione dell'input agli estremi degli handler.

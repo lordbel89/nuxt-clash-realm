@@ -9,7 +9,7 @@ import * as v from 'valibot';
  * UUID così come arriva dall'URL. Senza questo controllo un id malformato
  * raggiungerebbe Postgres come cast non valido: 500 al posto di un 400 sensato.
  */
-export const Uuid = v.pipe(v.string(), v.uuid('Identificativo non valido'));
+export const Uuid = v.pipe(v.string('Identificativo richiesto'), v.uuid('Identificativo non valido'));
 
 /**
  * UUID di rotta promosso a identificativo marchiato. Il cast vive solo qui:
@@ -26,14 +26,14 @@ export function brandedUuid<TId extends string>() {
 function integerFromQuery(fallback: number, minimum: number, maximum: number) {
   return v.optional(
     v.pipe(
-      v.union([v.string(), v.number()]),
+      v.pipe(v.string('Parametro numerico richiesto'), v.regex(/^\d+$/, 'Usare un intero non negativo in cifre decimali')),
       v.transform(Number),
       v.number('Valore non numerico'),
       v.integer('Valore non intero'),
       v.minValue(minimum, `Valore minimo ${minimum}`),
       v.maxValue(maximum, `Valore massimo ${maximum}`),
     ),
-    fallback,
+    String(fallback),
   );
 }
 
@@ -55,6 +55,6 @@ export const MAX_OFFSET = 100_000;
 export const ListQuery = v.object({
   limit: integerFromQuery(25, 1, MAX_LIMIT),
   offset: integerFromQuery(0, 0, MAX_OFFSET),
-});
+}, 'Parametri di ricerca non validi');
 
 export type ListQuery = v.InferOutput<typeof ListQuery>;

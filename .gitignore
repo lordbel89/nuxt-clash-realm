@@ -13,9 +13,10 @@ node_modules
 logs
 *.log
 
-# Claude AI
+# Claude/Agents AI
 .claude
 CLAUDE.md
+AGENTS.md
 
 # Misc
 .DS_Store
