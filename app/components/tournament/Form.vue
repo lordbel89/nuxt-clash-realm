@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { USelectItem } from '~/types/components';
-import type { TournamentConfig } from '~/types/tournament';
+import type { TournamentConfig } from '#shared/types/tournament';
 
 const model = defineModel<TournamentConfig>({ required: true });
 

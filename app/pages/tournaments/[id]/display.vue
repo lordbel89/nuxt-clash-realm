@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Match, Tournament } from '~/types/tournament';
+import type { Match, Tournament } from '#shared/types/tournament';
 
 definePageMeta({ layout: 'projector' });
 
