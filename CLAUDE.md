@@ -17,7 +17,7 @@ npm run db:seed        # dati di sviluppo (rieseguibile)
 npm run db:studio      # Drizzle Studio sul database configurato in .env
 ```
 
-Node version is pinned in `.nvmrc` (v24.11.0). Lint requires `.nuxt/eslint.config.mjs`, produced by `nuxt prepare` (runs on `postinstall`) — run `npx nuxt prepare` first if `.nuxt/` is missing.
+Node version is pinned in `.nvmrc` to the major `26` (LTS from 2026-10-28), which nvm resolves to the latest 26.x. Node 26 is required for native `Temporal`. Lint requires `.nuxt/eslint.config.mjs`, produced by `nuxt prepare` (runs on `postinstall`) — run `npx nuxt prepare` first if `.nuxt/` is missing.
 
 There is no test setup in this repo.
 
