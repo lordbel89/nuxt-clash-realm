@@ -1,0 +1,7 @@
+# Personale (non committato)
+
+Questa sessione è di **Marco**: lavoro sul frontend (`app/`, `server/mocks/`, `server/middleware/mocks.ts`, `public/`).
+
+Backend, motore del torneo e schema del database (`server/` tranne i mock, `tests/backend/`) sono di Lord Bel. Se un compito richiede di toccarli, fermati e descrivi cosa andrebbe cambiato, così glielo passo.
+
+Un cambiamento in `shared/` va sempre segnalato nel riepilogo finale: è il contratto che il backend implementa.

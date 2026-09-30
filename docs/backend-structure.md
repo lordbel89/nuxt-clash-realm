@@ -34,7 +34,7 @@ UserSummary non è un Player; l'identità sportiva non è ancora implementata.
   autorizzazioni appartengono ai casi d'uso, non agli schemi condivisi.
 
 Per i futuri comandi, il servizio coordinerà autorizzazioni e transazione; il
-motore puro potrà vivere in server/domain quando esisterà un primo algoritmo.
+motore puro vivrà in server/engine quando esisterà un primo algoritmo.
 Nessuna classe entità, repository generico o directory vuota è necessaria oggi.
 Le operazioni su più righe non diventano mapper d'ingresso. Un ritorno NewRow
 verifica la forma della riga, non che tutti i campi significativi siano utilizzati.
