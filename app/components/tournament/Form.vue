@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { USelectItem } from '~/types/components';
-import type { TournamentConfig } from '~/types/tournament';
+import type { TournamentConfig } from '#shared/types/tournament';
 
 const model = defineModel<TournamentConfig>({ required: true });
 
@@ -37,43 +37,38 @@ const leagues: USelectItem<string>[] = [
         class="w-full" />
     </UFormField>
 
-    <UFormField
-      label="Gioco"
-      name="game"
-      required>
-      <USelect
-        v-model="model.game"
-        :items="games"
-        class="w-full" />
-    </UFormField>
-
-    <UFormField
-      label="Lega"
-      name="league">
-      <div class="flex gap-2">
+    <div class="grid gap-4 sm:grid-cols-2">
+      <UFormField
+        label="Gioco"
+        name="game"
+        required>
         <USelect
-          v-model="model.leagueId"
-          :items="leagues"
+          v-model="model.game"
+          :items="games"
           class="w-full" />
-        <UButton
-          v-if="model.leagueId"
-          variant="outline"
-          icon="i-lucide-trash"
-          size="sm"
-          @click="model.leagueId = undefined" />
-      </div>
-    </UFormField>
+      </UFormField>
+
+      <UFormField
+        label="Lega"
+        name="league">
+        <div class="flex gap-2">
+          <USelect
+            v-model="model.leagueId"
+            :items="leagues"
+            class="w-full" />
+          <UButton
+            v-if="model.leagueId"
+            variant="outline"
+            icon="i-lucide-trash"
+            size="sm"
+            @click="model.leagueId = undefined" />
+        </div>
+      </UFormField>
+    </div>
 
     <div class="grid gap-4 sm:grid-cols-4">
       <UFormField
-        label="A Squadre"
-        name="isTeam"
-        required>
-        <USwitch
-          v-model="model.isTeam"
-        />
-      </UFormField>
-      <UFormField
+        class="col-span-2"
         label="Partecipanti max"
         name="maxParticipants"
       >
@@ -83,22 +78,30 @@ const leagues: USelectItem<string>[] = [
           min="2"
           class="w-full" />
       </UFormField>
+      <UFormField
+        label="A Squadre"
+        name="isTeam"
+        required>
+        <USwitch
+          class="self-center mt-3"
+        />
+      </UFormField>
     </div>
 
-    <UFormField
-      label="Descrizione"
-      name="description"
-    >
-      <UInput
-        v-model="model.description"
-        class="w-full" />
-    </UFormField>
     <UFormField
       label="Inizio torneo"
       name="startDate"
     >
       <FormDatePicker
         v-model="model.startDate"
+        class="w-full" />
+    </UFormField>
+    <UFormField
+      label="Descrizione"
+      name="description"
+    >
+      <UInput
+        v-model="model.description"
         class="w-full" />
     </UFormField>
 

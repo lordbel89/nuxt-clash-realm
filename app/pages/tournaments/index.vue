@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import type { Tournament } from '~/types/tournament';
+import type { Paginated } from '#shared/types/api';
+import type { Tournament } from '#shared/types/tournament';
 
 definePageMeta({ title: 'Tornei' });
 
-// ponytail: dati dal backend (collega). Sostituire con useFetch<Tournament[]>('/api/tournaments').
-const tournaments = ref<Tournament[]>([]);
+// Risponde `server/mocks/tournaments.mock.ts`: l'handler reale non esiste
+// ancora. Il generico serve proprio per questo — Nitro non conosce la rotta,
+// quindi non c'è niente da inferire. Quando l'endpoint arriverà va tolto,
+// come in `app/pages/hello.vue`.
+const { data, status, error } = await useFetch<Paginated<Tournament>>('/api/tournaments');
+
+const tournaments = computed(() => data.value?.items ?? []);
 </script>
 
 <template>
@@ -15,8 +21,22 @@ const tournaments = ref<Tournament[]>([]);
       </UButton>
     </div>
 
+    <p
+      v-if="status === 'pending'"
+      class="text-muted">
+      Caricamento…
+    </p>
+
+    <UAlert
+      v-else-if="error"
+      color="error"
+      variant="subtle"
+      title="Impossibile leggere i tornei"
+      :description="error.message"
+    />
+
     <div
-      v-if="tournaments.length"
+      v-else-if="tournaments.length"
       class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <TournamentCard
         v-for="tournament in tournaments"

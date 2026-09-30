@@ -1,7 +1,5 @@
 <script setup lang="ts">
-// La pagina interroga /api/users, che ora richiede una sessione: senza
-// middleware mostrerebbe un 401 invece di portare al login
-definePageMeta({ title: 'Hello', middleware: 'auth' });
+definePageMeta({ title: 'Hello' });
 
 // Pagina di verifica: prima connessione reale tra frontend e database.
 // Niente generico su useFetch: annotarlo a mano disattiva l'inferenza da Nitro,

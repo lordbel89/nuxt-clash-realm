@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Match } from '~/types/tournament';
+import type { Match } from '#shared/types/tournament';
 
 defineProps<{
   match: Match;

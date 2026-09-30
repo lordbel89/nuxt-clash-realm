@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Match, Standing, Tournament } from '~/types/tournament';
+import type { Match, Standing, Tournament } from '#shared/types/tournament';
 
 definePageMeta({ title: 'Torneo' });
 

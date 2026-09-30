@@ -76,11 +76,47 @@ Per ripartire da un database pulito in locale basta cancellare la cartella dati 
 rm -rf .data/pglite && npm run db:migrate && npm run db:seed
 ```
 
+## Mock
+
+Dati finti serviti da Nitro **solo in sviluppo**: servono a lavorare su una pagina prima che l'endpoint esista, o a riprodurre a comando uno stato che il database non ha. Un mock è un file TypeScript in `server/mocks/` — un JSON con i superpoteri di tipi, faker e funzioni.
+
+```ts
+// server/mocks/tournaments.mock.ts
+import { fakerIT as faker } from '@faker-js/faker';
+import { defineMock } from './define.ts';
+
+export default defineMock<Paginated<Tournament>>({
+  method: 'GET',
+  path: '/api/tournaments',
+  enabled: true,
+  delay: 500,
+  data: () => ({ items: [/* faker… */], total: 6, limit: 25, offset: 0 }),
+});
+```
+
+Poi una riga in `server/mocks/index.ts`, che è l'elenco dei mock esistenti. Un file può esportare un mock solo o un array, per tenere insieme le rotte di una stessa entità.
+
+| Campo | A cosa serve |
+|---|---|
+| `method` | `'GET'`, `'POST'`, `'PUT'`, `'PATCH'`, `'DELETE'`. |
+| `path` | Percorso dell'endpoint, con `:nome` per i parametri: `'/api/tournaments/:id'`. Arrivano in `data`. |
+| `enabled` | `false` spegne il singolo mock. Default `true`, ma nei file è scritto esplicitamente: è lì che si mette `false`. |
+| `delay` | Millisecondi di attesa: è così che si vedono gli stati di caricamento. |
+| `data` | Il corpo della risposta. Un valore per dati fissi, una funzione `({ params, query, event })` per generarli a ogni chiamata. |
+
+- **Accendere e spegnere una chiamata alla volta**: `enabled: false` e la richiesta prosegue verso l'handler reale — se non esiste, torna il suo 404. Nitro ricarica al salvataggio, non serve riavviare.
+- **Un mock spento non si cancella**: quando l'endpoint vero funziona, il file resta lì da spegnere e riaccendere. È lo strumento per riprodurre a comando un caso che il database non ha — duecento partecipanti, un 500, una risposta lenta — aggiornandone i dati il giorno che quel caso serve.
+- **Riconoscerli**: ogni risposta che arriva da un mock porta l'header `MOCK_DATA: true`, e nessun'altra. Nel tab Network si vede a colpo d'occhio quali chiamate della pagina sono vere.
+- **Endpoint che non esistono ancora**: i mock passano da un middleware, quindi rispondono prima del routing. La pagina chiama `useFetch('/api/tournaments')` e riceve i dati anche senza `server/api/tournaments.get.ts` (vedi `app/pages/tournaments/index.vue`). In quel caso il generico su `useFetch` è necessario, perché non c'è una rotta da cui inferire il tipo: va tolto quando l'handler arriva.
+- **Precedenza**: un mock acceso vince sull'handler reale. È voluto — accenderlo non richiede di toccare `server/api/`.
+- **Errori**: `data` può lanciare. `throw createError({ statusCode: 500 })` fa arrivare alla pagina l'errore vero, non un caso finto da gestire a parte.
+- **Fuori dallo sviluppo non esistono**: il middleware è dietro `import.meta.dev`, che in build diventa `false`; né i mock né `@faker-js/faker` (devDependency) entrano nel bundle di produzione.
+
 ## Struttura
 
 ```
 app/          frontend Nuxt (pagine, componenti, layout, tema)
-server/       backend Nitro: api/, database/ (schema, migrazioni, seed), mappers/
+server/       backend Nitro: api/, database/ (schema, migrazioni, seed), mappers/, mocks/
 shared/       codice condiviso client/server: types/ (DTO) e schemas/ (Valibot)
 public/       asset statici
 ```
