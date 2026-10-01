@@ -5,9 +5,13 @@ import type { UserId } from '#shared/types/ids';
  * riga del database. I campi sono elencati uno a uno (allowlist): una colonna
  * nuova in `users` non finisce qui da sola.
  */
-export interface User {
+export interface UserSummary {
   id: UserId;
   name: string;
+}
+
+/** Dati privati del proprio account, restituiti solo da /api/users/me. */
+export interface User extends UserSummary {
   email: string;
   /** Verificata via email: resta false finché non ci sarà un mailer */
   emailVerified: boolean;
