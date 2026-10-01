@@ -1,0 +1,452 @@
+{
+  "C:\\Workspace\\nuxt-clash-realm\\drizzle.config.ts": {
+    "mtime": 1788701123.5802329,
+    "ast_hash": "ceef3b1384e5eda870e9cbfe78650000",
+    "semantic_hash": "ceef3b1384e5eda870e9cbfe78650000"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\eslint.config.mjs": {
+    "mtime": 1788701123.5812323,
+    "ast_hash": "bee3b2bf79229ee2858db44bea5f838b",
+    "semantic_hash": "bee3b2bf79229ee2858db44bea5f838b"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\nuxt.config.ts": {
+    "mtime": 1788765706.9666448,
+    "ast_hash": "c1bec1e2cef0956e3c6db2ec59785da4",
+    "semantic_hash": "c1bec1e2cef0956e3c6db2ec59785da4"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\package.json": {
+    "mtime": 1790883241.7783043,
+    "ast_hash": "2cf9f81743b6e9de840a6436a4931dd9",
+    "semantic_hash": "2cf9f81743b6e9de840a6436a4931dd9"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\tsconfig.json": {
+    "mtime": 1788158792.0,
+    "ast_hash": "99d8d7543e8bac462160e11d33e5146e",
+    "semantic_hash": "99d8d7543e8bac462160e11d33e5146e"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\launch.json": {
+    "mtime": 1790883241.7363284,
+    "ast_hash": "0f1ab45dcaaaab7eb4ed1113b4ca3d86",
+    "semantic_hash": "0f1ab45dcaaaab7eb4ed1113b4ca3d86"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.vscode\\launch.json": {
+    "mtime": 1780262310.897719,
+    "ast_hash": "6849a585df69c28e67da7a801a8cc4a9",
+    "semantic_hash": "6849a585df69c28e67da7a801a8cc4a9"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.vscode\\settings.json": {
+    "mtime": 1770297259.7778714,
+    "ast_hash": "8528715601e538962d18588d854ecf91",
+    "semantic_hash": "8528715601e538962d18588d854ecf91"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\app.config.ts": {
+    "mtime": 1788701123.556232,
+    "ast_hash": "49dd59c806a41e8fb4c5ada5520fe907",
+    "semantic_hash": "49dd59c806a41e8fb4c5ada5520fe907"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\app.vue": {
+    "mtime": 1788701123.5572326,
+    "ast_hash": "c06fc50b26f8939e34fda42d87c986c0",
+    "semantic_hash": "c06fc50b26f8939e34fda42d87c986c0"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\components\\RoundTimer.vue": {
+    "mtime": 1788701123.5582335,
+    "ast_hash": "5a8572f1c1f8f3df2791ed146d1c0d82",
+    "semantic_hash": "5a8572f1c1f8f3df2791ed146d1c0d82"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\components\\form\\DatePicker.vue": {
+    "mtime": 1788701123.559233,
+    "ast_hash": "fbe3dc9777ee14bb52395d6fc04b28ec",
+    "semantic_hash": "fbe3dc9777ee14bb52395d6fc04b28ec"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\components\\match\\Card.vue": {
+    "mtime": 1789339441.151575,
+    "ast_hash": "338d4460e7ac4da6f6b632d05e3d7601",
+    "semantic_hash": "338d4460e7ac4da6f6b632d05e3d7601"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\components\\tournament\\Card.vue": {
+    "mtime": 1789339441.1525743,
+    "ast_hash": "7f10172f12adf45c3715b73d6d73c7b9",
+    "semantic_hash": "7f10172f12adf45c3715b73d6d73c7b9"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\components\\tournament\\Form.vue": {
+    "mtime": 1789339441.1525743,
+    "ast_hash": "72c50e455e88e38a08eaefee7a021f52",
+    "semantic_hash": "72c50e455e88e38a08eaefee7a021f52"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\components\\tournament\\Standings.vue": {
+    "mtime": 1789339441.153574,
+    "ast_hash": "4a916c77694a7d9ea7cf7ef790903dd5",
+    "semantic_hash": "4a916c77694a7d9ea7cf7ef790903dd5"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\composables\\formatDate.ts": {
+    "mtime": 1788701123.565232,
+    "ast_hash": "d765b19b18cac0d258a314fe01045ad8",
+    "semantic_hash": "d765b19b18cac0d258a314fe01045ad8"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\config\\navigation.ts": {
+    "mtime": 1788701123.5662355,
+    "ast_hash": "b67e1859dd866794cb6c8150758b26e3",
+    "semantic_hash": "b67e1859dd866794cb6c8150758b26e3"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\layouts\\auth.vue": {
+    "mtime": 1788558110.4171228,
+    "ast_hash": "dac1004d6eee103337c4632a749afd3b",
+    "semantic_hash": "dac1004d6eee103337c4632a749afd3b"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\layouts\\default.vue": {
+    "mtime": 1788701123.5672326,
+    "ast_hash": "7afec08720c1b03e7a99c10b298d2808",
+    "semantic_hash": "7afec08720c1b03e7a99c10b298d2808"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\layouts\\projector.vue": {
+    "mtime": 1788541766.046062,
+    "ast_hash": "e8311fde1af4d6ef3041720a65f42baa",
+    "semantic_hash": "e8311fde1af4d6ef3041720a65f42baa"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\middleware\\auth.global.ts": {
+    "mtime": 1789339441.153574,
+    "ast_hash": "ab550aef3a45303b65192c0318363c2e",
+    "semantic_hash": "ab550aef3a45303b65192c0318363c2e"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\middleware\\loginBypass.ts": {
+    "mtime": 1789339441.154575,
+    "ast_hash": "526eb0a022dc8a4546684c15bfc87f3c",
+    "semantic_hash": "526eb0a022dc8a4546684c15bfc87f3c"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\hello.vue": {
+    "mtime": 1789339441.154575,
+    "ast_hash": "fa443557e25f1dade1783fc2d321af01",
+    "semantic_hash": "fa443557e25f1dade1783fc2d321af01"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\index.vue": {
+    "mtime": 1788701123.5712323,
+    "ast_hash": "e543a50dac12c9456e9946e7ec594c31",
+    "semantic_hash": "e543a50dac12c9456e9946e7ec594c31"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\login.vue": {
+    "mtime": 1789339441.1555755,
+    "ast_hash": "4557cec31a75b91462a8837528f5672c",
+    "semantic_hash": "4557cec31a75b91462a8837528f5672c"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\community\\news-feed.vue": {
+    "mtime": 1788656269.4245598,
+    "ast_hash": "2c337bcdd1cba046f70dbab44f2b48c8",
+    "semantic_hash": "2c337bcdd1cba046f70dbab44f2b48c8"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\dev\\components.vue": {
+    "mtime": 1788701123.5682316,
+    "ast_hash": "58643871b9d37d5b8587d68e4fad0df8",
+    "semantic_hash": "58643871b9d37d5b8587d68e4fad0df8"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\dev\\tables.vue": {
+    "mtime": 1788701123.5692334,
+    "ast_hash": "f8bc301ad7876df7d463d533edf5270f",
+    "semantic_hash": "f8bc301ad7876df7d463d533edf5270f"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\tournaments\\index.vue": {
+    "mtime": 1789339441.1575744,
+    "ast_hash": "4986a255c5d4f64bb848f516aba50ada",
+    "semantic_hash": "4986a255c5d4f64bb848f516aba50ada"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\tournaments\\new.vue": {
+    "mtime": 1789339441.1575744,
+    "ast_hash": "392faf1c38e5ca37275d11f7d7a1ef58",
+    "semantic_hash": "392faf1c38e5ca37275d11f7d7a1ef58"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\tournaments\\[id]\\display.vue": {
+    "mtime": 1789339441.1555755,
+    "ast_hash": "b84fc72554e448438b26b1e034b94afa",
+    "semantic_hash": "b84fc72554e448438b26b1e034b94afa"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\tournaments\\[id]\\index.vue": {
+    "mtime": 1789339441.156574,
+    "ast_hash": "0e25bcd78041666dffd9fb89b94dbee7",
+    "semantic_hash": "0e25bcd78041666dffd9fb89b94dbee7"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\pages\\tournaments\\[id]\\settings.vue": {
+    "mtime": 1789339441.156574,
+    "ast_hash": "e68be9e84c398f6f4c09ecee088b411e",
+    "semantic_hash": "e68be9e84c398f6f4c09ecee088b411e"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\types\\components.ts": {
+    "mtime": 1788701123.5782328,
+    "ast_hash": "45aa8d4176e98bc29404ec4a728d0801",
+    "semantic_hash": "45aa8d4176e98bc29404ec4a728d0801"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\utils\\authClient.ts": {
+    "mtime": 1788765706.965645,
+    "ast_hash": "af4c57fc38eb205d0d92be8034b84d19",
+    "semantic_hash": "af4c57fc38eb205d0d92be8034b84d19"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\app\\utils\\sideMenuUtils.ts": {
+    "mtime": 1788701123.5792332,
+    "ast_hash": "936f5517b54b228a04311494f9c98e53",
+    "semantic_hash": "936f5517b54b228a04311494f9c98e53"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\api\\users.get.ts": {
+    "mtime": 1790883241.7816043,
+    "ast_hash": "20aafb45550ab541ee9a35a3f213312e",
+    "semantic_hash": "20aafb45550ab541ee9a35a3f213312e"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\api\\auth\\[...all].ts": {
+    "mtime": 1788765706.9736507,
+    "ast_hash": "affebe93eb12cb0c42ac136f6d84bb78",
+    "semantic_hash": "affebe93eb12cb0c42ac136f6d84bb78"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\api\\users\\me.get.ts": {
+    "mtime": 1790883241.7825117,
+    "ast_hash": "e8a88172e0734c7e05480fb8f8985cb4",
+    "semantic_hash": "e8a88172e0734c7e05480fb8f8985cb4"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\api\\users\\[id].get.ts": {
+    "mtime": 1790883241.7825117,
+    "ast_hash": "396ae07effebd3b6008f2988f967efa5",
+    "semantic_hash": "396ae07effebd3b6008f2988f967efa5"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\auth\\env.ts": {
+    "mtime": 1788765706.9776552,
+    "ast_hash": "e2da583106257151b85bbb17803c0561",
+    "semantic_hash": "e2da583106257151b85bbb17803c0561"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\auth\\index.ts": {
+    "mtime": 1788765706.978651,
+    "ast_hash": "dd6b94a9fba80e02d9386fb1e663e725",
+    "semantic_hash": "dd6b94a9fba80e02d9386fb1e663e725"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\client.ts": {
+    "mtime": 1788701123.5912328,
+    "ast_hash": "9c0cb909c7aa19ac8c66267816e7f6e6",
+    "semantic_hash": "9c0cb909c7aa19ac8c66267816e7f6e6"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\env.ts": {
+    "mtime": 1788765706.9796493,
+    "ast_hash": "d66791da7328e731d5f46ab8868bc0c3",
+    "semantic_hash": "d66791da7328e731d5f46ab8868bc0c3"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\migrate.ts": {
+    "mtime": 1788701123.5932326,
+    "ast_hash": "076058db8e91031130e8ff0e6e0119b9",
+    "semantic_hash": "076058db8e91031130e8ff0e6e0119b9"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\relations.ts": {
+    "mtime": 1788765706.9826508,
+    "ast_hash": "9d2b6c0a8a4381dc5f1c07e648a7c79f",
+    "semantic_hash": "9d2b6c0a8a4381dc5f1c07e648a7c79f"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\seed.ts": {
+    "mtime": 1788765706.9866512,
+    "ast_hash": "e60a506330fc7aa2e959247216fc4c08",
+    "semantic_hash": "e60a506330fc7aa2e959247216fc4c08"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\migrations\\20260905100919_marvelous_flatman\\migration.sql": {
+    "mtime": 1788649999.392065,
+    "ast_hash": "29ec422e201b32b1c7597b3db6721466",
+    "semantic_hash": "29ec422e201b32b1c7597b3db6721466"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\migrations\\20260905100919_marvelous_flatman\\snapshot.json": {
+    "mtime": 1788649999.392065,
+    "ast_hash": "797a0c07727f714279d082c43231c350",
+    "semantic_hash": "797a0c07727f714279d082c43231c350"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\migrations\\20260906221336_big_shinobi_shaw\\migration.sql": {
+    "mtime": 1788765706.9806492,
+    "ast_hash": "68b2e2d8c062f4224d6a96e1c33cfeec",
+    "semantic_hash": "68b2e2d8c062f4224d6a96e1c33cfeec"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\migrations\\20260906221336_big_shinobi_shaw\\snapshot.json": {
+    "mtime": 1788765706.9816494,
+    "ast_hash": "2d3f81c9ffc3d72dd42804bd069a7bf2",
+    "semantic_hash": "2d3f81c9ffc3d72dd42804bd069a7bf2"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\schema\\auth.ts": {
+    "mtime": 1788765706.9836514,
+    "ast_hash": "18157bc7b37b2b701b63adc138bdd627",
+    "semantic_hash": "18157bc7b37b2b701b63adc138bdd627"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\schema\\index.ts": {
+    "mtime": 1788765706.9846504,
+    "ast_hash": "23a9a3b65b664b50c7b16ceaa6903e00",
+    "semantic_hash": "23a9a3b65b664b50c7b16ceaa6903e00"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\database\\schema\\users.ts": {
+    "mtime": 1788765706.9856515,
+    "ast_hash": "c7d8b8e9299811fd07166b849de54a0c",
+    "semantic_hash": "c7d8b8e9299811fd07166b849de54a0c"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\mappers\\user.ts": {
+    "mtime": 1790883241.7856908,
+    "ast_hash": "b3291f1aa6d90cff18011493bfd5d309",
+    "semantic_hash": "b3291f1aa6d90cff18011493bfd5d309"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\middleware\\mocks.ts": {
+    "mtime": 1789339441.1625752,
+    "ast_hash": "634e268f5618fd2310115789def5c8fe",
+    "semantic_hash": "634e268f5618fd2310115789def5c8fe"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\mocks\\define.ts": {
+    "mtime": 1789339441.1652124,
+    "ast_hash": "ddd09022d549babe52081a00b8a5d235",
+    "semantic_hash": "ddd09022d549babe52081a00b8a5d235"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\mocks\\index.ts": {
+    "mtime": 1789339441.1652124,
+    "ast_hash": "3996033eee5a77696af9d1c0cf6f0a96",
+    "semantic_hash": "3996033eee5a77696af9d1c0cf6f0a96"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\mocks\\tournaments.mock.ts": {
+    "mtime": 1789339441.1652124,
+    "ast_hash": "08c948203bbf38346f118319c3830032",
+    "semantic_hash": "08c948203bbf38346f118319c3830032"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\plugins\\database.ts": {
+    "mtime": 1788701123.598233,
+    "ast_hash": "0b22af081a0890dbfaba6ef272a94fc6",
+    "semantic_hash": "0b22af081a0890dbfaba6ef272a94fc6"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\services\\users.ts": {
+    "mtime": 1790883241.7874963,
+    "ast_hash": "0f5f5a0204ea5c96888b7a155a889a6d",
+    "semantic_hash": "0f5f5a0204ea5c96888b7a155a889a6d"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\utils\\auth.ts": {
+    "mtime": 1788765706.9866512,
+    "ast_hash": "c6d9b2af8935a9e33bb580f4ba747557",
+    "semantic_hash": "c6d9b2af8935a9e33bb580f4ba747557"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\utils\\database.ts": {
+    "mtime": 1788765706.9894612,
+    "ast_hash": "1cf2797aba788f20ef6ea8cb10be47d2",
+    "semantic_hash": "1cf2797aba788f20ef6ea8cb10be47d2"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\server\\utils\\validation.ts": {
+    "mtime": 1790883241.7900417,
+    "ast_hash": "ec0de6e47349397761718ece2441d17c",
+    "semantic_hash": "ec0de6e47349397761718ece2441d17c"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\shared\\schemas\\common.ts": {
+    "mtime": 1790883241.7900417,
+    "ast_hash": "3d77ff5d0e7720da0d1d1d16fc333c4d",
+    "semantic_hash": "3d77ff5d0e7720da0d1d1d16fc333c4d"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\shared\\schemas\\user.ts": {
+    "mtime": 1790883241.7900417,
+    "ast_hash": "b4776994e6f32d07653bcbdacf6fc34c",
+    "semantic_hash": "b4776994e6f32d07653bcbdacf6fc34c"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\shared\\types\\api.ts": {
+    "mtime": 1788765706.9924624,
+    "ast_hash": "8b74de8c914f2eb34bbfc2394ff78fd2",
+    "semantic_hash": "8b74de8c914f2eb34bbfc2394ff78fd2"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\shared\\types\\ids.ts": {
+    "mtime": 1788765706.9924624,
+    "ast_hash": "d1aa4d9bcb205a163b67e941d1cda887",
+    "semantic_hash": "d1aa4d9bcb205a163b67e941d1cda887"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\shared\\types\\tournament.ts": {
+    "mtime": 1789339441.1672206,
+    "ast_hash": "f41c4befb8a66370931265fb4a003309",
+    "semantic_hash": "f41c4befb8a66370931265fb4a003309"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\shared\\types\\user.ts": {
+    "mtime": 1790883241.87442,
+    "ast_hash": "ac2aa0c42527d33ab9208698c8fd782d",
+    "semantic_hash": "ac2aa0c42527d33ab9208698c8fd782d"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\tests\\backend\\account.test.ts": {
+    "mtime": 1790883241.8775432,
+    "ast_hash": "60a54fe23c63eb54530a8a518d15ed1f",
+    "semantic_hash": "60a54fe23c63eb54530a8a518d15ed1f"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\tests\\backend\\contracts.test.ts": {
+    "mtime": 1790883241.8775432,
+    "ast_hash": "283fd0c38f4579d3410813b62de7a5ff",
+    "semantic_hash": "283fd0c38f4579d3410813b62de7a5ff"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\CLAUDE.md": {
+    "mtime": 1790883241.7573006,
+    "ast_hash": "22ce9e374dfbc44c81ce4aabe57e2378",
+    "semantic_hash": "22ce9e374dfbc44c81ce4aabe57e2378"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\README.md": {
+    "mtime": 1789339441.150575,
+    "ast_hash": "06a3e9dd56c461ffbbe9a93206bf6128",
+    "semantic_hash": "06a3e9dd56c461ffbbe9a93206bf6128"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\mock.md": {
+    "mtime": 1789339441.149574,
+    "ast_hash": "3a774e56fa022329b9f13254814ecba1",
+    "semantic_hash": "3a774e56fa022329b9f13254814ecba1"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\rules\\contract.md": {
+    "mtime": 1790883241.7443242,
+    "ast_hash": "122b69fab50c5c712089aea3ca28fe65",
+    "semantic_hash": "122b69fab50c5c712089aea3ca28fe65"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\rules\\engine.md": {
+    "mtime": 1790883241.7443242,
+    "ast_hash": "0a76faae90df99cb2501b4e937373e5a",
+    "semantic_hash": "0a76faae90df99cb2501b4e937373e5a"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\rules\\backend\\api.md": {
+    "mtime": 1790883241.740522,
+    "ast_hash": "d524512683acf9bb4b29aae1a3b9f091",
+    "semantic_hash": "d524512683acf9bb4b29aae1a3b9f091"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\rules\\backend\\auth.md": {
+    "mtime": 1790883241.740522,
+    "ast_hash": "12630a8eb88b2c7aa60727d166ad330f",
+    "semantic_hash": "12630a8eb88b2c7aa60727d166ad330f"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\rules\\backend\\database.md": {
+    "mtime": 1790883241.7443242,
+    "ast_hash": "67534838f07ca8793388eba278e9cc95",
+    "semantic_hash": "67534838f07ca8793388eba278e9cc95"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\rules\\frontend\\app.md": {
+    "mtime": 1790883241.7486055,
+    "ast_hash": "78e6203ffc037c34e3d11dc3385ac744",
+    "semantic_hash": "78e6203ffc037c34e3d11dc3385ac744"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\rules\\frontend\\mocks.md": {
+    "mtime": 1790883241.7486055,
+    "ast_hash": "9fe19aad6e264d391dda14e31e331c7c",
+    "semantic_hash": "9fe19aad6e264d391dda14e31e331c7c"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\.claude\\rules\\frontend\\theming.md": {
+    "mtime": 1790883241.7486055,
+    "ast_hash": "2a916e70fa26e3aa30a8642cc1e7273c",
+    "semantic_hash": "2a916e70fa26e3aa30a8642cc1e7273c"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\docs\\backend-structure.md": {
+    "mtime": 1790883241.7607296,
+    "ast_hash": "f3df66a733d6a3d613ab608a8f017928",
+    "semantic_hash": "f3df66a733d6a3d613ab608a8f017928"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\docs\\brainstorm.md": {
+    "mtime": 1790883241.7616572,
+    "ast_hash": "61de57a4de297629c99484448af49e25",
+    "semantic_hash": "61de57a4de297629c99484448af49e25"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\docs\\glossario.md": {
+    "mtime": 1790883241.7650447,
+    "ast_hash": "4bd0198fed090849bdf03074c98983fd",
+    "semantic_hash": "4bd0198fed090849bdf03074c98983fd"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\docs\\revisione-brainstorm.md": {
+    "mtime": 1790883241.7693624,
+    "ast_hash": "77a46af4320099d2945c46a3ffc4cac2",
+    "semantic_hash": "77a46af4320099d2945c46a3ffc4cac2"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\public\\robots.txt": {
+    "mtime": 1788158792.0,
+    "ast_hash": "243b03ecba82dde9612cd5163145a86d",
+    "semantic_hash": "243b03ecba82dde9612cd5163145a86d"
+  },
+  "C:\\Workspace\\nuxt-clash-realm\\public\\assets\\Logo Placeholder.png": {
+    "mtime": 1788557769.8238008,
+    "ast_hash": "d0106eeddf89f854831090cf68d88827",
+    "semantic_hash": "d0106eeddf89f854831090cf68d88827"
+  }
+}
