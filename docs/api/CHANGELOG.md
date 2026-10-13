@@ -1,0 +1,21 @@
+# Changelog dell'API
+
+Cosa cambia nel contratto fra backend e frontend, dal più recente. Ogni voce dice lo stato della
+rotta (**proposto**, **disponibile**, **cambiato**, **deprecato**), cosa fare dal lato del frontend e
+quale seam `ponytail:` chiude, se ne chiude uno. Il riferimento completo è su `/_docs` in sviluppo,
+generato in `docs/api/openapi.json`; le convenzioni sono in `docs/api/README.md`.
+
+## 2026-10-13 · Riferimento generato e convenzioni (F0.3)
+
+- **Nuovo:** `/_docs` (solo in sviluppo) mostra il riferimento dell'API con Scalar, letto da
+  `docs/api/openapi.json`. Il file si rigenera con `npm run api:spec`, e un test fallisce se resta
+  indietro rispetto al codice.
+- **Nuovo in `shared/types/api.ts`:** `ApiWarning`, `ApiWarningCode` e `WithWarnings<T>`. Un comando
+  che avvisa senza impedire risponde `{ data, warnings }`. Oggi nessuna rotta avvisa, e
+  `ApiWarningCode` è vuoto (`never`): i codici arrivano con le rotte che li usano.
+- **Convenzioni fissate** (`docs/api/README.md`): atti come `POST /api/<risorsa>/:id/<atto>`, `reason`
+  obbligatoria dove serve, errori `400/401/403/404/409` con il testo per l'utente in `message`.
+- **Disponibile, invariato:** `GET /api/users`, `GET /api/users/:id`, `GET /api/users/me`, ora
+  documentati nel riferimento.
+- **Sviluppo:** `NUXT_MOCKS=false` nel `.env` spegne tutti i mock (`server/middleware/mocks.ts`). Il
+  default resta acceso.
