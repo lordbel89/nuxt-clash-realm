@@ -4,6 +4,13 @@ import { DATABASE_DEFAULTS } from './server/database/env.ts';
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxtjs/i18n'],
+  $env: {
+    // `nuxt dev --envName scenario`, lanciato dai test [S] (tests/support/server.ts):
+    // una cartella di build sua, così non riscrive .nuxt/ sotto un dev server già acceso
+    scenario: {
+      buildDir: 'node_modules/.cache/nuxt-scenario',
+    },
+  },
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   ui: {
@@ -24,6 +31,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     apiSecret: '', // can be overridden by NUXT_API_SECRET environment variable
+    // Mock di server/mocks/, solo in sviluppo. NUXT_MOCKS=false li spegne tutti
+    mocks: true,
     // Sovrascrivibile con NUXT_AUTH_SECRET / _URL
     auth: {
       secret: AUTH_DEFAULTS.secret as string,

@@ -88,3 +88,5 @@ A junction table that carries its own columns (a seed, an enrolment date) is an 
 ## Tests
 
 `npm run test:backend` runs `tests/backend/*.test.ts` with `node --test`, without a database and without Nuxt. It covers mapper allowlists, serialisation, validation and error payloads, query projections, and `/me` authorisation with fake dependencies. It is not an end-to-end HTTP test, and it does not exercise Better Auth or Postgres.
+
+Services against a real database go in `tests/integration/` (PGlite, `createTestDatabase()`), concurrency in `tests/concurrency/` (Postgres in Docker), whole flows over HTTP in `tests/scenario/`. The levels and helpers are described in `docs/backend-structure.md`, *Verifica*.

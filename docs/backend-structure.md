@@ -55,9 +55,29 @@ I futuri elenchi potranno usare cursori senza imporre un conteggio esatto univer
 
 ## Verifica
 
-`npm run test:backend` usa il test runner di Node 24, senza database e senza Nuxt.
-Controlla allowlist dei mapper, serializzazione, validazione e payload degli errori,
-proiezioni delle query e autorizzazione di /me con dipendenze simulate. Non è un test
-HTTP end-to-end né un test dell'integrazione Better Auth/PostgreSQL.
-Per futuri comandi concorrenti serviranno test d'integrazione su PostgreSQL reale;
-PGlite non sostituisce quella verifica. Nessuna migrazione è richiesta qui.
+Cinque livelli, tutti con `node --test` (Node 26 esegue i `.ts` senza flag). `npm run test`
+lancia [M], [U] e [I], cioè quello che non chiede Docker né un server avviato.
+
+| Livello | Cartella | Comando | Con cosa |
+|---|---|---|---|
+| [M] motore | `tests/engine/` | `npm run test:engine` | motore puro, fixture |
+| [U] unitari | `tests/backend/` | `npm run test:backend` | nessun database, dipendenze simulate |
+| [I] integrazione | `tests/integration/` | `npm run test:integration` | PGlite in memoria, un database per file |
+| [C] concorrenza | `tests/concurrency/` | `npm run test:concurrency` | Postgres 18 in Docker (`compose.test.yml`) |
+| [S] scenario | `tests/scenario/` | `npm run test:scenario` | `nuxt dev` su un PGlite nuovo, via HTTP |
+
+Gli aiuti stanno in `tests/support/`:
+
+- `createTestDatabase()` (`database.ts`): PGlite in memoria con le migrazioni applicate. Uno per
+  file di test, chiuso con `closeDatabase(db)` in un `after`.
+- `createTestPostgres()` (`postgres.ts`): un database nuovo, dal nome casuale, sul Postgres di
+  `compose.test.yml` (porta 54329), con le migrazioni; `drop()` lo cancella. `npm run
+  test:concurrency` avvia il container da sé; si spegne con `docker compose -f compose.test.yml down`.
+- `startTestServer()` (`server.ts`): `nuxt dev --envName scenario` su una porta libera e su un
+  PGlite nuovo in una cartella temporanea, con i mock spenti (`NUXT_MOCKS=false`). L'ambiente
+  `scenario` ha una cartella di build sua (`node_modules/.cache/nuxt-scenario`), così i test non
+  riscrivono `.nuxt/` sotto un dev server acceso; per lo stesso motivo i file [S] girano uno alla
+  volta. Si usa `nuxt dev` e non il build di produzione perché quello esclude PGlite dal bundle.
+
+PGlite è una connessione sola: i test [I] non vedono bug di lock o di concorrenza. Tutto ciò che
+dipende dal comportamento transazionale sotto carico va provato in [C].

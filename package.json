@@ -2,8 +2,16 @@
   "name": "clash-realm",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=26"
+  },
   "scripts": {
+    "test": "node --test tests/engine/*.test.ts tests/backend/*.test.ts tests/integration/*.test.ts",
+    "test:engine": "node --test tests/engine/*.test.ts",
     "test:backend": "node --test tests/backend/*.test.ts",
+    "test:integration": "node --test tests/integration/*.test.ts",
+    "test:concurrency": "docker compose -f compose.test.yml up -d --wait && node --test tests/concurrency/*.test.ts",
+    "test:scenario": "node --test --test-concurrency=1 tests/scenario/*.test.ts",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
