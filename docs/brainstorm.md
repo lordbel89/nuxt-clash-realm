@@ -33,7 +33,8 @@ della revisione che ha tolto le contraddizioni sono in [`revisione-brainstorm.md
 5. **Aggiungere un gioco significa scrivere una composizione, non toccare il motore.** Il motore
    offre un catalogo di moduli; un gioco che rientra nel catalogo è un preset, cioè una scelta di
    moduli e parametri. Una regola che il catalogo non ha è un **modulo nuovo**, cioè codice, ed è
-   giusto che lo sia: niente DSL, niente interprete (§3).
+   giusto che lo sia: niente DSL, niente interprete. **Il catalogo è chiuso**: i moduli arrivano con
+   un deploy, nessuno si carica a runtime (§3).
 6. **La riga di database non è il contratto API** (vedi `CLAUDE.md`): row → mapper → DTO in uscita,
    schema Valibot condiviso in entrata.
 
@@ -197,7 +198,26 @@ Il catalogo ha cinque categorie:
 5. **Moduli operativi** — tipo di fase e di abbinamento, eredità fra fasi e composizione del
    tabellone (per fase, §4), formato di gioco e forma della lista (per fase, nel torneo
    multi-formato), durata round, best-of, tabella round per fascia di giocatori, regime di tempo,
-   late entry, se e quando le liste si bloccano.
+   late entry, se e quando le liste si bloccano, arbitraggio (per torneo, §7), postazioni limitate
+   (dopo la v1, §7).
+
+**Moduli del motore e moduli dell'applicazione.** Alcuni moduli calcolano: forma del risultato, punti,
+tiebreak, fase, abbinamento. Sono funzioni pure del motore. Altri accendono funzioni
+dell'applicazione, con entità, permessi e interfaccia propri: regime di tempo, arbitraggio, postazioni
+limitate, liste. Il meccanismo è uno solo: si scelgono nella composizione, si validano con lo schema
+del catalogo, si congelano nella copia del torneo.
+
+**Ogni modulo dichiara**, nello stesso posto: parametri e limiti · **ambito** (`tournament` o `phase`)
+· **dipendenze** (`requires`) · **incompatibilità** (`conflicts`). Lo schema rifiuta una composizione
+che viola un vincolo, e i preset passano dalla stessa validazione. Le incompatibilità oggi sparse nel
+testo (la patta nelle fasi a eliminazione, §4) diventano dichiarazioni del modulo.
+
+**Catalogo chiuso, non plugin.** I moduli li scrive lo sviluppo; l'organizzatore compone liberamente
+quelli che esistono. Un sistema di plugin aperto non cambierebbe niente per l'organizzatore e
+costerebbe due cose: i moduli non si limitano a convivere ma si modificano a vicenda (la penalità si
+traduce nella forma del risultato, i tiebreak dipendono dal bye, le postazioni cambiano il ciclo del
+round), e quelle interazioni sono codice; e la verifica di un round (§0.4) deve sapere esattamente
+quale codice l'ha prodotto.
 
 **Il gioco** di un torneo è testo libero, anche fuori dai preset, e conta per le statistiche e per il
 profilo pubblico del giocatore.
@@ -609,6 +629,23 @@ tiene `now = null` fino a `onMounted`.
 Nelle fasi a eliminazione, dove la patta non è inseribile, **il cronometro è informativo**: la fine
 del tempo non produce un esito. Il ruleset deve poter dichiarare che quella fase non ha esito a tempo.
 
+### Postazioni limitate (dopo la v1)
+
+In alcuni giochi i match sono più delle **postazioni** (`Station`): le arene di Beyblade, le console
+di Smash Bros. Allora non si gioca tutti insieme, e i match aspettano una postazione libera.
+
+- **La chiamata segue l'ordine di arrivo e di disponibilità**; l'organizzatore può scegliere a mano
+  quale match mandare in partita.
+- **Il ciclo di vita non è più solo del round**: ogni match ha uno stato e un inizio propri (in coda,
+  chiamato, in corso, refertato). In svizzera il round finisce con l'ultimo match in coda; in
+  eliminazione un match diventa giocabile appena i due che lo alimentano sono chiusi.
+- **Il tempo per tavolo è il regime naturale**; il tempo globale di round è probabilmente
+  un'incompatibilità.
+- **La postazione è fisica**, diversa dal numero di tavolo (`table`, l'ordine di forza) e dal tavolo
+  delle squadre (`Board`).
+
+Va ricercato prima di progettarlo: start.gg (*stations*), Challonge, tornei di Smash e di Beyblade.
+
 ### Ruoli, penalità, arbitraggio
 
 - **Ruoli su due livelli.**
@@ -623,6 +660,8 @@ del tempo non produce un esito. Il ruleset deve poter dichiarare che quella fase
     quindi questo livello è una tabella nostra.
   - Staff e admin si aggiungono **con un invito via email** (Better Auth) o **cercandoli fra gli
     utenti registrati**.
+- **L'arbitraggio è una scelta del torneo** (`judging`). Spento, non esistono head judge e judge,
+  penalità né chiamata arbitro: lo staff è fatto di owner, admin e scorekeeper.
 - **Il judge che gioca è un'opzione del torneo, spenta di default**, come nell'MTR (1.3: chi gioca
   non può fare l'ufficiale, a meno che il torneo non lo permetta esplicitamente). Accesa, il judge
   gioca ma non può arbitrare, correggere o penalizzare il proprio match: è un **controllo di permesso
@@ -895,6 +934,8 @@ Ogni voce sblocca o prepara la successiva:
 10. qualifiche, crediti bye, riallineamento, quote di emissione;
 11. leghe interne;
 12. rating Glicko e statistiche del giocatore, profilo pubblico.
+
+Previste ma senza un posto nella sequenza: **postazioni limitate** (§7).
 
 Prima dell'**apertura al pubblico**, in qualunque momento arrivi: rivedere i *Rischi accettati* del
 §2.
