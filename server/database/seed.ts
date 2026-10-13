@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm';
+import { createAccount } from '../auth/accounts.ts';
 import { readAuthEnv } from '../auth/env.ts';
 import { createAuth } from '../auth/index.ts';
 import { closeDatabase, createDatabase } from './client.ts';
@@ -9,9 +10,10 @@ import { users } from './schema/users.ts';
 /**
  * Dati di partenza per lo sviluppo. Rieseguibile.
  *
- * La registrazione passa da `auth.api.signUpEmail` e non da un `insert`: è
- * l'unico modo di ottenere anche la riga in `accounts` con l'hash della
- * password, quindi utenti con cui si può davvero accedere. Per chi era già nel
+ * La creazione passa da `createAccount` e non da un `insert` nudo: scrive anche
+ * la riga in `accounts` con l'hash della password, quindi utenti con cui si può
+ * davvero accedere. L'iscrizione pubblica è spenta, quindi `auth.api.signUpEmail`
+ * qui non funzionerebbe. Per chi era già nel
  * database prima dell'autenticazione (o è nato senza credenziali) le
  * credenziali si aggiungono a parte, con l'hasher della libreria.
  *
@@ -43,9 +45,7 @@ async function main() {
     });
 
     if (!existing) {
-      await auth.api.signUpEmail({
-        body: { name: seed.name, email: seed.email, password: SEED_PASSWORD },
-      });
+      await createAccount(db, auth, { name: seed.name, email: seed.email, password: SEED_PASSWORD });
 
       registered += 1;
     }

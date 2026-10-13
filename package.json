@@ -21,6 +21,7 @@
     "db:migrate": "node server/database/migrate.ts",
     "db:seed": "node server/database/seed.ts",
     "db:studio": "drizzle-kit studio",
+    "user:create": "node scripts/user-create.ts",
     "api:spec": "node scripts/api-spec.ts",
     "format": "eslint --fix ."
   },

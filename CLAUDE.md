@@ -39,6 +39,7 @@ npm run test:backend   # node --test, no database and no Nuxt
 npm run test:concurrency   # Postgres in Docker (compose.test.yml)
 npm run test:scenario  # nuxt dev on a fresh PGlite, over HTTP
 npm run api:spec       # regenerate docs/api/openapi.json (reference on /_docs in dev)
+npm run user:create -- --email … --name …   # no public sign-up: accounts are made here
 ```
 
 Database commands (`db:*`) are in `.claude/rules/backend/database.md`.

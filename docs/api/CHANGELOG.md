@@ -5,6 +5,15 @@ rotta (**proposto**, **disponibile**, **cambiato**, **deprecato**), cosa fare da
 quale seam `ponytail:` chiude, se ne chiude uno. Il riferimento completo è su `/_docs` in sviluppo,
 generato in `docs/api/openapi.json`; le convenzioni sono in `docs/api/README.md`.
 
+## 2026-10-13 · Iscrizione pubblica spenta (F0.4)
+
+- **Cambiato:** `POST /api/auth/sign-up/email` (Better Auth) risponde `400` con
+  `code: 'EMAIL_PASSWORD_SIGN_UP_DISABLED'`. In v1 nessuno si iscrive da solo: gli account li crea
+  il backend con `npm run user:create`. Nel frontend non c'è una pagina di registrazione, quindi non
+  si rompe niente; non va aggiunta.
+- Login, logout e sessione (`/api/auth/sign-in/email`, `/sign-out`, `/get-session`) non cambiano. Gli
+  utenti del seed restano, con la password `password`.
+
 ## 2026-10-13 · Riferimento generato e convenzioni (F0.3)
 
 - **Nuovo:** `/_docs` (solo in sviluppo) mostra il riferimento dell'API con Scalar, letto da

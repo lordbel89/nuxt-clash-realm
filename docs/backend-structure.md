@@ -78,6 +78,8 @@ Gli aiuti stanno in `tests/support/`:
   `scenario` ha una cartella di build sua (`node_modules/.cache/nuxt-scenario`), così i test non
   riscrivono `.nuxt/` sotto un dev server acceso; per lo stesso motivo i file [S] girano uno alla
   volta. Si usa `nuxt dev` e non il build di produzione perché quello esclude PGlite dal bundle.
+  L'iscrizione pubblica è spenta: gli utenti dello scenario si passano in `startTestServer({ users })`
+  e si creano prima dell'avvio; `signIn(server, email, password)` apre la sessione via HTTP.
 
 PGlite è una connessione sola: i test [I] non vedono bug di lock o di concorrenza. Tutto ciò che
 dipende dal comportamento transazionale sotto carico va provato in [C].
