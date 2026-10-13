@@ -30,6 +30,15 @@ Gli handler chiedono `requireOrganizationRole(event, id, roles)`: chi non è mem
 l'organizzazione non esistesse. Le modifiche che possono togliere un owner bloccano la riga
 dell'organizzazione (`FOR UPDATE`), così l'ultimo owner resta anche sotto modifiche simultanee.
 
+## Date e fusi orari
+
+L'aritmetica di calendario passa da `server/utils/time.ts`, sopra Temporal: fuso del torneo valido
+(`canonicalTimeZone`, solo nomi IANA), istante ↔ fuso (`inTimeZone`, `toDate`), orari locali con la
+disambiguazione `compatible` (`fromLocal`, `atLocalTime`), giorni di calendario (`addLocalDays`: 23 o
+25 ore nelle notti del cambio d'ora), scadenze a fine giornata come limite escluso (`endOfLocalDay`,
+`deadlineAfterDays`). Il database parla `Date`; nessun `Date` fa aritmetica di calendario. Il modulo
+non legge l'ora: chi ne ha bisogno la riceve come parametro.
+
 ## Responsabilità
 
 - Gli handler leggono la sessione, validano input e traducono l'assenza in HTTP 404.
