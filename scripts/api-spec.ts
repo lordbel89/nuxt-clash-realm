@@ -30,13 +30,13 @@ type JsonSchema = Record<string, unknown>;
 /** La specifica completa, serializzata in modo stabile: due generazioni dallo stesso codice danno lo stesso testo. */
 export async function buildOpenApi(): Promise<string> {
   // ApiErrorData non è la risposta di nessuna rotta, ma il corpo dei 400 la usa
-  const responses = await responseSchemas([...routes.map(route => route.response), 'ApiErrorData']);
+  const responses = await responseSchemas([...routes.map(route => route.response).filter(type => type !== 'void'), 'ApiErrorData']);
   const paths: Record<string, Record<string, unknown>> = {};
 
   for (const route of routes) {
     const path = route.path.replace(/:(\w+)/g, '{$1}');
     paths[path] ??= {};
-    paths[path][route.method.toLowerCase()] = operation(route, responses.refs.get(route.response)!);
+    paths[path][route.method.toLowerCase()] = operation(route, responses.refs.get(route.response));
   }
 
   const spec = {
@@ -66,7 +66,7 @@ export async function buildOpenApi(): Promise<string> {
 
 const STATUS_LABEL = { proposed: 'proposto', available: 'disponibile', deprecated: 'deprecato' } as const;
 
-function operation(route: RouteSpec, responseRef: JsonSchema) {
+function operation(route: RouteSpec, responseRef: JsonSchema | undefined) {
   const parameters = [
     ...objectParameters(route.params, 'path'),
     ...objectParameters(route.query, 'query'),
@@ -92,7 +92,9 @@ function operation(route: RouteSpec, responseRef: JsonSchema) {
       requestBody: { required: true, content: { 'application/json': { schema: inputSchema(route.body) } } },
     }),
     'responses': {
-      200: { description: 'OK', content: { 'application/json': { schema: responseRef } } },
+      ...(responseRef
+        ? { 200: { description: 'OK', content: { 'application/json': { schema: responseRef } } } }
+        : { 204: { description: 'Fatto, nessun contenuto' } }),
       ...errors,
     },
   };

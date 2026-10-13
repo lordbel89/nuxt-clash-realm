@@ -38,7 +38,7 @@ della revisione che ha tolto le contraddizioni sono in [`revisione-brainstorm.md
 6. **La riga di database non è il contratto API** (vedi `CLAUDE.md`): row → mapper → DTO in uscita,
    schema Valibot condiviso in entrata.
 
-**Stack:** Nuxt full stack · better-auth per l'identità multi-organizzazione · Drizzle su Postgres ·
+**Stack:** Nuxt full stack · better-auth solo per account e login · Drizzle su Postgres ·
 Node 26 · pg-boss per **tutti** i job · SSE per il live in sala · PWA installabile con Web Push (VAPID) · email
 via SMTP. Nessun Redis, e **nessun fornitore insostituibile**: l'SMTP è uno standard e il fornitore
 sta in configurazione. Deploy su **CapRover**, in un container Node sempre acceso.
@@ -649,17 +649,19 @@ Va ricercato prima di progettarlo: start.gg (*stations*), Challonge, tornei di S
 ### Ruoli, penalità, arbitraggio
 
 - **Ruoli su due livelli.**
-  - **Organizzazione** — *owner* e *admin*, come le community di Challonge e i ruoli predefiniti del
-    plugin `organization` di Better Auth. Creano i tornei dell'organizzazione, ne gestiscono staff,
-    template e leghe, e hanno pieno controllo su tutti i suoi tornei. **Non esiste un ruolo
-    «organizzatore» del torneo**: la responsabilità è dell'organizzazione, e chi ha creato il torneo
-    resta solo come dato registrato. Chi vuole un torneo fra amici crea un'organizzazione.
+  - **Organizzazione** — *owner* e *admin*, come le community di Challonge. Organizzazioni, membri e
+    ruoli sono tabelle e rotte nostre: Better Auth serve solo per account e login, e il suo plugin
+    `organization` non si usa (decisione del 13/10). Creano i tornei dell'organizzazione, ne
+    gestiscono staff, template e leghe, e hanno pieno controllo su tutti i suoi tornei. **Non esiste
+    un ruolo «organizzatore» del torneo**: la responsabilità è dell'organizzazione, e chi ha creato
+    il torneo resta solo come dato registrato. Chi vuole un torneo fra amici crea
+    un'organizzazione.
   - **Torneo** — *head judge* · *judge* · *scorekeeper*, assegnati al singolo torneo. Possono essere
     membri dell'organizzazione o **utenti esterni**: il judge che arbitra in negozi diversi si aggiunge
-    al torneo senza entrare nell'organizzazione. Better Auth non ha permessi per singola risorsa,
-    quindi questo livello è una tabella nostra.
-  - Staff e admin si aggiungono **con un invito via email** (Better Auth) o **cercandoli fra gli
-    utenti registrati**.
+    al torneo senza entrare nell'organizzazione. Anche questo livello è una tabella
+    nostra.
+  - Staff e admin si aggiungono **con un invito via email** (nostro, quando ci sarà il mailer) o
+    **cercandoli fra gli utenti registrati**.
 - **L'arbitraggio è una scelta del torneo** (`judging`). Spento, non esistono head judge e judge,
   penalità né chiamata arbitro: lo staff è fatto di owner, admin e scorekeeper.
 - **Il judge che gioca è un'opzione del torneo, spenta di default**, come nell'MTR (1.3: chi gioca
@@ -892,7 +894,7 @@ definito, nessun preset), **svizzera con top cut**, individuale.
 
 ### Nella v1
 
-- **Fondamenta**: deploy su CapRover (Node 26, Postgres), plugin `organization` con owner e admin,
+- **Fondamenta**: deploy su CapRover (Node 26, Postgres), organizzazioni con owner e admin,
   profili giocatore creati al volo al banco (§2), storico del torneo, fuso orario del torneo.
 - **Composizione**: solo torneo libero. Moduli: svizzera, gate per posizione, top cut a eliminazione
   singola; forme di risultato `win_loss_draw` e `best_of_n`; punti 3/1/0; tiebreak `OMW%`, `GW%`,
@@ -912,7 +914,7 @@ torneo continua solo dai dati mobili di un telefono. È il rischio che la v1 acc
 
 | Milestone | Entro | Contenuto |
 |---|---|---|
-| **M0 · Walking skeleton** | domenica 11 ottobre | App e Postgres su CapRover, Node 26, plugin `organization`, un torneo libero creato da un admin e mostrato in una pagina che si aggiorna via SSE. Due prove tecniche: pg-boss e `fromDrizzle` su PGlite, `LISTEN/NOTIFY` dietro l'nginx di CapRover. |
+| **M0 · Walking skeleton** | domenica 11 ottobre | App e Postgres su CapRover, Node 26, organizzazioni, un torneo libero creato da un admin e mostrato in una pagina che si aggiorna via SSE. Due prove tecniche: pg-boss e `fromDrizzle` su PGlite, `LISTEN/NOTIFY` dietro l'nginx di CapRover. |
 | **M1 · Svizzera completa** | domenica 1 novembre | Profili al volo, iscrizione e check-in, motore svizzero con tiebreak, ciclo del round, risultati e contestazioni, storico, classifica e snapshot, cronometro, display. |
 | **M2 · Top cut** | domenica 15 novembre | Gate, eliminazione singola senza patta, linearizzazione, classifica finale. |
 | **M3 · Prova generale** | domenica 22 novembre | Un torneo di prova nel negozio con persone vere, e una settimana per correggere. |

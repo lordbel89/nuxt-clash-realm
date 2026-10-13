@@ -57,7 +57,8 @@ termine italiano nella prosa e l'identificatore inglese dove parla di modello, t
 | Termine | Identificatore | Definizione |
 |---|---|---|
 | Organizzazione | `Organization` | Proprietaria dei tornei. Non esistono tornei personali. |
-| Ruoli di organizzazione | `owner`, `admin` | I ruoli predefiniti del plugin `organization` di Better Auth. |
+| Ruoli di organizzazione | `owner`, `admin` | Gli unici due, con pieno controllo sui tornei dell'organizzazione. Solo un owner crea o promuove un owner; l'ultimo owner non può uscire. Gestiti da noi: Better Auth serve solo per account e login. |
+| Membro dell'organizzazione | `OrganizationMember` | Un utente con un ruolo nell'organizzazione. Da non confondere con il membro del partecipante (`ParticipantMember`). |
 | Ruoli di torneo | `head_judge`, `judge`, `scorekeeper` | Assegnati al singolo torneo, anche a utenti esterni all'organizzazione. |
 | Lega interna | `League` | Creata dall'organizzazione; tornei propri, ricorrenti. |
 | Circuito nazionale | `Circuit` | Uno per gioco, creato solo dalla piattaforma. Accetta solo il proprio preset, non modificato. |

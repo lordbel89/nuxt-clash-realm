@@ -1,8 +1,10 @@
-import type { UserId } from '#shared/types/ids';
+import type { OrganizationId, UserId } from '#shared/types/ids';
+import type { OrganizationRole } from '#shared/types/organization';
 import type { H3Event } from 'h3';
 import type { Auth } from '../auth/index.ts';
 import { createAuth } from '../auth/index.ts';
 import { DEV_SECRET } from '../auth/env.ts';
+import { findMemberRole } from '../services/organizations.ts';
 
 /**
  * Unico punto di contatto fra Better Auth e il resto del backend: gli handler
@@ -85,4 +87,26 @@ export async function requireUserId(event: H3Event): Promise<UserId> {
   const session = await requireSession(event);
 
   return session.user.id as UserId;
+}
+
+/** Tutti i ruoli di organizzazione: per le letture aperte a qualunque membro. */
+export const ANY_ORGANIZATION_ROLE: readonly OrganizationRole[] = ['owner', 'admin'];
+
+/**
+ * Sessione e ruolo nell'organizzazione. Chi non ne è membro riceve 404, come se non esistesse:
+ * un'organizzazione non si scopre per tentativi. Un membro senza il ruolo richiesto riceve 403.
+ */
+export async function requireOrganizationRole(event: H3Event, organizationId: OrganizationId, roles: readonly OrganizationRole[]) {
+  const userId = await requireUserId(event);
+  const role = await findMemberRole(await useDatabase(), organizationId, userId);
+
+  if (!role) {
+    throw createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Organizzazione non trovata' });
+  }
+
+  if (!roles.includes(role)) {
+    throw createError({ statusCode: 403, statusMessage: 'Forbidden', message: `Operazione riservata al ruolo ${roles.join(' o ')}` });
+  }
+
+  return { userId, role };
 }

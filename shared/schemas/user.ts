@@ -1,6 +1,6 @@
 import type { UserId } from '#shared/types/ids';
 import * as v from 'valibot';
-import { brandedUuid } from './common.ts';
+import { brandedUuid, ListQuery } from './common.ts';
 
 /**
  * Contratti d'ingresso dell'utente.
@@ -23,3 +23,20 @@ export const UserIdParams = v.object({
 }, 'Identificativo utente richiesto');
 
 export type UserIdParams = v.InferOutput<typeof UserIdParams>;
+
+/**
+ * Elenco della rubrica, con la ricerca per trovare chi aggiungere a un'organizzazione o a uno
+ * staff. `search` cerca nel nome per sottostringa, e nell'email solo per intero: chi conosce
+ * l'indirizzo trova la persona, ma gli indirizzi non si scoprono per tentativi parziali.
+ */
+export const UserListQuery = v.object({
+  ...ListQuery.entries,
+  search: v.optional(v.pipe(
+    v.string('Testo di ricerca non valido'),
+    v.trim(),
+    v.minLength(2, 'Scrivere almeno due caratteri'),
+    v.maxLength(100, 'Testo di ricerca troppo lungo'),
+  )),
+}, 'Parametri di ricerca non validi');
+
+export type UserListQuery = v.InferOutput<typeof UserListQuery>;

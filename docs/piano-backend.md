@@ -53,7 +53,7 @@ Cosa c'è oggi nel codice:
 | `users`, `sessions`, `accounts`, `verifications` | fatto, con migrazioni |
 | `GET /api/users`, `/api/users/:id`, `/api/users/me` | fatto, con test [U] |
 | `readInput` / `readParams` / `readQuery`, `ApiErrorData` | fatto |
-| Plugin `organization`, pg-boss, SSE, deploy CapRover | **mancano: la M0 non è chiusa** |
+| Organizzazioni, pg-boss, SSE, deploy CapRover | **mancano: la M0 non è chiusa** |
 | `server/engine/` | vuoto |
 | `shared/types/tournament.ts` | modello provvisorio del frontend, servito solo dai mock |
 
@@ -261,14 +261,18 @@ e uno script `npm run user:create -- --email … --name …` che crea l'utente c
 Auth. Va detto a Marco: una pagina di registrazione, se c'è, smette di funzionare. *Test:* [I] lo
 script crea un utente che poi fa login. *Fatto:* nessuno si registra da solo.
 
-**F0.5 · Plugin `organization`.** Le tabelle `organizations`, `members`, `invitations` scritte a mano
-come quelle di `auth.ts`, più `activeOrganizationId` sulla sessione. Ruoli: solo `owner` e `admin`.
-Chi crea un'organizzazione ne diventa owner. In `server/utils/auth.ts` va
-`requireOrganizationRole(event, organizationId, roles)`. Senza mailer i membri si aggiungono cercandoli
-fra gli utenti registrati: `GET /api/users?search=` e `POST /api/organizations/:id/members` (le API
-server del plugin, perché `addMember` non è esposta al client). **[contratto]** *Test:* [I] creazione,
-aggiunta di un membro, rifiuto di un non membro. *Fatto:* un utente crea un'organizzazione e aggiunge
-un admin.
+**F0.5 · Organizzazioni.** Tutto nostro: Better Auth resta solo per account e login, il plugin
+`organization` non si usa (decisione del 2026-10-13). Tabelle `organizations` (`name`, `slug` dal nome
+e poi fisso) e `members` (`role` solo `owner` o `admin`). Chi crea un'organizzazione ne diventa owner.
+In `server/utils/auth.ts` va `requireOrganizationRole(event, organizationId, roles)`: 404 a chi non è
+membro, 403 a chi non ha il ruolo. Senza mailer i membri si aggiungono cercandoli fra gli utenti
+registrati (`GET /api/users?search=`, nome per sottostringa, email solo intera). Rotte:
+`GET/POST /api/organizations`, `GET/PATCH /api/organizations/:id`, `GET/POST …/:id/members`,
+`PATCH/DELETE …/:id/members/:userId`. Un owner aggiunge owner e admin, un admin solo admin; solo un
+owner cambia i ruoli; l'ultimo owner non esce né si declassa. Niente organizzazione «attiva» nella
+sessione: la porta il percorso. **[contratto]** *Test:* [U] regole e slug, [I] servizi, [C] due
+owner che si declassano insieme, [S] il flusso via HTTP. *Fatto:* un utente crea un'organizzazione e
+aggiunge un admin.
 
 **F0.6 · Fuso orario e date.** Un piccolo modulo `server/utils/time.ts` sopra Temporal: istante ↔
 `ZonedDateTime` nel fuso del torneo, disambiguazione `compatible`, «fine giornata nel fuso». Serve
@@ -787,7 +791,7 @@ Bozza: ogni rotta si fissa nello step che la introduce, ed è il registro di F0.
 | Area | Rotte | Step |
 |---|---|---|
 | Salute | `GET /api/health` | F0.11 |
-| Organizzazioni | `/api/auth/organization/*` (Better Auth), `POST /api/organizations/:id/members`, `GET /api/users?search=` | F0.5 |
+| Organizzazioni | `GET/POST /api/organizations`, `GET/PATCH /api/organizations/:id`, `GET/POST /api/organizations/:id/members`, `PATCH/DELETE /api/organizations/:id/members/:userId`, `GET /api/users?search=` | F0.5 |
 | Tornei | `GET/POST /api/tournaments`, `GET/PATCH /api/tournaments/:id` | F0.7 |
 | Atti del torneo | `POST /api/tournaments/:id/{publish,open-registration,open-checkin,start,cancel}` | F2.4, F2.8 |
 | Live | `GET /api/tournaments/:id/stream` (SSE), `GET /api/tournaments/:id/live` | F0.9, F4.2 |

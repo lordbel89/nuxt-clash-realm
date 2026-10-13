@@ -5,6 +5,28 @@ rotta (**proposto**, **disponibile**, **cambiato**, **deprecato**), cosa fare da
 quale seam `ponytail:` chiude, se ne chiude uno. Il riferimento completo è su `/_docs` in sviluppo,
 generato in `docs/api/openapi.json`; le convenzioni sono in `docs/api/README.md`.
 
+## 2026-10-13 · Organizzazioni (F0.5)
+
+Le organizzazioni sono tutte rotte nostre: Better Auth resta solo per account e login, e il plugin
+`organization` non si usa. Il client di Better Auth non va esteso.
+
+- **Disponibile:** `GET/POST /api/organizations`, `GET/PATCH /api/organizations/:id`,
+  `GET/POST /api/organizations/:id/members`, `PATCH/DELETE /api/organizations/:id/members/:userId`.
+  Dettagli e errori su `/_docs`. In breve:
+  - chiunque crea un'organizzazione e ne diventa owner; lo slug si calcola dal nome e non cambia
+    più, nemmeno quando il nome cambia;
+  - un'organizzazione la vedono solo i membri: per gli altri è un `404`;
+  - un owner aggiunge owner e admin, un admin solo admin; solo un owner cambia i ruoli;
+  - `DELETE …/members/<il proprio id>` è «esci dall'organizzazione»; l'ultimo owner non esce e non
+    si declassa (`409`).
+- **Cambiato:** `GET /api/users` accetta `search` (almeno due caratteri): trova il nome per
+  sottostringa e l'email solo se scritta per intero.
+- **Nuovo in `shared/`:** `types/organization.ts` (`Organization`, `OrganizationSummary`,
+  `OrganizationMember`, `OrganizationRole`), `schemas/organization.ts`, `OrganizationId` in
+  `types/ids.ts`, `UserListQuery` in `schemas/user.ts`.
+- **Seed:** `npm run db:migrate && npm run db:seed` crea «Negozio di prova», con Luca
+  (`test@example.com`) owner e Giulia admin. Marco Ferrari non ne è membro.
+
 ## 2026-10-13 · Iscrizione pubblica spenta (F0.4)
 
 - **Cambiato:** `POST /api/auth/sign-up/email` (Better Auth) risponde `400` con

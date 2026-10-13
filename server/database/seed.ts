@@ -4,6 +4,7 @@ import { readAuthEnv } from '../auth/env.ts';
 import { createAuth } from '../auth/index.ts';
 import { closeDatabase, createDatabase } from './client.ts';
 import { readDatabaseEnv } from './env.ts';
+import { members, organizations } from './schema/organizations.ts';
 import { accounts } from './schema/auth.ts';
 import { users } from './schema/users.ts';
 
@@ -19,6 +20,9 @@ import { users } from './schema/users.ts';
  *
  * Sofia serve a provare il divieto: la sospensione si applica dopo la
  * registrazione, come farebbe un'azione amministrativa.
+ *
+ * L'organizzazione di prova ha Luca owner e Giulia admin; Marco ne resta fuori,
+ * per vedere come risponde un'organizzazione a chi non è membro.
  */
 
 const SEED_PASSWORD = 'password';
@@ -72,12 +76,38 @@ async function main() {
     }
   }
 
+  const seedOrganization = await seedOrganizations(db);
+
   console.info(
     `Utenti registrati: ${registered}, credenziali aggiunte: ${repaired}, `
-    + `già a posto: ${SEED_USERS.length - registered - repaired} — password: ${SEED_PASSWORD}`,
+    + `già a posto: ${SEED_USERS.length - registered - repaired} — password: ${SEED_PASSWORD}. `
+    + `Organizzazione di prova: ${seedOrganization}`,
   );
 
   await closeDatabase(db);
+}
+
+const SEED_ORGANIZATION = { name: 'Negozio di prova', slug: 'negozio-di-prova' };
+
+const SEED_MEMBERS = [
+  { email: 'test@example.com', role: 'owner' as const },
+  { email: 'giulia.bianchi@example.com', role: 'admin' as const },
+];
+
+async function seedOrganizations(db: Awaited<ReturnType<typeof createDatabase>>) {
+  const existing = await db.query.organizations.findFirst({ where: { slug: { eq: SEED_ORGANIZATION.slug } }, columns: { id: true } });
+  if (existing) return 'già presente';
+
+  await db.transaction(async (tx) => {
+    const [organization] = await tx.insert(organizations).values(SEED_ORGANIZATION).returning({ id: organizations.id });
+
+    for (const member of SEED_MEMBERS) {
+      const user = await tx.query.users.findFirst({ where: { email: { eq: member.email } }, columns: { id: true } });
+      await tx.insert(members).values({ organizationId: organization!.id, userId: user!.id, role: member.role });
+    }
+  });
+
+  return 'creata';
 }
 
 main().catch((error) => {

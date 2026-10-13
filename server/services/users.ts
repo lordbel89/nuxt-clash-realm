@@ -1,21 +1,38 @@
 import type { Database } from '../database/client.ts';
 import type { UserId } from '#shared/types/ids';
-import type { ListQuery } from '#shared/schemas/common';
+import type { UserListQuery } from '#shared/schemas/user';
 import type { Paginated } from '#shared/types/api';
 import type { User, UserSummary } from '#shared/types/user';
+import { eq, ilike, or } from 'drizzle-orm';
 import { users } from '../database/schema/users.ts';
 import { toUser, toUserSummary } from '../mappers/user.ts';
 
-/** Letture senza dipendenze HTTP; la sessione è verificata dagli handler. */
-export async function listUsers(db: Database, { limit, offset }: ListQuery): Promise<Paginated<UserSummary>> {
+/** `%`, `_` e `\` sono speciali in ILIKE: chi cerca «100%» cerca il carattere, non un jolly. */
+export function escapeLike(text: string) {
+  return text.replace(/[\\%_]/g, '\\$&');
+}
+
+/**
+ * Letture senza dipendenze HTTP; la sessione è verificata dagli handler.
+ *
+ * `search` trova il nome per sottostringa e l'email solo per intero (le email sono salvate in
+ * minuscolo): chi conosce l'indirizzo trova la persona, ma gli indirizzi non si sondano a pezzi.
+ */
+export async function listUsers(db: Database, { limit, offset, search }: UserListQuery): Promise<Paginated<UserSummary>> {
+  const pattern = search && `%${escapeLike(search)}%`;
+  const email = search?.toLowerCase();
+
+  // Lo stesso filtro in due forme: la query relazionale dà un alias alla tabella, quindi non
+  // accetta l'SQL scritto sulle colonne, e il conteggio non accetta il filtro a oggetto
   const [rows, total] = await Promise.all([
     db.query.users.findMany({
       columns: { id: true, name: true },
+      ...(search && { where: { OR: [{ name: { ilike: pattern } }, { email: { eq: email } }] } }),
       orderBy: { createdAt: 'asc', id: 'asc' },
       limit,
       offset,
     }),
-    db.$count(users),
+    db.$count(users, search ? or(ilike(users.name, pattern!), eq(users.email, email!)) : undefined),
   ]);
 
   // Totale informativo: le due letture possono osservare scritture concorrenti.

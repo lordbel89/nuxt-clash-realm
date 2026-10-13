@@ -21,6 +21,15 @@ quel consumer dovrà usare la vista minima oppure /me per il proprio account.
 Non esiste ancora un ruolo amministrativo: nessuna route ne simula i privilegi.
 UserSummary non è un Player; l'identità sportiva non è ancora implementata.
 
+## Organizzazioni
+
+Tutte nostre: Better Auth gestisce solo account e login. `organizations` e `members` (ruolo `owner`
+o `admin`, vincolo `CHECK`) sono scritte solo da `server/services/organizations.ts`, che contiene
+anche le regole fra ruoli come funzioni pure (`canAssignRole`, `canChangeRole`, `canRemoveMember`).
+Gli handler chiedono `requireOrganizationRole(event, id, roles)`: chi non è membro riceve 404, come se
+l'organizzazione non esistesse. Le modifiche che possono togliere un owner bloccano la riga
+dell'organizzazione (`FOR UPDATE`), così l'ultimo owner resta anche sotto modifiche simultanee.
+
 ## Responsabilità
 
 - Gli handler leggono la sessione, validano input e traducono l'assenza in HTTP 404.

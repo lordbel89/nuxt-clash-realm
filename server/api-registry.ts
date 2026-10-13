@@ -1,6 +1,14 @@
 import type { GenericSchema } from 'valibot';
 import { ListQuery } from '../shared/schemas/common.ts';
-import { UserIdParams } from '../shared/schemas/user.ts';
+import {
+  AddOrganizationMemberInput,
+  CreateOrganizationInput,
+  OrganizationIdParams,
+  OrganizationMemberParams,
+  UpdateOrganizationInput,
+  UpdateOrganizationMemberInput,
+} from '../shared/schemas/organization.ts';
+import { UserIdParams, UserListQuery } from '../shared/schemas/user.ts';
 
 /**
  * Registro delle rotte: da qui `npm run api:spec` genera `docs/api/openapi.json`, il riferimento
@@ -41,7 +49,10 @@ export interface RouteSpec {
   params?: GenericSchema;
   query?: GenericSchema;
   body?: GenericSchema;
-  /** Il tipo di risposta come espressione TypeScript sui nomi di `shared/types`: `Paginated<UserSummary>` */
+  /**
+   * Il tipo di risposta come espressione TypeScript sui nomi di `shared/types`: `Paginated<UserSummary>`.
+   * `void` vuol dire `204` senza corpo.
+   */
   response: string;
   /** Quando ciascun errore del dominio può capitare */
   errors?: Partial<Record<DomainErrorStatus, string>>;
@@ -53,10 +64,10 @@ export const routes: RouteSpec[] = [
     path: '/api/users',
     tag: 'Utenti',
     summary: 'Rubrica degli utenti registrati',
-    description: 'Solo id e nome, per cercare qualcuno da aggiungere. I dati privati stanno su `/api/users/me`.',
+    description: 'Solo id e nome, per cercare qualcuno da aggiungere a un\'organizzazione. `search` trova il nome per sottostringa e l\'email solo se scritta per intero. I dati privati stanno su `/api/users/me`.',
     status: 'available',
     access: 'session',
-    query: ListQuery,
+    query: UserListQuery,
     response: 'Paginated<UserSummary>',
   },
   {
@@ -81,5 +92,113 @@ export const routes: RouteSpec[] = [
     access: 'session',
     response: 'User',
     errors: { 404: 'L\'utente della sessione non esiste più' },
+  },
+  {
+    method: 'GET',
+    path: '/api/organizations',
+    tag: 'Organizzazioni',
+    summary: 'Le proprie organizzazioni',
+    description: 'Quelle di cui chi chiama è membro, ciascuna con il suo ruolo (`myRole`).',
+    status: 'available',
+    access: 'session',
+    query: ListQuery,
+    response: 'Paginated<Organization>',
+  },
+  {
+    method: 'POST',
+    path: '/api/organizations',
+    tag: 'Organizzazioni',
+    summary: 'Crea un\'organizzazione',
+    description: 'Qualunque utente può crearne una, e ne diventa owner. Lo slug si calcola dal nome (`Negozio Rossi` → `negozio-rossi`, poi `negozio-rossi-2`…) e non cambia più.',
+    status: 'available',
+    access: 'session',
+    body: CreateOrganizationInput,
+    response: 'Organization',
+  },
+  {
+    method: 'GET',
+    path: '/api/organizations/:id',
+    tag: 'Organizzazioni',
+    summary: 'Un\'organizzazione',
+    status: 'available',
+    access: 'session',
+    params: OrganizationIdParams,
+    response: 'Organization',
+    errors: { 404: 'L\'organizzazione non esiste, o chi chiama non ne è membro' },
+  },
+  {
+    method: 'PATCH',
+    path: '/api/organizations/:id',
+    tag: 'Organizzazioni',
+    summary: 'Rinomina un\'organizzazione',
+    description: 'Owner e admin. Lo slug resta quello di prima.',
+    status: 'available',
+    access: 'session',
+    params: OrganizationIdParams,
+    body: UpdateOrganizationInput,
+    response: 'Organization',
+    errors: { 404: 'L\'organizzazione non esiste, o chi chiama non ne è membro' },
+  },
+  {
+    method: 'GET',
+    path: '/api/organizations/:id/members',
+    tag: 'Organizzazioni',
+    summary: 'I membri di un\'organizzazione',
+    status: 'available',
+    access: 'session',
+    params: OrganizationIdParams,
+    query: ListQuery,
+    response: 'Paginated<OrganizationMember>',
+    errors: { 404: 'L\'organizzazione non esiste, o chi chiama non ne è membro' },
+  },
+  {
+    method: 'POST',
+    path: '/api/organizations/:id/members',
+    tag: 'Organizzazioni',
+    summary: 'Aggiunge un membro',
+    description: 'Un utente registrato, trovato con `GET /api/users?search=`. Un owner aggiunge owner e admin, un admin solo admin.',
+    status: 'available',
+    access: 'session',
+    params: OrganizationIdParams,
+    body: AddOrganizationMemberInput,
+    response: 'OrganizationMember',
+    errors: {
+      403: 'Un admin prova ad aggiungere un owner',
+      404: 'L\'organizzazione o l\'utente non esistono, o chi chiama non è membro',
+      409: 'L\'utente è già membro',
+    },
+  },
+  {
+    method: 'PATCH',
+    path: '/api/organizations/:id/members/:userId',
+    tag: 'Organizzazioni',
+    summary: 'Cambia il ruolo di un membro',
+    description: 'Solo un owner. L\'ultimo owner non si può declassare.',
+    status: 'available',
+    access: 'session',
+    params: OrganizationMemberParams,
+    body: UpdateOrganizationMemberInput,
+    response: 'OrganizationMember',
+    errors: {
+      403: 'Chi chiama è admin',
+      404: 'L\'organizzazione non esiste, chi chiama non è membro, o l\'utente non è membro',
+      409: 'Si declasserebbe l\'ultimo owner',
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/api/organizations/:id/members/:userId',
+    tag: 'Organizzazioni',
+    summary: 'Toglie un membro, o esce',
+    description: 'Con il proprio `userId` si esce dall\'organizzazione. Un owner toglie chiunque, un admin solo admin. L\'ultimo owner non esce.',
+    status: 'available',
+    access: 'session',
+    params: OrganizationMemberParams,
+    response: 'void',
+    errors: {
+      403: 'Un admin prova a togliere un owner',
+      404: 'L\'organizzazione non esiste, chi chiama non è membro, o l\'utente non è membro',
+      409: 'Uscirebbe l\'ultimo owner',
+    },
   },
 ];
