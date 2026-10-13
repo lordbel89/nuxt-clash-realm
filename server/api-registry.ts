@@ -8,6 +8,7 @@ import {
   UpdateOrganizationInput,
   UpdateOrganizationMemberInput,
 } from '../shared/schemas/organization.ts';
+import { CreateTournamentInput, TournamentIdParams, TournamentListQuery, UpdateTournamentInput } from '../shared/schemas/tournament.ts';
 import { UserIdParams, UserListQuery } from '../shared/schemas/user.ts';
 
 /**
@@ -199,6 +200,57 @@ export const routes: RouteSpec[] = [
       403: 'Un admin prova a togliere un owner',
       404: 'L\'organizzazione non esiste, chi chiama non è membro, o l\'utente non è membro',
       409: 'Uscirebbe l\'ultimo owner',
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/tournaments',
+    tag: 'Tornei',
+    summary: 'Elenco dei tornei',
+    description: 'Pubblico. Senza `organizationId`: i tornei pubblicati di tutte le organizzazioni. Con `organizationId`: quelli dell\'organizzazione, bozze comprese se chi chiama ne è membro. Dal più recente.',
+    status: 'available',
+    access: 'public',
+    query: TournamentListQuery,
+    response: 'Paginated<TournamentSummary>',
+  },
+  {
+    method: 'POST',
+    path: '/api/tournaments',
+    tag: 'Tornei',
+    summary: 'Crea un torneo',
+    description: 'Owner e admin dell\'organizzazione. Nasce in bozza (`draft`), visibile solo all\'organizzazione. `startsAt` è l\'orario locale nel fuso del torneo (`2026-11-29T10:00`); `timezone` vale `Europe/Rome` se manca.',
+    status: 'available',
+    access: 'session',
+    body: CreateTournamentInput,
+    response: 'Tournament',
+    errors: { 404: 'L\'organizzazione non esiste, o chi chiama non ne è membro' },
+  },
+  {
+    method: 'GET',
+    path: '/api/tournaments/:id',
+    tag: 'Tornei',
+    summary: 'Un torneo',
+    description: 'Pubblico da `published` in poi; una bozza la vede solo l\'organizzazione.',
+    status: 'available',
+    access: 'public',
+    params: TournamentIdParams,
+    response: 'Tournament',
+    errors: { 404: 'Il torneo non esiste, o è una bozza e chi chiama non è dell\'organizzazione' },
+  },
+  {
+    method: 'PATCH',
+    path: '/api/tournaments/:id',
+    tag: 'Tornei',
+    summary: 'Modifica un torneo',
+    description: 'Owner e admin dell\'organizzazione. Un campo assente resta com\'è, `null` lo svuota. Cambiare solo `timezone` mantiene l\'orario locale di inizio.',
+    status: 'available',
+    access: 'session',
+    params: TournamentIdParams,
+    body: UpdateTournamentInput,
+    response: 'Tournament',
+    errors: {
+      404: 'Il torneo non esiste, o chi chiama non è dell\'organizzazione',
+      409: 'Il torneo è concluso o annullato',
     },
   },
 ];

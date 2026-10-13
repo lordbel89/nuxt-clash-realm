@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Paginated } from '#shared/types/api';
-import type { Tournament } from '#shared/types/tournament';
+import type { LegacyTournament as Tournament } from '#shared/types/legacy-tournament';
 
 definePageMeta({ title: 'Tornei' });
 

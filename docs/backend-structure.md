@@ -30,6 +30,15 @@ Gli handler chiedono `requireOrganizationRole(event, id, roles)`: chi non è mem
 l'organizzazione non esistesse. Le modifiche che possono togliere un owner bloccano la riga
 dell'organizzazione (`FOR UPDATE`), così l'ultimo owner resta anche sotto modifiche simultanee.
 
+## Tornei
+
+Un torneo appartiene a un'organizzazione e nasce in bozza. La bozza la vedono solo i membri
+dell'organizzazione (agli altri risponde 404); da `published` in poi le letture sono pubbliche e non
+chiedono sessione (`findUserId`, non `requireUserId`). `startsAt` è un istante con il fuso in
+`timezone`: in ingresso arriva come orario locale e lo converte il mapper (`fromLocal`), in uscita
+c'è anche come `startsAtLocal`. Il `seed` (256 bit, crittografico) non esce mai sul filo. Le modifiche
+passeranno dall'helper dei comandi in F0.8.
+
 ## Date e fusi orari
 
 L'aritmetica di calendario passa da `server/utils/time.ts`, sopra Temporal: fuso del torneo valido

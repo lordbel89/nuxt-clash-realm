@@ -5,6 +5,42 @@ rotta (**proposto**, **disponibile**, **cambiato**, **deprecato**), cosa fare da
 quale seam `ponytail:` chiude, se ne chiude uno. Il riferimento completo è su `/_docs` in sviluppo,
 generato in `docs/api/openapi.json`; le convenzioni sono in `docs/api/README.md`.
 
+## 2026-10-13 · Torneo minimo (F0.7)
+
+**Rompe il contratto provvisorio dei tornei**, come concordato.
+
+- **Spostato:** i tipi provvisori di `shared/types/tournament.ts` ora stanno in
+  `shared/types/legacy-tournament.ts`, con il prefisso `Legacy` (`LegacyTournament`, `LegacyMatch`,
+  `LegacyRound`, `LegacyParticipant`, `LegacyStanding`, `LegacyTournamentConfig`…). Nelle pagine e nel
+  mock è cambiata solo la riga d'import, con un alias (`LegacyTournament as Tournament`): il resto del
+  codice non è toccato e il typecheck dà gli stessi errori di prima. Il file legacy si cancella quando
+  nessuno lo importa più.
+- **Nuovo `shared/types/tournament.ts`:** `TournamentSummary` (elenchi) e `Tournament` (dettaglio),
+  `TournamentStatus` con i sette stati del glossario, `TournamentLocation`. Differenze dal legacy:
+  - `status`: `draft`, `published`, `registration_open`, `checkin_open`, `running`, `finished`,
+    `cancelled`. Spariscono `ready` e `paused` (la pausa è del cronometro del round);
+  - `startDate: Date` diventa `startsAt: string | null` (ISO in UTC) più `timezone` (IANA) e
+    `startsAtLocal` (`2026-11-29T10:00`, l'orario nel fuso del torneo, da rimettere nel form);
+  - `organization: OrganizationSummary`: ogni torneo è di un'organizzazione;
+  - `location: { name, position } | null`, `description: string | null`, `maxParticipants: number | null`
+    (null = nessun limite);
+  - non ci sono ancora `isTeam`, `leagueId`, `participants`, `rounds`, `currentRound`: arrivano con i
+    loro step (F2, F3, F13, F17).
+- **Nuovo `shared/schemas/tournament.ts`:** `CreateTournamentInput`, `UpdateTournamentInput`,
+  `TournamentListQuery`, più `TimeZoneInput` e `LocalDateTimeInput` riusabili nel form. `startsAt` si
+  manda come **orario locale** nel fuso del torneo (`2026-11-29T10:00`, il valore di un campo
+  `datetime-local`); il server lo converte. `timezone` vale `Europe/Rome` se manca. Nel `PATCH` un campo
+  assente resta com'è e `null` lo svuota; cambiare solo `timezone` mantiene l'orario locale.
+- **Disponibile:** `GET/POST /api/tournaments`, `GET/PATCH /api/tournaments/:id`. Un torneo nasce in
+  bozza: la bozza la vede solo l'organizzazione (per gli altri è un `404`), da `published` in poi le
+  letture non chiedono sessione. Chiudono i seam `ponytail:` di `tournaments/new.vue` (creazione),
+  `tournaments/[id]/settings.vue` (caricamento e salvataggio) e, per i soli dati del torneo,
+  `tournaments/[id]/index.vue`. Il mock `tournaments.mock.ts` copre solo i due `GET`: finché è
+  acceso, in sviluppo leggono dal mock, mentre `POST` e `PATCH` arrivano già agli handler veri.
+- **Nuovo in `shared/types/ids.ts`:** `TournamentId`.
+- **Seed:** il «Negozio di prova» ha due tornei, «Open di Natale» pubblicato e «Lega del giovedì» in
+  bozza.
+
 ## 2026-10-13 · Organizzazioni (F0.5)
 
 Le organizzazioni sono tutte rotte nostre: Better Auth resta solo per account e login, e il plugin

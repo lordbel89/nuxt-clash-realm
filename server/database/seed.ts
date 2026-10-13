@@ -5,6 +5,9 @@ import { createAuth } from '../auth/index.ts';
 import { closeDatabase, createDatabase } from './client.ts';
 import { readDatabaseEnv } from './env.ts';
 import { members, organizations } from './schema/organizations.ts';
+import { tournaments } from './schema/tournaments.ts';
+import { generateSeed } from '../services/tournaments.ts';
+import { fromLocal, toDate } from '../utils/time.ts';
 import { accounts } from './schema/auth.ts';
 import { users } from './schema/users.ts';
 
@@ -22,7 +25,8 @@ import { users } from './schema/users.ts';
  * registrazione, come farebbe un'azione amministrativa.
  *
  * L'organizzazione di prova ha Luca owner e Giulia admin; Marco ne resta fuori,
- * per vedere come risponde un'organizzazione a chi non è membro.
+ * per vedere come risponde un'organizzazione a chi non è membro. Ha due tornei:
+ * uno in bozza (lo vede solo l'organizzazione) e uno pubblicato (lo vedono tutti).
  */
 
 const SEED_PASSWORD = 'password';
@@ -105,6 +109,34 @@ async function seedOrganizations(db: Awaited<ReturnType<typeof createDatabase>>)
       const user = await tx.query.users.findFirst({ where: { email: { eq: member.email } }, columns: { id: true } });
       await tx.insert(members).values({ organizationId: organization!.id, userId: user!.id, role: member.role });
     }
+
+    const owner = await tx.query.users.findFirst({ where: { email: { eq: SEED_MEMBERS[0]!.email } }, columns: { id: true } });
+    const timezone = 'Europe/Rome';
+
+    await tx.insert(tournaments).values([
+      {
+        organizationId: organization!.id,
+        name: 'Open di Natale',
+        game: 'Magic: the Gathering',
+        description: 'Torneo libero, svizzera e top 8.',
+        timezone,
+        startsAt: toDate(fromLocal('2026-12-20T15:00', timezone)),
+        status: 'published',
+        maxParticipants: 32,
+        locationName: 'Negozio di prova',
+        createdBy: owner!.id,
+        seed: generateSeed(),
+      },
+      {
+        organizationId: organization!.id,
+        name: 'Lega del giovedì',
+        game: 'Pokémon GCC',
+        timezone,
+        status: 'draft',
+        createdBy: owner!.id,
+        seed: generateSeed(),
+      },
+    ]);
   });
 
   return 'creata';

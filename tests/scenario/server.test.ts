@@ -35,7 +35,7 @@ test('l\'iscrizione pubblica è spenta', async () => {
 });
 
 test('i mock sono spenti: nessuna risposta porta l\'header dei dati finti', async () => {
-  // /api/tournaments oggi esiste solo come mock
+  // /api/tournaments ha un mock di Marco: con i mock accesi risponderebbe lui
   const response = await fetch(`${server.url}/api/tournaments`, { redirect: 'manual' });
 
   assert.equal(response.headers.get('MOCK_DATA'), null);

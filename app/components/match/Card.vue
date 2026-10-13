@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Match } from '#shared/types/tournament';
+import type { LegacyMatch as Match } from '#shared/types/legacy-tournament';
 
 defineProps<{
   match: Match;

@@ -89,6 +89,16 @@ export async function requireUserId(event: H3Event): Promise<UserId> {
   return session.user.id as UserId;
 }
 
+/**
+ * Id dell'utente se la richiesta ha una sessione, `null` altrimenti: per le letture pubbliche che
+ * mostrano di più a chi è dell'organizzazione (le bozze dei tornei).
+ */
+export async function findUserId(event: H3Event): Promise<UserId | null> {
+  const session = await getAuthSession(event);
+
+  return session ? session.user.id as UserId : null;
+}
+
 /** Tutti i ruoli di organizzazione: per le letture aperte a qualunque membro. */
 export const ANY_ORGANIZATION_ROLE: readonly OrganizationRole[] = ['owner', 'admin'];
 

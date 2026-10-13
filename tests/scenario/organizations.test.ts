@@ -73,3 +73,32 @@ test('un nome troppo corto risponde 400 con il messaggio sul campo', async () =>
   assert.equal(response.status, 400);
   assert.deepEqual((await response.json()).data.fields.name, ['Il nome deve avere almeno due caratteri']);
 });
+
+test('l\'organizzazione crea un torneo in bozza: fuori dall\'organizzazione non esiste', async () => {
+  const organization = await (await mario.fetch('/api/organizations', { method: 'POST', ...json({ name: 'Ludoteca' }) })).json();
+
+  const created = await mario.fetch('/api/tournaments', {
+    method: 'POST',
+    ...json({ organizationId: organization.id, name: 'Open di Natale', game: 'Magic', startsAt: '2026-12-20T15:00' }),
+  });
+  assert.equal(created.status, 200);
+  const tournament = await created.json();
+  assert.equal(tournament.status, 'draft');
+  assert.equal(tournament.timezone, 'Europe/Rome');
+  assert.equal(tournament.startsAt, '2026-12-20T14:00:00.000Z');
+
+  // Senza sessione e da non membro, la bozza non c'è
+  assert.equal((await fetch(`${server.url}/api/tournaments/${tournament.id}`)).status, 404);
+  assert.equal((await anna.fetch(`/api/tournaments/${tournament.id}`)).status, 404);
+  const anonymous = await (await fetch(`${server.url}/api/tournaments?organizationId=${organization.id}`)).json();
+  assert.equal(anonymous.total, 0);
+
+  // Chi non è dell'organizzazione non modifica; chi lo è sì
+  const intrusion = await anna.fetch(`/api/tournaments/${tournament.id}`, { method: 'PATCH', ...json({ name: 'Mio' }) });
+  assert.equal(intrusion.status, 404);
+  const renamed = await mario.fetch(`/api/tournaments/${tournament.id}`, { method: 'PATCH', ...json({ name: 'Open di Natale 2026' }) });
+  assert.equal((await renamed.json()).name, 'Open di Natale 2026');
+
+  const own = await (await mario.fetch(`/api/tournaments?organizationId=${organization.id}`)).json();
+  assert.deepEqual(own.items.map((item: { name: string; }) => item.name), ['Open di Natale 2026']);
+});

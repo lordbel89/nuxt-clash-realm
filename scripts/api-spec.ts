@@ -106,7 +106,22 @@ function errorResponse(description: string, schema = 'ApiError') {
 
 /** Lo schema d'ingresso, senza `$schema`: in OpenAPI 3.1 il dialetto lo dichiara il documento. */
 function inputSchema(schema: GenericSchema): JsonSchema {
-  const { $schema: _, ...json } = toJsonSchema(schema, { typeMode: 'input', errorMode: 'ignore' }) as JsonSchema;
+  const { $schema: _, ...json } = toJsonSchema(schema, {
+    typeMode: 'input',
+    errorMode: 'ignore',
+    overrideAction: ({ valibotAction, jsonSchema }) => {
+      // `isoDateTime` di Valibot è un orario locale senza fuso (`2026-11-29T10:00`); il `date-time`
+      // di JSON Schema invece vuole l'offset, quindi direbbe il contrario
+      if (valibotAction.type !== 'iso_date_time') return undefined;
+      const { format: __, ...rest } = jsonSchema as JsonSchema;
+      return {
+        ...rest,
+        pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$',
+        description: 'Orario locale nel fuso del torneo, senza fuso né secondi',
+        examples: ['2026-11-29T10:00'],
+      };
+    },
+  }) as JsonSchema;
   return json;
 }
 

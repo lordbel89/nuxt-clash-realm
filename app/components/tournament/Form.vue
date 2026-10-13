@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { USelectItem } from '~/types/components';
-import type { TournamentConfig } from '#shared/types/tournament';
+import type { LegacyTournamentConfig as TournamentConfig } from '#shared/types/legacy-tournament';
 
 const model = defineModel<TournamentConfig>({ required: true });
 

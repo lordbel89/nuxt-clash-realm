@@ -287,6 +287,10 @@ dell'organizzazione), `GET /api/tournaments/:id`, `PATCH /api/tournaments/:id`. 
 `shared/types/tournament.ts` si riscrive qui (decisione 14.3): è un cambiamento che rompe le pagine
 di Marco e il suo mock, quindi va concordato con lui prima. *Test:* [U] mapper e schema, [I]
 servizio. *Fatto:* un admin crea e legge un torneo via API.
+*Deciso con Marco (2026-10-13):* i tipi provvisori passano in `shared/types/legacy-tournament.ts` con
+prefisso `Legacy`, e lui adatta pagine e mock per conto suo; `location` è `{ name, position }`;
+`startsAt` arriva come orario locale nel fuso del torneo; c'è `description`; `Europe/Rome` è il fuso di
+default. Una bozza la vede solo l'organizzazione.
 
 **F0.8 · Helper dei comandi e storico.** La tabella `history_entries`
 (`{ tournamentId, entity, entityId, action, actorId, reason, before, after, at }`) e
