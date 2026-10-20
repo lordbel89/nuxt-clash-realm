@@ -1,0 +1,20 @@
+# Fuori dal contesto di build: si rigenera nell'immagine o non serve al server
+.git
+.github
+.claude
+.vscode
+.idea
+.data
+.nuxt
+.output
+.cache
+node_modules
+graphify-out
+tests
+test
+docs
+*.log
+.env
+.env.*
+!.env.example
+CLAUDE.local.md

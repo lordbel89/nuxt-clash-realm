@@ -14,6 +14,9 @@
     },
     {
       "name": "Tornei"
+    },
+    {
+      "name": "Servizio"
     }
   ],
   "paths": {
@@ -1414,6 +1417,39 @@
           }
         }
       }
+    },
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Servizio"
+        ],
+        "summary": "Il servizio è in piedi?",
+        "description": "**Stato:** disponibile\n\nControlla anche che il database risponda. Lo usa il controllo di salute del container; il frontend non ne ha bisogno.",
+        "x-status": "available",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Il database non risponde",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1488,6 +1524,20 @@
         },
         "additionalProperties": false,
         "description": "Payload di `createError({ data })` per gli errori di validazione. Tipizzarlo serve al frontend: `useFetch` espone un `FetchError<ApiErrorData>` e i messaggi tornano nel form senza passare da `any`."
+      },
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false,
+        "description": "Lo stato del servizio: `ok` solo se il database risponde."
       },
       "Organization": {
         "type": "object",

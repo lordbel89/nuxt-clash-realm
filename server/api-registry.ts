@@ -31,8 +31,11 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 /** Ciclo di vita di un endpoint: proposto (tipi e schemi pronti), disponibile (handler), deprecato. */
 export type RouteStatus = 'proposed' | 'available' | 'deprecated';
 
-/** Errori del dominio. 400 e 401 si deducono da input e accesso, quindi non si elencano. */
-export type DomainErrorStatus = 403 | 404 | 409;
+/**
+ * Errori che una rotta dichiara: quelli del dominio, più il 503 di un servizio che non risponde.
+ * 400 e 401 si deducono da input e accesso, quindi non si elencano.
+ */
+export type DomainErrorStatus = 403 | 404 | 409 | 503;
 
 export interface RouteSpec {
   method: HttpMethod;
@@ -276,5 +279,16 @@ export const routes: RouteSpec[] = [
       'Gli eventi non si conservano: chi si riconnette riparte da `hello` e rilegge.',
     ].join('\n'),
     errors: { 404: 'Il torneo non esiste, o è una bozza e chi chiama non è dell\'organizzazione' },
+  },
+  {
+    method: 'GET',
+    path: '/api/health',
+    tag: 'Servizio',
+    summary: 'Il servizio è in piedi?',
+    description: 'Controlla anche che il database risponda. Lo usa il controllo di salute del container; il frontend non ne ha bisogno.',
+    status: 'available',
+    access: 'public',
+    response: 'HealthStatus',
+    errors: { 503: 'Il database non risponde' },
   },
 ];

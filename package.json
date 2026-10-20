@@ -20,9 +20,11 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node server/database/migrate.ts",
     "db:seed": "node server/database/seed.ts",
+    "db:grant": "node server/database/grant.ts",
     "db:studio": "drizzle-kit studio",
     "user:create": "node scripts/user-create.ts",
     "api:spec": "node scripts/api-spec.ts",
+    "smoke": "node scripts/smoke.ts",
     "format": "eslint --fix ."
   },
   "dependencies": {

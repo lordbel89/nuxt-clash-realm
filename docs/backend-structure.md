@@ -103,6 +103,26 @@ plugin `server/plugins/jobs.ts` è spento (`NUXT_JOBS_ENABLED=false`); da F7 si 
 - **Tutto il resto** (ritentativi, cron, job differiti, code fallite) è F7.1. LISTEN/NOTIFY di pg-boss
   è spento: le code si interrogano a intervalli.
 
+## Deploy
+
+Il runbook è `docs/deploy.md`; qui il codice. Un push su `production` fa girare la Action
+(`.github/workflows/deploy.yml`: eslint, typecheck, test, concorrenza su un Postgres vero, scenari
+HTTP, `docker build`) e poi manda il repository a CapRover, che costruisce il `Dockerfile` (due fasi,
+`node:26-slim`, arm64 e amd64). Lo script di avvio (`docker-entrypoint.sh`) esce se manca una delle
+variabili obbligatorie (database, owner, segreto e origine di Better Auth), poi migra col ruolo owner
+(`DATABASE_MIGRATION_URL`), applica `applyGrants` (`server/database/grants.ts`) e lancia il server
+col ruolo dell'app, senza l'URL dell'owner nell'ambiente. Nell'immagine, oltre a `.output`, ci sono
+`server/auth`, `server/database` e `scripts/user-create.ts` con le sole dipendenze che servono loro,
+copiate dal `node_modules` del build con `scripts/runtime-deps.ts` (versioni del lockfile, non una
+nuova risoluzione).
+
+Il ruolo dell'app ha `SELECT, INSERT, UPDATE, DELETE` sulle tabelle di `public`, tranne quelle di
+sola aggiunta (`history_entries`: niente `UPDATE`, `DELETE` né `TRUNCATE`); non crea tabelle e non
+vede lo schema `drizzle`. `GET /api/health` controlla il database con un limite di 3 secondi e, se
+fallisce, scrive il motivo nel log (`[health]`). `npm run smoke` prova un'istanza già in piedi,
+compreso un flusso SSE aperto 65 secondi. Nessun template nginx: il `ping` ogni 30 secondi e
+`X-Accel-Buffering: no` bastano dietro l'nginx predefinito di CapRover (motivi in `docs/deploy.md`).
+
 ## Date e fusi orari
 
 L'aritmetica di calendario passa da `server/utils/time.ts`, sopra Temporal: fuso del torneo valido

@@ -309,8 +309,9 @@ transazione. In v1 nessuna funzione usa i job. *Test:* [I] e [C], un job accodat
 annullata non esiste. *Fatto:* esito documentato.
 
 **F0.11 · Deploy su CapRover.** `captain-definition` e `Dockerfile` (Node 26, `node-server`); il
-Postgres come app CapRover a sé; variabili `NUXT_*`; migrazioni applicate al rilascio; template nginx
-dell'app con `proxy_read_timeout` alto e buffering spento per SSE; `GET /api/health`. In produzione,
+Postgres come app CapRover a sé; variabili `NUXT_*`; migrazioni applicate al rilascio; SSE dietro
+l'nginx predefinito di CapRover, senza template: `ping` ogni 30 secondi sotto il `proxy_read_timeout`
+di 60, buffering spento da `X-Accel-Buffering: no` (vedi `docs/deploy.md`); `GET /api/health`. In produzione,
 il ruolo Postgres dell'app ha solo `INSERT` e `SELECT` su `history_entries`. Prova di
 `LISTEN/NOTIFY` dietro l'nginx di CapRover. *Test:* [S] ridotto contro l'istanza di produzione
 (health, login, SSE che resta aperto oltre 60 secondi). *Fatto:* il criterio della fase.

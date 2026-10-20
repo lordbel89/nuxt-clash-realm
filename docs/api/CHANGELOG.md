@@ -5,6 +5,15 @@ rotta (**proposto**, **disponibile**, **cambiato**, **deprecato**), cosa fare da
 quale seam `ponytail:` chiude, se ne chiude uno. Il riferimento completo è su `/_docs` in sviluppo,
 generato in `docs/api/openapi.json`; le convenzioni sono in `docs/api/README.md`.
 
+## 2026-10-21 · Health check (F0.11)
+
+**Nuova rotta, non rompe niente.** Nuovo file `shared/types/health.ts` (`HealthStatus`).
+
+- **Disponibile:** `GET /api/health`, pubblica. `200 { "status": "ok" }` se il database risponde,
+  `503` altrimenti. Lo usa il controllo di salute del container su CapRover; il frontend non ne ha
+  bisogno.
+- Nessun seam `ponytail:` chiuso.
+
 ## 2026-10-21 · Flusso live del torneo (F0.9)
 
 **Nuova rotta, non rompe niente.** Nessun file di `shared/` è cambiato.

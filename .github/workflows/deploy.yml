@@ -1,0 +1,76 @@
+# Deploy su CapRover a ogni push sul ramo `production`.
+#
+# Prima si verifica tutto, poi si invia il codice: se un controllo fallisce, CapRover non riceve
+# niente, quindi nessun build, nessuna migrazione e nessun container nuovo. Le migrazioni girano
+# all'avvio del container (docker-entrypoint.sh): se falliscono, la versione precedente resta su.
+# Il runbook è in docs/deploy.md.
+name: Deploy
+
+on:
+  push:
+    branches: [production]
+  workflow_dispatch:
+
+# Due deploy insieme si pesterebbero le migrazioni: il secondo aspetta il primo
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: clash
+          POSTGRES_PASSWORD: clash
+          POSTGRES_DB: clash_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U clash -d clash_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      # Il Postgres di sopra, al posto di quello di compose.test.yml
+      TEST_POSTGRES_URL: postgres://clash:clash@localhost:5432/clash_test
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx eslint .
+      - run: npx nuxt typecheck
+      - run: npm test
+      - name: Concorrenza (Postgres vero)
+        run: node --test tests/concurrency/*.test.ts
+      - name: Scenari via HTTP
+        run: npm run test:scenario
+
+  # Lo stesso Dockerfile che CapRover costruirà: un errore qui si vede prima, non sul server
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build .
+
+  deploy:
+    needs: [verify, image]
+    # «Run workflow» lascia scegliere qualunque ramo: online va solo `production`
+    if: github.ref == 'refs/heads/production'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # CapRover riceve il repository con il suo Dockerfile e costruisce l'immagine sul server
+      - uses: caprover/deploy-from-github@v2
+        with:
+          server: ${{ secrets.CAPROVER_SERVER }}
+          app: clash-realm
+          token: ${{ secrets.CAPROVER_APP_TOKEN }}
