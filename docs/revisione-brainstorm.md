@@ -9,7 +9,7 @@ con il metodo di sempre: **ricerca → domande → decisioni → conseguenze**. 
 | # | Argomento | Stato |
 |---|---|---|
 | 1 | Il log: che cos'è la fonte di verità | chiuso |
-| 2 | Riproducibilità: cosa si riesegue e cosa si salva come fatto | chiuso |
+| 2 | Riproducibilità: cosa si riesegue e cosa si salva come fatto | chiuso, ripensato il 21/10 |
 | 3 | Confine fra configurazione e codice («aggiungere un gioco») | chiuso |
 | 4 | Il bye nei tiebreak: scelta globale o parametro del ruleset | chiuso |
 | 5 | No-rematch quando un abbinamento completo non esiste | chiuso |
@@ -399,6 +399,26 @@ operazioni, evento terminato servito dall'ultimo snapshot) · §10 (il tie-break
 la condizione di «stesso input, stesso esito»).
 
 **Argomento chiuso.**
+
+### Ripensamento del 21 ottobre 2026
+
+**La verificabilità non è più un requisito.** Un abbinamento o un sorteggio non si ricontrolla
+rifacendo il calcolo con la versione del motore che l'ha prodotto. Cadono:
+- la decisione 4: il motore che non si aggiorna durante un torneo, e la firma che permette di
+  ricostruire il round;
+- nella decisione 2, la verifica del seed da parte dello staff;
+- le proposte tecniche 1 (firma di generazione) e 3 (motore come pacchetto con una versione propria,
+  verifica da riga di comando).
+
+Restano le decisioni 1, 3 e 5 e le proposte 2, 4 e 5. **Il seed resta salvato sul round, come dato
+interno** che non esce mai: dà lo stesso esito a parità di input, quindi un «rigenera» resta inutile e
+il diff del ri-abbinamento mostra solo l'effetto della correzione, e alimenta lo spaiamento automatico
+delle squadre e il numero di sorteggio. Restano anche il §0.2 (si congela la configurazione) e la
+matematica con le sole quattro operazioni: servono al ricalcolo, non alla verifica. Le menzioni della
+firma negli argomenti successivi (5, 12, 13) restano come traccia di allora.
+
+Applicato a `brainstorm.md` §0.4, §3, §7 e §11 · `glossario.md` (tolto `GenerationSignature`) ·
+`piano-backend.md` (tolti F1.13, F19.6 e `GET /api/rounds/:id/verification`) · `.claude/rules/engine.md`.
 
 ---
 
@@ -2058,3 +2078,9 @@ garanzia del circuito, che deve poter confrontare tornei diversi.
 postazioni fra i moduli) · §7 (arbitraggio per torneo; nuova sottosezione *Postazioni limitate*) ·
 §11 (postazioni limitate dopo la v1, fuori sequenza) · `glossario.md` (`Station`, `judging`, `scope`,
 `requires`, `conflicts`).
+
+### Ripensamento del 21 ottobre 2026
+
+La ragione 2 della discussione (verificabilità) cade con la verificabilità stessa (argomento 2,
+ripensamento del 21 ottobre). La decisione 2, catalogo chiuso, resta: la reggono le altre due
+ragioni, le interazioni fra moduli e il costo. Applicato al §3 di `brainstorm.md`.

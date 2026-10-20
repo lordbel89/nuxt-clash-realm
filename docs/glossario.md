@@ -91,7 +91,6 @@ termine italiano nella prosa e l'identificatore inglese dove parla di modello, t
 |---|---|---|
 | Risultato contestato | `disputed` | Stato di un match con una refertazione contraddittoria. |
 | Voce di storico | `HistoryEntry` | `{ tournamentId, entity, entityId, action, actorId, reason, before, after, at }`. Solo aggiunta. |
-| Firma di generazione | `GenerationSignature` | `{ engineVersion, seed, input }` sul round: serve a verificare un abbinamento, non a rieseguirlo. |
 | Snapshot | `StandingsSnapshot` | Classifica calcolata alla chiusura di un round. Per un torneo terminato è la classifica mostrata. |
 | Penalità | `Penalty` | *warning*, *game loss*, *match loss*, *disqualification*. |
 | Chiamata arbitro | `JudgeCall` | Dal telefono del giocatore, agganciata al tavolo. |

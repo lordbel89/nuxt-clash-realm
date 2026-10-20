@@ -27,9 +27,9 @@ della revisione che ha tolto le contraddizioni sono in [`revisione-brainstorm.md
    database: prendono partecipanti, risultati e configurazione, restituiscono abbinamenti o classifica. Fixture
    e test su quelli.
 4. **Ogni casualità è seedata, e ogni esito è un fatto.** Abbinamenti e sorteggi si salvano, non si
-   rieseguono. Seed e versione del motore non servono a rifare il calcolo ma a **verificarlo**: ogni
-   esito deve poter essere ricontrollato con la versione che l'ha prodotto. Il seed lo genera il
-   server e **nessuno lo sceglie**, nemmeno lo staff; lo verifica solo lo staff (§7).
+   rieseguono, e nessuno li ricontrolla rifacendo il calcolo. Il seed lo genera il server e
+   **nessuno lo sceglie**, nemmeno lo staff: è un dato interno, che non esce mai, e serve a dare lo
+   stesso esito a parità di input (§7).
 5. **Aggiungere un gioco significa scrivere una composizione, non toccare il motore.** Il motore
    offre un catalogo di moduli; un gioco che rientra nel catalogo è un preset, cioè una scelta di
    moduli e parametri. Una regola che il catalogo non ha è un **modulo nuovo**, cioè codice, ed è
@@ -214,10 +214,9 @@ testo (la patta nelle fasi a eliminazione, §4) diventano dichiarazioni del modu
 
 **Catalogo chiuso, non plugin.** I moduli li scrive lo sviluppo; l'organizzatore compone liberamente
 quelli che esistono. Un sistema di plugin aperto non cambierebbe niente per l'organizzatore e
-costerebbe due cose: i moduli non si limitano a convivere ma si modificano a vicenda (la penalità si
+costerebbe molto: i moduli non si limitano a convivere ma si modificano a vicenda (la penalità si
 traduce nella forma del risultato, i tiebreak dipendono dal bye, le postazioni cambiano il ciclo del
-round), e quelle interazioni sono codice; e la verifica di un round (§0.4) deve sapere esattamente
-quale codice l'ha prodotto.
+round), e quelle interazioni sono codice.
 
 **Il gioco** di un torneo è testo libero, anche fuori dai preset, e conta per le statistiche e per il
 profilo pubblico del giocatore.
@@ -511,16 +510,9 @@ regole diventano pesi sugli archi e si risolve un massimo accoppiamento, una com
   crittografico del server, e non cambia più. Ne segue che **stesso input dà stesso esito**: rigenerare
   senza cambiare niente restituisce lo stesso abbinamento, quindi «rigenera» è inutile per
   costruzione, non per divieto. Ogni cambiamento successivo è un override.
-- **Firma di generazione sul round**: `{ engineVersion, seed, input }`, con `input` in `jsonb` —
-  partecipanti nell'ordine ricevuto, punteggi considerati, coppie già incontrate, bye già ricevuti,
-  configurazione della fase.
-  Verificare significa `motore(input, seed) == abbinamento salvato`. È un'istantanea di ciò che il
-  motore ha ricevuto, non una ricostruzione di tutto il torneo.
-- **Il motore è un pacchetto con una versione propria.** Un round della versione corrente si verifica
-  dall'applicazione, uno di una versione precedente eseguendo quella versione da riga di comando,
-  come il pairing checker FIDE: l'applicazione non conserva il codice delle versioni vecchie. Il
-  motore non si aggiorna durante un torneo; se succede, il torneo passa alla versione nuova e la firma
-  dice quale round è stato generato da quale.
+- **Nessuna verifica a posteriori.** Il round salva il proprio seed, ma non l'input del motore né la
+  sua versione: un abbinamento non si ricontrolla rifacendo il calcolo. Contro le manipolazioni
+  basta lo storico, dove ogni override porta la sua motivazione.
 - **Cambiare l'input cambia l'esito**: aggiungere e togliere un partecipante prima di generare è un modo
   per ottenere un abbinamento diverso. Non si impedisce: resta visibile nello storico.
 
@@ -900,7 +892,7 @@ definito, nessun preset), **svizzera con top cut**, individuale.
   singola; forme di risultato `win_loss_draw` e `best_of_n`; punti 3/1/0; tiebreak `OMW%`, `GW%`,
   `OGW%` con pavimento; bye con i default del torneo libero.
 - **Torneo**: iscrizione e check-in fatti dall'organizzatore; round `generate → publish → start`;
-  motore con blossom pesato, seed del server e firma di generazione; **risultati inseriti solo dallo
+  motore con blossom pesato e seed del server; **risultati inseriti solo dallo
   staff**, con lo stato `disputed`; drop e mancato arrivo; override con motivazione; cronometro
   globale; classifica e snapshot; linearizzazione del top cut e classifica finale.
 - **Live**: SSE con fan-out per il display in sala e per i telefoni dei giocatori.
