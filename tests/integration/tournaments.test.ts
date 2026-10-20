@@ -81,14 +81,14 @@ test('l\'elenco di un\'organizzazione mostra le bozze ai membri; quello generale
 test('la modifica cambia solo i campi presenti; il solo fuso mantiene l\'orario locale', async () => {
   const tournament = await create(mario, shop.id, { startsAt: '2026-11-29T10:00', maxParticipants: 16, description: 'Prima' });
 
-  const moved = await updateTournament(db, tournament.id, validate(UpdateTournamentInput, { timezone: 'Europe/London' }));
+  const moved = await updateTournament(db, tournament.id, mario, validate(UpdateTournamentInput, { timezone: 'Europe/London' }));
   assert.ok(moved.ok);
   assert.equal(moved.tournament.startsAtLocal, '2026-11-29T10:00');
   assert.equal(moved.tournament.startsAt, '2026-11-29T10:00:00.000Z');
   assert.equal(moved.tournament.maxParticipants, 16);
   assert.equal(moved.tournament.description, 'Prima');
 
-  const cleared = await updateTournament(db, tournament.id, validate(UpdateTournamentInput, { description: null, maxParticipants: null }));
+  const cleared = await updateTournament(db, tournament.id, mario, validate(UpdateTournamentInput, { description: null, maxParticipants: null }));
   assert.ok(cleared.ok);
   assert.equal(cleared.tournament.description, null);
   assert.equal(cleared.tournament.maxParticipants, null);
@@ -98,9 +98,9 @@ test('un torneo concluso non si modifica; uno inesistente non si trova', async (
   const tournament = await create(mario, shop.id);
   await setStatus(tournament.id, 'finished');
 
-  assert.deepEqual(await updateTournament(db, tournament.id, { name: 'Troppo tardi' }), { ok: false, reason: 'closed' });
+  assert.deepEqual(await updateTournament(db, tournament.id, mario, { name: 'Troppo tardi' }), { ok: false, reason: 'closed' });
   assert.deepEqual(
-    await updateTournament(db, '00000000-0000-4000-8000-00000000ffff' as TournamentId, { name: 'Nessuno' }),
+    await updateTournament(db, '00000000-0000-4000-8000-00000000ffff' as TournamentId, mario, { name: 'Nessuno' }),
     { ok: false, reason: 'not_found' },
   );
 });

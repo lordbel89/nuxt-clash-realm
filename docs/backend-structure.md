@@ -37,7 +37,29 @@ dell'organizzazione (agli altri risponde 404); da `published` in poi le letture 
 chiedono sessione (`findUserId`, non `requireUserId`). `startsAt` è un istante con il fuso in
 `timezone`: in ingresso arriva come orario locale e lo converte il mapper (`fromLocal`), in uscita
 c'è anche come `startsAtLocal`. Il `seed` (256 bit, crittografico) non esce mai sul filo. Le modifiche
-passeranno dall'helper dei comandi in F0.8.
+passano dall'helper dei comandi (sotto).
+
+## Comandi del torneo e storico
+
+Ogni scrittura su un torneo esistente passa da `runTournamentCommand`
+(`server/services/tournament-commands.ts`). La creazione no: prima del torneo non c'è una riga da
+bloccare. L'helper apre una transazione e rilegge il torneo con `SELECT … FOR UPDATE`, quindi due
+comandi sullo stesso torneo si serializzano e il secondo vede lo stato lasciato dal primo; per questo i
+controlli di stato (un torneo concluso non si modifica) si fanno sulla riga che l'helper consegna e
+non su una lettura fatta prima. Il comando riceve `{ tx, tournament, record, emit }`:
+
+- `record({ entity, entityId, action, before, after })` aggiunge una voce a `history_entries`, scritta
+  nella stessa transazione. Attore e motivazione vengono dal contesto del comando. Lo storico è solo
+  aggiunta e registra anche le intenzioni che non cambiano lo stato (un risultato respinto);
+- `emit(event)` fa `pg_notify` sul canale `tournament_events` (`server/realtime/events.ts`), con soli
+  identificativi. Postgres consegna al commit; il notifier che ascolta è F0.9.
+
+Un comando che lancia un errore annulla modifica, voci ed eventi. Un comando che ritorna fa commit
+anche quando rifiuta l'atto con un esito, così un tentativo respinto lascia la sua voce; chi rifiuta
+senza voler lasciare tracce non chiama `record`. L'ordine delle voci è `history_entries.id`, che dentro
+un torneo segue l'ordine reale grazie al blocco; `at` è l'istante della transazione e le voci di uno
+stesso comando lo condividono. Il ruolo Postgres con solo `INSERT` e `SELECT` sulla tabella è parte
+del deploy (F0.11).
 
 ## Date e fusi orari
 

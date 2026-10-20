@@ -1,11 +1,12 @@
 import { randomBytes } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import type { CreateTournamentInput, TournamentListQuery, UpdateTournamentInput } from '#shared/schemas/tournament';
 import type { Paginated } from '#shared/types/api';
 import type { OrganizationId, TournamentId, UserId } from '#shared/types/ids';
 import type { Tournament, TournamentStatus, TournamentSummary } from '#shared/types/tournament';
 import { and, eq, ne } from 'drizzle-orm';
 import type { Database } from '../database/client.ts';
-import { tournaments } from '../database/schema/tournaments.ts';
+import { tournaments, type TournamentRow } from '../database/schema/tournaments.ts';
 import {
   TOURNAMENT_COLUMNS,
   TOURNAMENT_SUMMARY_COLUMNS,
@@ -15,6 +16,7 @@ import {
   toTournamentUpdate,
 } from '../mappers/tournament.ts';
 import { findMemberRole } from './organizations.ts';
+import { runTournamentCommand, TournamentNotFoundError, type Executor } from './tournament-commands.ts';
 
 /**
  * Tornei. Visibilità (brainstorm, ciclo di vita): una bozza la vede solo l'organizzazione; da
@@ -38,7 +40,7 @@ async function isMember(db: Database, organizationId: OrganizationId, viewerId: 
   return viewerId !== null && await findMemberRole(db, organizationId, viewerId) !== null;
 }
 
-async function readTournament(db: Database, id: TournamentId) {
+async function readTournament(db: Executor, id: TournamentId) {
   return await db.query.tournaments.findFirst({
     where: { id: { eq: id } },
     columns: { ...TOURNAMENT_COLUMNS, organizationId: true },
@@ -96,19 +98,36 @@ export async function findTournamentOrganization(db: Database, id: TournamentId)
 
 export type TournamentUpdate = { ok: true; tournament: Tournament; } | { ok: false; reason: 'not_found' | 'closed'; };
 
-/** Un torneo concluso o annullato non si modifica più. In F0.8 passa dall'helper dei comandi. */
-export async function updateTournament(db: Database, id: TournamentId, input: UpdateTournamentInput): Promise<TournamentUpdate> {
-  const current = await db.query.tournaments.findFirst({
-    where: { id: { eq: id } },
-    columns: { status: true, timezone: true, startsAt: true },
-  });
-  if (!current) return { ok: false, reason: 'not_found' };
-  if (CLOSED.includes(current.status)) return { ok: false, reason: 'closed' };
+/**
+ * Un torneo concluso o annullato non si modifica più. Lo stato si controlla con la riga bloccata
+ * dall'helper dei comandi, e lo storico porta solo i campi che cambiano davvero: una modifica che
+ * non cambia niente non lascia voci.
+ */
+export async function updateTournament(db: Database, id: TournamentId, actorId: UserId, input: UpdateTournamentInput): Promise<TournamentUpdate> {
+  try {
+    return await runTournamentCommand(db, { tournamentId: id, actorId }, async ({ tx, tournament, record, emit }) => {
+      if (CLOSED.includes(tournament.status)) return { ok: false, reason: 'closed' } as const;
 
-  const changes = toTournamentUpdate(input, current);
-  if (Object.keys(changes).length > 0) {
-    await db.update(tournaments).set(changes).where(eq(tournaments.id, id));
+      const changes = Object.entries(toTournamentUpdate(input, tournament))
+        .filter(([column, value]) => !isDeepStrictEqual(value, tournament[column as keyof TournamentRow]));
+
+      if (changes.length > 0) {
+        await tx.update(tournaments).set(Object.fromEntries(changes)).where(eq(tournaments.id, id));
+        record({
+          entity: 'tournament',
+          entityId: id,
+          action: 'updated',
+          before: Object.fromEntries(changes.map(([column]) => [column, tournament[column as keyof TournamentRow]])),
+          after: Object.fromEntries(changes),
+        });
+        emit({ type: 'tournament.updated' });
+      }
+
+      return { ok: true, tournament: toTournament((await readTournament(tx, id))!) } as const;
+    });
   }
-
-  return { ok: true, tournament: toTournament((await readTournament(db, id))!) };
+  catch (error) {
+    if (error instanceof TournamentNotFoundError) return { ok: false, reason: 'not_found' };
+    throw error;
+  }
 }
