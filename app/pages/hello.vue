@@ -4,15 +4,10 @@ definePageMeta({ title: 'Hello' });
 // Pagina di verifica: prima connessione reale tra frontend e database.
 // Niente generico su useFetch: annotarlo a mano disattiva l'inferenza da Nitro,
 // che è proprio ciò che tiene allineati handler e pagina. L'endpoint risponde
-// con un `Paginated<User>`, quindi le righe stanno in `items`.
+// con un `Paginated<UserSummary>`, quindi le righe stanno in `items`.
 const { data, status, error } = await useFetch('/api/users');
 
 const users = computed(() => data.value?.items ?? []);
-
-function formatDate(isoDate: string) {
-  // Il contratto trasporta stringhe ISO: la conversione a Date spetta a noi
-  return new Date(isoDate).toLocaleDateString('it-IT', { dateStyle: 'medium' });
-}
 </script>
 
 <template>
@@ -49,24 +44,10 @@ function formatDate(isoDate: string) {
         :key="user.id"
         class="flex items-center justify-between gap-4 py-3"
       >
-        <div>
-          <p class="text-default font-medium">
-            {{ user.name }}
-          </p>
-          <p class="text-muted text-sm">
-            {{ user.email }}
-          </p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <span class="text-muted text-sm">{{ formatDate(user.createdAt) }}</span>
-          <UBadge
-            :color="user.isActive ? 'success' : 'neutral'"
-            variant="subtle"
-          >
-            {{ user.isActive ? 'Attivo' : 'Disattivo' }}
-          </UBadge>
-        </div>
+        <p class="text-default font-medium">
+          {{ user.name }}
+        </p>
+        <span class="text-muted text-sm">{{ user.id }}</span>
       </li>
     </ul>
   </div>

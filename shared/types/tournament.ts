@@ -2,8 +2,7 @@ import type { TournamentId } from '#shared/types/ids';
 import type { OrganizationSummary } from '#shared/types/organization';
 
 /**
- * Contratto del torneo (F0.7). I tipi provvisori che lo precedevano sono in
- * `legacy-tournament.ts`, finché le pagine non passano a questi.
+ * Contratto del torneo (F0.7).
  *
  * Partecipanti, round, match e classifiche arrivano con i loro step (F2, F3): qui c'è solo ciò
  * che il torneo è prima di partire.

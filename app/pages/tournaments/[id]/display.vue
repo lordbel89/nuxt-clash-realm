@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import type { LegacyMatch as Match, LegacyTournament as Tournament } from '#shared/types/legacy-tournament';
+import type { Match } from '~/types/placeholder-types';
 
 definePageMeta({ layout: 'projector' });
 
 const route = useRoute();
-const _id = route.params.id as string;
+const id = route.params.id as string;
 
-// ponytail: dati in tempo reale dal backend (collega) — polling o SSE.
-const tournament = ref<Tournament | null>(null);
+const { data: tournament, error } = await useFetch(`/api/tournaments/${id}`);
+if (error.value) {
+  throw createError({ statusCode: error.value.statusCode, message: apiErrorMessage(error.value), fatal: true });
+}
+
+// ponytail: round e match in tempo reale dal backend (collega) — polling o SSE, con F3.
+const currentRound = ref<number>();
 const liveMatches = ref<Match[]>([]);
 const upcomingMatches = ref<Match[]>([]);
 const roundEndsAt = ref<string | undefined>();
@@ -21,7 +26,7 @@ const roundEndsAt = ref<string | undefined>();
           {{ tournament?.name ?? 'Torneo' }}
         </h1>
         <p class="text-2xl text-muted">
-          Round {{ tournament?.currentRound ?? '—' }}
+          Round {{ currentRound ?? '—' }}
         </p>
       </div>
       <RoundTimer

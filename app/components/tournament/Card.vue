@@ -1,15 +1,24 @@
 <script setup lang="ts">
-import type { LegacyTournament as Tournament } from '#shared/types/legacy-tournament';
+import type { TournamentStatus, TournamentSummary } from '#shared/types/tournament';
+import type { BadgeProps } from '@nuxt/ui';
 
-defineProps<{ tournament: Tournament; }>();
+const props = defineProps<{ tournament: TournamentSummary; }>();
 
-const statusColor = {
-  draft: 'neutral',
-  ready: 'secondary',
-  running: 'primary',
-  paused: 'warning',
-  finished: 'success',
-} as const;
+// `satisfies` fa fallire il typecheck quando il backend aggiunge uno stato
+const statusUi = {
+  draft: { label: 'Bozza', color: 'neutral' },
+  published: { label: 'Pubblicato', color: 'secondary' },
+  registration_open: { label: 'Iscrizioni aperte', color: 'accent' },
+  checkin_open: { label: 'Check-in aperto', color: 'warning' },
+  running: { label: 'In corso', color: 'primary' },
+  finished: { label: 'Concluso', color: 'success' },
+  cancelled: { label: 'Annullato', color: 'error' },
+} as const satisfies Record<TournamentStatus, { label: string; color: BadgeProps['color']; }>;
+
+// Data e ora nel fuso del torneo, non in quello del browser
+const startsAt = computed(() => props.tournament.startsAt
+  ? new Date(props.tournament.startsAt).toLocaleString('it-IT', { dateStyle: 'medium', timeStyle: 'short', timeZone: props.tournament.timezone })
+  : 'Data da fissare');
 </script>
 
 <template>
@@ -21,19 +30,19 @@ const statusColor = {
             {{ tournament.name }}
           </h3>
           <p class="text-sm text-muted">
-            {{ tournament.game }} · {{ tournament.format }}
+            {{ tournament.game }} · {{ tournament.organization.name }}
           </p>
         </div>
         <UBadge
-          :color="statusColor[tournament.status]"
+          :color="statusUi[tournament.status].color"
           variant="subtle">
-          {{ tournament.status }}
+          {{ statusUi[tournament.status].label }}
         </UBadge>
       </div>
     </template>
 
     <p class="text-sm text-muted">
-      {{ tournament.participants.length }} partecipanti · round {{ tournament.currentRound }}
+      {{ startsAt }}
     </p>
 
     <template #footer>

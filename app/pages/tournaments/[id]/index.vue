@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import type { LegacyMatch as Match, LegacyStanding as Standing, LegacyTournament as Tournament } from '#shared/types/legacy-tournament';
+import type { Match, Standing } from '~/types/placeholder-types';
 
 definePageMeta({ title: 'Torneo' });
 
 const route = useRoute();
 const id = route.params.id as string;
 
-// ponytail: dati dal backend (collega). Sostituire con useFetch(`/api/tournaments/${id}`).
-const tournament = ref<Tournament | null>(null);
+const { data: tournament, error } = await useFetch(`/api/tournaments/${id}`);
+if (error.value) {
+  throw createError({ statusCode: error.value.statusCode, message: apiErrorMessage(error.value), fatal: true });
+}
+
+// ponytail: round, match e classifica dal backend (collega), con F2/F3.
+const currentRound = ref<number>();
 const currentMatches = ref<Match[]>([]);
 const standings = ref<Standing[]>([]);
 const roundEndsAt = ref<string | undefined>();
@@ -21,7 +26,7 @@ const roundEndsAt = ref<string | undefined>();
           {{ tournament?.name ?? 'Torneo' }}
         </h1>
         <p class="text-sm text-muted">
-          Round {{ tournament?.currentRound ?? '—' }}
+          Round {{ currentRound ?? '—' }}
         </p>
       </div>
 

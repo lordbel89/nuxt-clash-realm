@@ -26,6 +26,7 @@ Rules for each area load on their own when Claude reads a file in that area. If 
 
 - **Stay on your side.** `CLAUDE.local.md` says whose session this is. If it is missing, ask, and point to `CLAUDE.local.md.example`. If a task needs a change in the other half, stop and describe the change instead of making it, unless the user explicitly asks for it.
 - **`shared/` is the boundary.** A change there changes the other person's contract. Say so explicitly in your summary, and do not "fix" the consumers on the other side yourself.
+- **Placeholder types.** API types live in `shared/types/`. Until the backend ships an endpoint, the frontend types the data it needs in `app/types/placeholder-types.ts`. When the backend adds a type to `shared/types/`, check that file for a placeholder it replaces and name the replacement in the summary and in the changelog entry. The frontend switches the imports and deletes the placeholder.
 
 ## Commands
 
