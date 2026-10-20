@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Standing } from '#shared/types/tournament';
+import type { LegacyStanding as Standing } from '#shared/types/legacy-tournament';
 
 defineProps<{ standings: Standing[]; }>();
 

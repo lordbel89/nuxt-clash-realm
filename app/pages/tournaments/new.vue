@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TournamentConfig } from '#shared/types/tournament';
+import type { LegacyTournamentConfig as TournamentConfig } from '#shared/types/legacy-tournament';
 
 definePageMeta({ title: 'Nuovo torneo' });
 

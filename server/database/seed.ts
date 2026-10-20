@@ -1,22 +1,32 @@
 import { eq } from 'drizzle-orm';
+import { createAccount } from '../auth/accounts.ts';
 import { readAuthEnv } from '../auth/env.ts';
 import { createAuth } from '../auth/index.ts';
 import { closeDatabase, createDatabase } from './client.ts';
 import { readDatabaseEnv } from './env.ts';
+import { members, organizations } from './schema/organizations.ts';
+import { tournaments } from './schema/tournaments.ts';
+import { generateSeed } from '../services/tournaments.ts';
+import { fromLocal, toDate } from '../utils/time.ts';
 import { accounts } from './schema/auth.ts';
 import { users } from './schema/users.ts';
 
 /**
  * Dati di partenza per lo sviluppo. Rieseguibile.
  *
- * La registrazione passa da `auth.api.signUpEmail` e non da un `insert`: è
- * l'unico modo di ottenere anche la riga in `accounts` con l'hash della
- * password, quindi utenti con cui si può davvero accedere. Per chi era già nel
+ * La creazione passa da `createAccount` e non da un `insert` nudo: scrive anche
+ * la riga in `accounts` con l'hash della password, quindi utenti con cui si può
+ * davvero accedere. L'iscrizione pubblica è spenta, quindi `auth.api.signUpEmail`
+ * qui non funzionerebbe. Per chi era già nel
  * database prima dell'autenticazione (o è nato senza credenziali) le
  * credenziali si aggiungono a parte, con l'hasher della libreria.
  *
  * Sofia serve a provare il divieto: la sospensione si applica dopo la
  * registrazione, come farebbe un'azione amministrativa.
+ *
+ * L'organizzazione di prova ha Luca owner e Giulia admin; Marco ne resta fuori,
+ * per vedere come risponde un'organizzazione a chi non è membro. Ha due tornei:
+ * uno in bozza (lo vede solo l'organizzazione) e uno pubblicato (lo vedono tutti).
  */
 
 const SEED_PASSWORD = 'password';
@@ -43,9 +53,7 @@ async function main() {
     });
 
     if (!existing) {
-      await auth.api.signUpEmail({
-        body: { name: seed.name, email: seed.email, password: SEED_PASSWORD },
-      });
+      await createAccount(db, auth, { name: seed.name, email: seed.email, password: SEED_PASSWORD });
 
       registered += 1;
     }
@@ -72,12 +80,66 @@ async function main() {
     }
   }
 
+  const seedOrganization = await seedOrganizations(db);
+
   console.info(
     `Utenti registrati: ${registered}, credenziali aggiunte: ${repaired}, `
-    + `già a posto: ${SEED_USERS.length - registered - repaired} — password: ${SEED_PASSWORD}`,
+    + `già a posto: ${SEED_USERS.length - registered - repaired} — password: ${SEED_PASSWORD}. `
+    + `Organizzazione di prova: ${seedOrganization}`,
   );
 
   await closeDatabase(db);
+}
+
+const SEED_ORGANIZATION = { name: 'Negozio di prova', slug: 'negozio-di-prova' };
+
+const SEED_MEMBERS = [
+  { email: 'test@example.com', role: 'owner' as const },
+  { email: 'giulia.bianchi@example.com', role: 'admin' as const },
+];
+
+async function seedOrganizations(db: Awaited<ReturnType<typeof createDatabase>>) {
+  const existing = await db.query.organizations.findFirst({ where: { slug: { eq: SEED_ORGANIZATION.slug } }, columns: { id: true } });
+  if (existing) return 'già presente';
+
+  await db.transaction(async (tx) => {
+    const [organization] = await tx.insert(organizations).values(SEED_ORGANIZATION).returning({ id: organizations.id });
+
+    for (const member of SEED_MEMBERS) {
+      const user = await tx.query.users.findFirst({ where: { email: { eq: member.email } }, columns: { id: true } });
+      await tx.insert(members).values({ organizationId: organization!.id, userId: user!.id, role: member.role });
+    }
+
+    const owner = await tx.query.users.findFirst({ where: { email: { eq: SEED_MEMBERS[0]!.email } }, columns: { id: true } });
+    const timezone = 'Europe/Rome';
+
+    await tx.insert(tournaments).values([
+      {
+        organizationId: organization!.id,
+        name: 'Open di Natale',
+        game: 'Magic: the Gathering',
+        description: 'Torneo libero, svizzera e top 8.',
+        timezone,
+        startsAt: toDate(fromLocal('2026-12-20T15:00', timezone)),
+        status: 'published',
+        maxParticipants: 32,
+        locationName: 'Negozio di prova',
+        createdBy: owner!.id,
+        seed: generateSeed(),
+      },
+      {
+        organizationId: organization!.id,
+        name: 'Lega del giovedì',
+        game: 'Pokémon GCC',
+        timezone,
+        status: 'draft',
+        createdBy: owner!.id,
+        seed: generateSeed(),
+      },
+    ]);
+  });
+
+  return 'creata';
 }
 
 main().catch((error) => {

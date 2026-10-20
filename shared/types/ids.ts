@@ -12,3 +12,5 @@ declare const brand: unique symbol;
 export type Branded<TBase, TName extends string> = TBase & { readonly [brand]: TName; };
 
 export type UserId = Branded<string, 'UserId'>;
+export type OrganizationId = Branded<string, 'OrganizationId'>;
+export type TournamentId = Branded<string, 'TournamentId'>;

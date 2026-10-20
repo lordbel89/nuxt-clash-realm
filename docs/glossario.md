@@ -33,6 +33,7 @@ termine italiano nella prosa e l'identificatore inglese dove parla di modello, t
 | Tavolo | `Board` | Nei tornei a squadre, l'incontro fra due membri dentro un match. |
 | Partita | `Game` | Una singola partita di un best-of. |
 | Tavolo (numero) | `table` | Il numero del tavolo assegnato dal motore: tavolo 1 = i più forti. |
+| Postazione | `Station` | Il posto fisico dove si gioca un match (arena, console) quando le postazioni sono meno dei match. Diversa da `table` e da `Board`. Dopo la v1. |
 
 ## Persone e iscrizioni
 
@@ -56,7 +57,8 @@ termine italiano nella prosa e l'identificatore inglese dove parla di modello, t
 | Termine | Identificatore | Definizione |
 |---|---|---|
 | Organizzazione | `Organization` | Proprietaria dei tornei. Non esistono tornei personali. |
-| Ruoli di organizzazione | `owner`, `admin` | I ruoli predefiniti del plugin `organization` di Better Auth. |
+| Ruoli di organizzazione | `owner`, `admin` | Gli unici due, con pieno controllo sui tornei dell'organizzazione. Solo un owner crea o promuove un owner; l'ultimo owner non può uscire. Gestiti da noi: Better Auth serve solo per account e login. |
+| Membro dell'organizzazione | `OrganizationMember` | Un utente con un ruolo nell'organizzazione. Da non confondere con il membro del partecipante (`ParticipantMember`). |
 | Ruoli di torneo | `head_judge`, `judge`, `scorekeeper` | Assegnati al singolo torneo, anche a utenti esterni all'organizzazione. |
 | Lega interna | `League` | Creata dall'organizzazione; tornei propri, ricorrenti. |
 | Circuito nazionale | `Circuit` | Uno per gioco, creato solo dalla piattaforma. Accetta solo il proprio preset, non modificato. |
@@ -68,7 +70,10 @@ termine italiano nella prosa e l'identificatore inglese dove parla di modello, t
 | Termine | Identificatore | Definizione |
 |---|---|---|
 | Catalogo dei moduli | `ModuleCatalog` | Le varianti di regola implementate nel motore. Codice. |
-| Modulo | `Module` | Una variante di regola, con i suoi parametri e i loro limiti. |
+| Modulo | `Module` | Una variante di regola o una funzione dell'applicazione, con i suoi parametri e i loro limiti. |
+| Ambito del modulo | `scope` | `tournament` o `phase`: dove si sceglie il modulo. |
+| Vincoli del modulo | `requires`, `conflicts` | I moduli che un modulo richiede o esclude. Lo schema rifiuta la composizione che li viola. |
+| Arbitraggio | `judging` | Modulo del torneo: acceso, esistono head judge, judge, penalità e chiamata arbitro. |
 | Composizione, ruleset | `Ruleset` | Una scelta di moduli con i loro parametri. Il torneo ne conserva una copia risolta. |
 | Origine del ruleset | `origin` | `preset:<game>@<version>`, `custom`, `free`. |
 | Preset | `Preset` | Composizione di piattaforma, una per gioco, in un file TypeScript del repository. |

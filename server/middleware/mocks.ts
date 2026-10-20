@@ -9,9 +9,12 @@
  * L'import è dinamico e dietro `import.meta.dev`: in produzione la costante
  * diventa `false`, il resto è codice morto e né i mock né faker (che è una
  * devDependency) entrano nel bundle.
+ *
+ * `NUXT_MOCKS=false` nel .env li spegne tutti insieme: serve agli scenari [S],
+ * che girano su `nuxt dev` e devono parlare con gli handler veri.
  */
 export default defineEventHandler(async (event) => {
-  if (!import.meta.dev) return;
+  if (!import.meta.dev || !useRuntimeConfig(event).mocks) return;
 
   const { serveMock } = await import('../mocks/index.ts');
 

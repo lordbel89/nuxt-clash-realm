@@ -9,7 +9,11 @@ paths:
 
 # Authentication (server side)
 
-Better Auth (`better-auth` + `@better-auth/drizzle-adapter`), self-hosted: the tables are in our own Postgres, and the cookies are signed by our own server. Email + password only for now: no 2FA, no organizations, no OAuth, and no mailer, so email verification and password reset are off.
+Better Auth (`better-auth` + `@better-auth/drizzle-adapter`), self-hosted: the tables are in our own Postgres, and the cookies are signed by our own server. Email + password only for now: no 2FA, no OAuth, and no mailer, so email verification and password reset are off.
+
+**Better Auth is for accounts and login only.** Organizations, members and roles are ours (`server/database/schema/organizations.ts`, `server/services/organizations.ts`, routes under `/api/organizations`); the `organization` plugin is not used and must not be added. `requireOrganizationRole(event, organizationId, roles)` in `server/utils/auth.ts` answers 404 to non-members and 403 to a member without the role.
+
+**No public sign-up in v1** (`emailAndPassword.disableSignUp`). Better Auth enforces it inside the endpoint, so `auth.api.signUpEmail` fails server-side too. Accounts are created by `createAccount(db, auth, { email, name, password })` in `server/auth/accounts.ts`: user + `credential` account in one transaction, hashed with Better Auth's own hasher. `npm run user:create -- --email … --name …` uses it (and prints a generated password once), so do the seed and the scenario harness (`startTestServer({ users })`).
 
 **The perimeter: `/api/auth/**` is Better Auth's territory.** Its endpoints validate their own input and return their own shape and errors (`{ code, message }`). They do not go through `readInput`, do not produce `ApiErrorData`, and do not touch a mapper. Everything else is our contract. Do not "harmonise" the two, because the client library reads that shape.
 

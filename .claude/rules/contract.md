@@ -4,6 +4,8 @@ paths:
   - "server/api/**"
   - "server/services/**"
   - "server/mappers/**"
+  - "server/api-registry.ts"
+  - "docs/api/**"
   - "server/mocks/**"
   - "app/pages/**"
   - "app/components/**"
@@ -16,16 +18,17 @@ paths:
 
 **The database row is not the API contract.** The backend maps rows to DTOs. The frontend only ever sees DTOs. A DTO's fields are written out one by one on purpose, as an allowlist: a new column does not reach the frontend by itself. Never derive a DTO from a table type (`Omit<UserRow, …>`).
 
-## Endpoints that exist today
+## The route registry and the reference
 
-| Route | Returns | Notes |
-|---|---|---|
-| `GET /api/users` | `Paginated<UserSummary>` | session required |
-| `GET /api/users/:id` | `UserSummary` | session required; no private data, even for your own id |
-| `GET /api/users/me` | `User` | the account from the session |
-| `/api/auth/**` | Better Auth's own shape | see "Two error shapes" |
+`server/api-registry.ts` lists every route under `/api/` except `/api/auth/**`: method, path, the Valibot schemas the handler reads, the response type as a TypeScript expression over `shared/types` names, the domain errors, and a status (`proposed`, `available`, `deprecated`). `npm run api:spec` generates `docs/api/openapi.json` from it, served by Scalar on `/_docs` in development. Conventions (acts, `reason`, errors, warnings) are in `docs/api/README.md`, which becomes the reference's intro; what changed is in `docs/api/CHANGELOG.md`.
 
-Anything else under `/api/` is served only by a mock (`server/mocks/`) until its handler exists.
+`tests/backend/api-registry.test.ts` fails when the registry and `server/api/` diverge (a route without an entry, an available entry without a handler, a different schema, response type or access) and when `openapi.json` is stale. So a new endpoint is: types and schemas in `shared/`, the registry entry as `proposed`, `npm run api:spec`, a changelog entry; then the handler, `available`, regenerate, another entry. The test reads the handler source: keep the `readParams(event, Schema)` calls and the `Promise<Type>` return annotation literal.
+
+Anything under `/api/` without a handler is served only by a mock (`server/mocks/`). `NUXT_MOCKS=false` turns every mock off.
+
+## Warnings
+
+A command that warns without refusing answers `200` with `WithWarnings<T>` (`{ data, warnings }`, `shared/types/api.ts`). `warnings` is always present on such a route, empty when there is nothing to say. `ApiWarningCode` is a closed union: a new code is added in the step that introduces it, and it is a contract change.
 
 ## Shapes
 
