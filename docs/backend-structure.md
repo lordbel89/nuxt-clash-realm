@@ -76,6 +76,33 @@ alla riconnessione il notifier manda `resync` a tutti e il flusso riparte da un 
 evento `ping`. Il permesso è controllato solo alla connessione. Un `nuxt dev` con più processi non
 condivide gli eventi: in sviluppo (PGlite) c'è un processo solo, e in produzione Postgres li smista.
 
+## Job: pg-boss
+
+Esito della prova tecnica (F0.10, pg-boss 12.38): **funziona in entrambi gli ambienti, e un job accodato
+in una transazione esiste solo se la transazione fa commit.** In v1 nessuna funzione lo usa, quindi il
+plugin `server/plugins/jobs.ts` è spento (`NUXT_JOBS_ENABLED=false`); da F7 si accende.
+
+- **Avvio.** `startBoss(db, { dialect, url })` (`server/jobs/boss.ts`), con `useBoss()` come singleton
+  lazy. Applica da sé le migrazioni del suo schema `pgboss` nello stesso database (versione 46). Il
+  plugin lo avvia all'accensione se i job sono abilitati; un avvio fallito si registra nel log e non
+  ferma il server. `database.ts` lo ferma (`stop({ graceful: true })`) prima di chiudere il database:
+  dopo un SIGTERM la sua riga in `pgboss.instance` ha `stopped_on`, dopo un SIGKILL no.
+- **Produzione (Postgres).** pg-boss apre un pool suo (4 connessioni, `application_name =
+  clash-realm-jobs`) con la stessa `NUXT_DATABASE_URL`: non esiste un adattatore per postgres-js. Provato
+  col build vero (`node .output/server/index.mjs`) su Postgres 18: parte, risponde, si ferma in
+  meno di un secondo senza connessioni residue. Pesa 1,2 MB nel bundle e PGlite resta fuori.
+- **Sviluppo (PGlite).** pg-boss usa la stessa istanza di Drizzle tramite `fromPglite`, con
+  `backend: 'pglite'`. Una connessione sola, quindi i worker girano uno alla volta.
+- **Nella transazione.** `boss.send(queue, data, { db: fromDrizzle(tx, sql) })` funziona sia su PGlite sia
+  su Postgres, anche se PGlite non è fra i driver che la documentazione elenca. Con rollback il job non
+  esiste, e una modifica e il suo job vivono o muoiono insieme.
+- **Trappola.** Senza `db: fromDrizzle(tx, sql)`, il job non segue la transazione. Su Postgres passa da
+  un'altra connessione e **sopravvive al rollback**. Su PGlite aspetta la fine della transazione: con
+  un `await` dentro la transazione non finisce più (deadlock), senza `await` termina dopo e il job
+  esiste comunque. Dentro una transazione di Drizzle si accoda sempre con `fromDrizzle(tx, sql)`.
+- **Tutto il resto** (ritentativi, cron, job differiti, code fallite) è F7.1. LISTEN/NOTIFY di pg-boss
+  è spento: le code si interrogano a intervalli.
+
 ## Date e fusi orari
 
 L'aritmetica di calendario passa da `server/utils/time.ts`, sopra Temporal: fuso del torneo valido

@@ -623,7 +623,7 @@ quanto si impara nella v1; ognuno si spezza in step atomici quando la fase comin
 ## F7 · Job, mailer, push, risultati dai giocatori
 
 - **F7.1 · pg-boss in produzione.** Code, worker nel plugin Nitro, ritentativi, job accodati nella
-  transazione (o fuori, secondo l'esito di F0.10), monitoraggio delle code fallite.
+  transazione con `fromDrizzle(tx, sql)` (esito di F0.10: funziona anche su PGlite), monitoraggio delle code fallite.
 - **F7.2 · Mailer.** SMTP con `NUXT_MAIL_*`, invio solo da un job, modelli in italiano; verifica
   email e reset password di Better Auth; inviti dell'organizzazione via email. Lo schema GET →
   conferma → POST vale per ogni link monouso. **[contratto]**
