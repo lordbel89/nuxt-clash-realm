@@ -3,7 +3,7 @@
   "info": {
     "title": "Clash Realm API",
     "version": "v1-dev",
-    "description": "# Convenzioni dell'API\n\nIl riferimento di Clash Realm: rotte, parametri, body, risposte ed errori. È generato dal registro\ndelle rotte (`server/api-registry.ts`) con `npm run api:spec`, e in sviluppo si consulta su\n[`/_docs`](/_docs). I tipi da importare stanno in `shared/types/`, gli schemi d'ingresso in\n`shared/schemas/`. Cosa cambia di volta in volta è in `docs/api/CHANGELOG.md`.\n\n## Stato di una rotta\n\nOgni rotta dichiara uno stato (`x-status`):\n\n- **proposto**: tipi e schemi esistono, l'handler no. Il mock si può scrivere sul tipo vero.\n- **disponibile**: l'handler esiste ed è provato. Il mock si può spegnere.\n- **deprecato**: esiste ancora, ma il changelog dice cosa usare al suo posto.\n\n## Letture e atti\n\n- Le letture sono `GET`. Gli elenchi rispondono `Paginated<T>` (`{ items, total, limit, offset }`),\n  mai un array nudo; `limit` e `offset` arrivano in query.\n- Gli atti del dominio sono `POST /api/<risorsa>/:id/<atto>` (`/api/rounds/:id/publish`), non un\n  `PATCH` dello stato: ogni atto ha un nome proprio e le sue precondizioni.\n- `PATCH` modifica i campi di una risorsa; `PUT` sostituisce un insieme intero (la composizione di un\n  torneo, gli abbinamenti di un round).\n- Dove un atto chiede una motivazione (override, annullamento, correzione), il body ha un campo\n  `reason` obbligatorio, che finisce nello storico del torneo.\n\n## Date e identificativi\n\n- Le date viaggiano come stringhe ISO 8601 in UTC. Il fuso di un torneo è un campo a sé (`timezone`).\n- Gli id sono UUID. Nei tipi TypeScript sono marchiati (`UserId`, `TournamentId`): sul filo sono\n  stringhe.\n\n## Avvisi\n\nUn comando che avvisa ma non impedisce (rivincita, secondo bye, round oltre il limite, profilo di un\nminore) risponde `200` con la busta `WithWarnings<T>`:\n\n```json\n{ \"data\": { }, \"warnings\": [{ \"code\": \"pairing.rematch\", \"message\": \"Testo in italiano\" }] }\n```\n\n`warnings` c'è sempre su queste rotte, vuoto se non ci sono avvisi. `code` è un valore di\n`ApiWarningCode`: un'unione chiusa, che cresce con le rotte che avvisano.\n\n## Errori\n\nOgni errore ha il corpo `ApiError`. Il testo per l'utente è in `message`, in italiano;\n`statusMessage` è la reason phrase HTTP, in inglese, e non va mostrata.\n\n| Stato | Quando |\n|---|---|\n| `400` | input non valido: `data` è un `ApiErrorData`, con i messaggi per campo (`fields`) e quelli che non appartengono a nessun campo (`messages`) |\n| `401` | la rotta chiede una sessione e la richiesta non ne ha una valida |\n| `403` | la sessione c'è, ma l'utente non ha il permesso per questo atto |\n| `404` | la risorsa non esiste, o l'utente non la può vedere |\n| `409` | lo stato della risorsa non consente l'atto («il round ha ancora risultati mancanti») |\n\nFanno eccezione le rotte di Better Auth (`/api/auth/**`), che hanno forma ed errori propri\n(`{ code, message }`) e si usano attraverso il suo client.\n\n## Sessione\n\nLe rotte con il lucchetto chiedono il cookie di sessione di Better Auth, che il browser manda da sé\ndopo il login (`POST /api/auth/sign-in/email`). Da `published` in poi un torneo ha anche letture\npubbliche, senza sessione: abbinamenti dei round pubblicati, cronometro, classifica.\n"
+    "description": "# Convenzioni dell'API\n\nIl riferimento di Clash Realm: rotte, parametri, body, risposte ed errori. È generato dal registro\ndelle rotte (`server/api-registry.ts`) con `npm run api:spec`, e in sviluppo si consulta su\n[`/_docs`](/_docs). I tipi da importare stanno in `shared/types/`, gli schemi d'ingresso in\n`shared/schemas/`. Cosa cambia di volta in volta è in `docs/api/CHANGELOG.md`.\n\n## Stato di una rotta\n\nOgni rotta dichiara uno stato (`x-status`):\n\n- **proposto**: tipi e schemi esistono, l'handler no. Il mock si può scrivere sul tipo vero.\n- **disponibile**: l'handler esiste ed è provato. Il mock si può spegnere.\n- **deprecato**: esiste ancora, ma il changelog dice cosa usare al suo posto.\n\n## Letture e atti\n\n- Le letture sono `GET`. Gli elenchi rispondono `Paginated<T>` (`{ items, total, limit, offset }`),\n  mai un array nudo; `limit` e `offset` arrivano in query.\n- Gli atti del dominio sono `POST /api/<risorsa>/:id/<atto>` (`/api/rounds/:id/publish`), non un\n  `PATCH` dello stato: ogni atto ha un nome proprio e le sue precondizioni.\n- `PATCH` modifica i campi di una risorsa; `PUT` sostituisce un insieme intero (la composizione di un\n  torneo, gli abbinamenti di un round).\n- Dove un atto chiede una motivazione (override, annullamento, correzione), il body ha un campo\n  `reason` obbligatorio, che finisce nello storico del torneo.\n\n## Date e identificativi\n\n- Le date viaggiano come stringhe ISO 8601 in UTC. Il fuso di un torneo è un campo a sé (`timezone`).\n- Gli id sono UUID. Nei tipi TypeScript sono marchiati (`UserId`, `TournamentId`): sul filo sono\n  stringhe.\n\n## Avvisi\n\nUn comando che avvisa ma non impedisce (rivincita, secondo bye, round oltre il limite, profilo di un\nminore) risponde `200` con la busta `WithWarnings<T>`:\n\n```json\n{ \"data\": { }, \"warnings\": [{ \"code\": \"pairing.rematch\", \"message\": \"Testo in italiano\" }] }\n```\n\n`warnings` c'è sempre su queste rotte, vuoto se non ci sono avvisi. `code` è un valore di\n`ApiWarningCode`: un'unione chiusa, che cresce con le rotte che avvisano.\n\n## Errori\n\nOgni errore ha il corpo `ApiError`. Il testo per l'utente è in `message`, in italiano;\n`statusMessage` è la reason phrase HTTP, in inglese, e non va mostrata.\n\n| Stato | Quando |\n|---|---|\n| `400` | input non valido: `data` è un `ApiErrorData`, con i messaggi per campo (`fields`) e quelli che non appartengono a nessun campo (`messages`) |\n| `401` | la rotta chiede una sessione e la richiesta non ne ha una valida |\n| `403` | la sessione c'è, ma l'utente non ha il permesso per questo atto |\n| `404` | la risorsa non esiste, o l'utente non la può vedere |\n| `409` | lo stato della risorsa non consente l'atto («il round ha ancora risultati mancanti») |\n\nFanno eccezione le rotte di Better Auth (`/api/auth/**`), che hanno forma ed errori propri\n(`{ code, message }`) e si usano attraverso il suo client.\n\n## Flussi live (SSE)\n\nLe rotte `…/stream` rispondono con `text/event-stream` e restano aperte. Ogni messaggio ha un nome\n(`event:`) e un `data` JSON con i soli identificativi: quando arriva, si rilegge lo stato con una `GET`.\nIl primo messaggio è sempre `hello`, con l'ora del server (`now`), e torna se il server ha perso degli\neventi. `ping` serve solo a tenere aperta la connessione. Gli eventi non si conservano: chi si\nriconnette riparte da `hello`. Il permesso si controlla alla connessione.\n\n## Sessione\n\nLe rotte con il lucchetto chiedono il cookie di sessione di Better Auth, che il browser manda da sé\ndopo il login (`POST /api/auth/sign-in/email`). Da `published` in poi un torneo ha anche letture\npubbliche, senza sessione: abbinamenti dei round pubblicati, cronometro, classifica.\n"
   },
   "tags": [
     {
@@ -1350,6 +1350,60 @@
           },
           "409": {
             "description": "Il torneo è concluso o annullato",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tournaments/{id}/stream": {
+      "get": {
+        "tags": [
+          "Tornei"
+        ],
+        "summary": "Gli eventi live di un torneo (SSE)",
+        "description": "**Stato:** disponibile\n\nUna connessione che resta aperta (`text/event-stream`): usa `EventSource`, che si riconnette da solo. Stessa visibilità di `GET /api/tournaments/:id`. I messaggi portano solo identificativi: quando ne arriva uno, rileggi lo stato con una `GET`.",
+        "x-status": "available",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Eventi, ciascuno col suo nome e un `data` JSON:\n- `hello` `{ now }`: alla connessione e dopo che il server ha perso degli eventi. `now` è l'ora del server (ISO). Rileggi lo stato.\n- `tournament.updated` `{ tournamentId }`: il torneo è cambiato.\n- `ping` `{}`: ogni 30 secondi, per tenere aperta la connessione. Ignoralo.\nGli eventi non si conservano: chi si riconnette riparte da `hello` e rilegge.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Il torneo non esiste, o è una bozza e chi chiama non è dell'organizzazione",
             "content": {
               "application/json": {
                 "schema": {

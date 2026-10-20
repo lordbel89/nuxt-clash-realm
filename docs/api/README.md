@@ -58,6 +58,14 @@ Ogni errore ha il corpo `ApiError`. Il testo per l'utente è in `message`, in it
 Fanno eccezione le rotte di Better Auth (`/api/auth/**`), che hanno forma ed errori propri
 (`{ code, message }`) e si usano attraverso il suo client.
 
+## Flussi live (SSE)
+
+Le rotte `…/stream` rispondono con `text/event-stream` e restano aperte. Ogni messaggio ha un nome
+(`event:`) e un `data` JSON con i soli identificativi: quando arriva, si rilegge lo stato con una `GET`.
+Il primo messaggio è sempre `hello`, con l'ora del server (`now`), e torna se il server ha perso degli
+eventi. `ping` serve solo a tenere aperta la connessione. Gli eventi non si conservano: chi si
+riconnette riparte da `hello`. Il permesso si controlla alla connessione.
+
 ## Sessione
 
 Le rotte con il lucchetto chiedono il cookie di sessione di Better Auth, che il browser manda da sé

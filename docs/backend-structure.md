@@ -61,6 +61,21 @@ un torneo segue l'ordine reale grazie al blocco; `at` è l'istante della transaz
 stesso comando lo condividono. Il ruolo Postgres con solo `INSERT` e `SELECT` sulla tabella è parte
 del deploy (F0.11).
 
+## Live: notifier e SSE
+
+`server/realtime/notifier.ts` tiene una connessione in `LISTEN` per processo (`useNotifier()`, creato
+alla prima richiesta e chiuso dal plugin `database` prima del database) e smista in memoria ai client
+iscritti a un torneo. L'ascolto dipende dal driver (`listenSourceOf`): PGlite in sviluppo, postgres-js
+in produzione, che apre una connessione sua e la riapre da solo. `LISTEN/NOTIFY` non conserva niente:
+alla riconnessione il notifier manda `resync` a tutti e il flusso riparte da un nuovo `hello`.
+
+`GET /api/tournaments/:id/stream` controlla la visibilità come la lettura del torneo, apre un
+`createEventStream` e lo collega con `pipeTournamentEvents` (`server/realtime/stream.ts`): `hello` con
+`now`, un messaggio per evento con i soli identificativi, `ping` ogni 30 secondi. h3 manda già
+`X-Accel-Buffering: no` (per l'nginx di CapRover) e non scrive commenti SSE, quindi il keepalive è un
+evento `ping`. Il permesso è controllato solo alla connessione. Un `nuxt dev` con più processi non
+condivide gli eventi: in sviluppo (PGlite) c'è un processo solo, e in produzione Postgres li smista.
+
 ## Date e fusi orari
 
 L'aritmetica di calendario passa da `server/utils/time.ts`, sopra Temporal: fuso del torneo valido

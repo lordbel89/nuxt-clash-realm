@@ -5,6 +5,28 @@ rotta (**proposto**, **disponibile**, **cambiato**, **deprecato**), cosa fare da
 quale seam `ponytail:` chiude, se ne chiude uno. Il riferimento completo è su `/_docs` in sviluppo,
 generato in `docs/api/openapi.json`; le convenzioni sono in `docs/api/README.md`.
 
+## 2026-10-21 · Flusso live del torneo (F0.9)
+
+**Nuova rotta, non rompe niente.** Nessun file di `shared/` è cambiato.
+
+- **Disponibile:** `GET /api/tournaments/:id/stream`, un flusso SSE (`text/event-stream`) che resta
+  aperto. Stessa visibilità di `GET /api/tournaments/:id`: pubblico da `published` in poi, una bozza
+  solo per l'organizzazione (per gli altri `404`). Si usa con `EventSource` o con `useEventSource` di
+  VueUse, che si riconnette da solo.
+- **Eventi** (ciascuno col suo nome, `data` in JSON):
+
+  | Evento | `data` | Quando |
+  |---|---|---|
+  | `hello` | `{ now }` | alla connessione, e di nuovo se il server ha perso degli eventi. `now` è l'ora del server (ISO) |
+  | `tournament.updated` | `{ tournamentId }` | `PATCH /api/tournaments/:id` ha cambiato qualcosa |
+  | `ping` | `{}` | ogni 30 secondi, per tenere aperta la connessione. Si ignora |
+
+- **Cosa fare dal lato del frontend:** gli eventi portano solo identificativi. Alla connessione e a
+  ogni `hello` o evento, rileggi lo stato con la `GET` (`/api/tournaments/:id`). Gli eventi non si
+  conservano: chi si riconnette riparte da `hello`. I nomi degli eventi crescono con le rotte che li
+  emettono (round, match, cronometro, classifica: F4.1).
+- Nessun seam `ponytail:` chiuso: finora nessuna pagina ascolta un flusso.
+
 ## 2026-10-13 · Torneo minimo (F0.7)
 
 **Rompe il contratto provvisorio dei tornei**, come concordato.
