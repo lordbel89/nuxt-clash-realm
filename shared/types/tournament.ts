@@ -1,72 +1,54 @@
-export type TournamentStatus = 'draft' | 'ready' | 'running' | 'paused' | 'finished';
-export type MatchStatus = 'pending' | 'running' | 'finished';
+import type { TournamentId } from '#shared/types/ids';
+import type { OrganizationSummary } from '#shared/types/organization';
 
-export interface Participant {
-  id: string;
+/**
+ * Contratto del torneo (F0.7). I tipi provvisori che lo precedevano sono in
+ * `legacy-tournament.ts`, finché le pagine non passano a questi.
+ *
+ * Partecipanti, round, match e classifiche arrivano con i loro step (F2, F3): qui c'è solo ciò
+ * che il torneo è prima di partire.
+ */
+
+/** Il ciclo di vita del glossario. La pausa non è uno stato del torneo: è del cronometro del round. */
+export type TournamentStatus
+  = | 'draft'
+    | 'published'
+    | 'registration_open'
+    | 'checkin_open'
+    | 'running'
+    | 'finished'
+    | 'cancelled';
+
+export interface TournamentLocation {
   name: string;
-  seed?: number;
-  avatar?: string;
+  /** Per la mappa; il formato non è ancora fissato */
+  position: string | null;
 }
 
-export interface Match {
-  id: string;
-  round: number;
-  table?: string;
-  status: MatchStatus;
-  home?: Participant;
-  away?: Participant;
-  homeScore?: number;
-  awayScore?: number;
-  /** ISO date, usato dal timer del round */
-  endsAt?: string;
-}
-
-export interface Round {
-  number: number;
-  label?: string;
-  durationMinutes?: number;
-  matches: Match[];
-}
-
-export interface Tournament {
-  // Data fields
-  id: string;
-
-  // Config fields
+/** Quanto basta per un elenco. */
+export interface TournamentSummary {
+  id: TournamentId;
   name: string;
+  /** Testo libero: il catalogo dei giochi arriverà con i preset */
   game: string;
-  isTeam: boolean;
-  maxParticipants?: number;
-  startDate?: Date;
-  description?: string;
-  location?: {
-    name?: string;
-    position?: string; // TODO: capire qual'è il dato utile per il widget di maps
-  };
-  leagueId?: string;
-
-  // Running fields
   status: TournamentStatus;
-  participants: Participant[];
-  rounds: Round[];
-  currentRound: number;
+  organization: OrganizationSummary;
+  /** Fuso IANA del torneo (`Europe/Rome`): date e orari si mostrano in questo fuso, non in quello del browser */
+  timezone: string;
+  /** ISO 8601 in UTC; null finché l'organizzatore non fissa la data */
+  startsAt: string | null;
 }
 
-export interface Standing {
-  participant: Participant;
-  played: number;
-  wins: number;
-  draws: number;
-  losses: number;
-  points: number;
+export interface Tournament extends TournamentSummary {
+  /**
+   * Lo stesso inizio come orario locale nel fuso del torneo, `2026-11-29T10:00`: è il valore da
+   * rimettere nel form, nella stessa forma in cui lo si invia.
+   */
+  startsAtLocal: string | null;
+  description: string | null;
+  /** Posti disponibili; null = nessun limite */
+  maxParticipants: number | null;
+  location: TournamentLocation | null;
+  /** ISO 8601 */
+  createdAt: string;
 }
-
-/** Payload di creazione/configurazione torneo */
-export type TournamentConfig = Omit<Tournament, 'id' | 'status' | 'participants' | 'rounds' | 'currentRound'> & {
-  roundDurationMinutes: number;
-  maxParticipants: number;
-  location: {
-    name?: string;
-    position?: string;
-  };
-};

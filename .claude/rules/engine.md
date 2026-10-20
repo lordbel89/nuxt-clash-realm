@@ -24,4 +24,4 @@ A round stores its generation signature `{ engineVersion, seed, input }`. Verify
 
 ## Tests
 
-Fixtures in, pairings or standings out, with no database. Test location and runner script are not decided yet.
+Fixtures in, pairings or standings out, with no database. They live in `tests/engine/` and run with `npm run test:engine` (`node --test`); `npm run test` includes them.

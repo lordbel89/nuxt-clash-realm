@@ -1,0 +1,1859 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Clash Realm API",
+    "version": "v1-dev",
+    "description": "# Convenzioni dell'API\n\nIl riferimento di Clash Realm: rotte, parametri, body, risposte ed errori. È generato dal registro\ndelle rotte (`server/api-registry.ts`) con `npm run api:spec`, e in sviluppo si consulta su\n[`/_docs`](/_docs). I tipi da importare stanno in `shared/types/`, gli schemi d'ingresso in\n`shared/schemas/`. Cosa cambia di volta in volta è in `docs/api/CHANGELOG.md`.\n\n## Stato di una rotta\n\nOgni rotta dichiara uno stato (`x-status`):\n\n- **proposto**: tipi e schemi esistono, l'handler no. Il mock si può scrivere sul tipo vero.\n- **disponibile**: l'handler esiste ed è provato. Il mock si può spegnere.\n- **deprecato**: esiste ancora, ma il changelog dice cosa usare al suo posto.\n\n## Letture e atti\n\n- Le letture sono `GET`. Gli elenchi rispondono `Paginated<T>` (`{ items, total, limit, offset }`),\n  mai un array nudo; `limit` e `offset` arrivano in query.\n- Gli atti del dominio sono `POST /api/<risorsa>/:id/<atto>` (`/api/rounds/:id/publish`), non un\n  `PATCH` dello stato: ogni atto ha un nome proprio e le sue precondizioni.\n- `PATCH` modifica i campi di una risorsa; `PUT` sostituisce un insieme intero (la composizione di un\n  torneo, gli abbinamenti di un round).\n- Dove un atto chiede una motivazione (override, annullamento, correzione), il body ha un campo\n  `reason` obbligatorio, che finisce nello storico del torneo.\n\n## Date e identificativi\n\n- Le date viaggiano come stringhe ISO 8601 in UTC. Il fuso di un torneo è un campo a sé (`timezone`).\n- Gli id sono UUID. Nei tipi TypeScript sono marchiati (`UserId`, `TournamentId`): sul filo sono\n  stringhe.\n\n## Avvisi\n\nUn comando che avvisa ma non impedisce (rivincita, secondo bye, round oltre il limite, profilo di un\nminore) risponde `200` con la busta `WithWarnings<T>`:\n\n```json\n{ \"data\": { }, \"warnings\": [{ \"code\": \"pairing.rematch\", \"message\": \"Testo in italiano\" }] }\n```\n\n`warnings` c'è sempre su queste rotte, vuoto se non ci sono avvisi. `code` è un valore di\n`ApiWarningCode`: un'unione chiusa, che cresce con le rotte che avvisano.\n\n## Errori\n\nOgni errore ha il corpo `ApiError`. Il testo per l'utente è in `message`, in italiano;\n`statusMessage` è la reason phrase HTTP, in inglese, e non va mostrata.\n\n| Stato | Quando |\n|---|---|\n| `400` | input non valido: `data` è un `ApiErrorData`, con i messaggi per campo (`fields`) e quelli che non appartengono a nessun campo (`messages`) |\n| `401` | la rotta chiede una sessione e la richiesta non ne ha una valida |\n| `403` | la sessione c'è, ma l'utente non ha il permesso per questo atto |\n| `404` | la risorsa non esiste, o l'utente non la può vedere |\n| `409` | lo stato della risorsa non consente l'atto («il round ha ancora risultati mancanti») |\n\nFanno eccezione le rotte di Better Auth (`/api/auth/**`), che hanno forma ed errori propri\n(`{ code, message }`) e si usano attraverso il suo client.\n\n## Sessione\n\nLe rotte con il lucchetto chiedono il cookie di sessione di Better Auth, che il browser manda da sé\ndopo il login (`POST /api/auth/sign-in/email`). Da `published` in poi un torneo ha anche letture\npubbliche, senza sessione: abbinamenti dei round pubblicati, cronometro, classifica.\n"
+  },
+  "tags": [
+    {
+      "name": "Utenti"
+    },
+    {
+      "name": "Organizzazioni"
+    },
+    {
+      "name": "Tornei"
+    }
+  ],
+  "paths": {
+    "/api/users": {
+      "get": {
+        "tags": [
+          "Utenti"
+        ],
+        "summary": "Rubrica degli utenti registrati",
+        "description": "**Stato:** disponibile\n\nSolo id e nome, per cercare qualcuno da aggiungere a un'organizzazione. `search` trova il nome per sottostringa e l'email solo se scritta per intero. I dati privati stanno su `/api/users/me`.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "default": "25"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "default": "0"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Paginated_UserSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "Utenti"
+        ],
+        "summary": "Un utente della rubrica",
+        "description": "**Stato:** disponibile\n\nNessun dato privato, nemmeno per il proprio id.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nessun utente con questo id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "tags": [
+          "Utenti"
+        ],
+        "summary": "Il proprio account",
+        "description": "**Stato:** disponibile\n\nL'identità arriva solo dalla sessione.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "L'utente della sessione non esiste più",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations": {
+      "get": {
+        "tags": [
+          "Organizzazioni"
+        ],
+        "summary": "Le proprie organizzazioni",
+        "description": "**Stato:** disponibile\n\nQuelle di cui chi chiama è membro, ciascuna con il suo ruolo (`myRole`).",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "default": "25"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "default": "0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Paginated_Organization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Organizzazioni"
+        ],
+        "summary": "Crea un'organizzazione",
+        "description": "**Stato:** disponibile\n\nQualunque utente può crearne una, e ne diventa owner. Lo slug si calcola dal nome (`Negozio Rossi` → `negozio-rossi`, poi `negozio-rossi-2`…) e non cambia più.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 80
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/{id}": {
+      "get": {
+        "tags": [
+          "Organizzazioni"
+        ],
+        "summary": "Un'organizzazione",
+        "description": "**Stato:** disponibile",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "L'organizzazione non esiste, o chi chiama non ne è membro",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Organizzazioni"
+        ],
+        "summary": "Rinomina un'organizzazione",
+        "description": "**Stato:** disponibile\n\nOwner e admin. Lo slug resta quello di prima.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 80
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "L'organizzazione non esiste, o chi chiama non ne è membro",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/{id}/members": {
+      "get": {
+        "tags": [
+          "Organizzazioni"
+        ],
+        "summary": "I membri di un'organizzazione",
+        "description": "**Stato:** disponibile",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "default": "25"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "default": "0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Paginated_OrganizationMember"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "L'organizzazione non esiste, o chi chiama non ne è membro",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Organizzazioni"
+        ],
+        "summary": "Aggiunge un membro",
+        "description": "**Stato:** disponibile\n\nUn utente registrato, trovato con `GET /api/users?search=`. Un owner aggiunge owner e admin, un admin solo admin.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "role": {
+                    "enum": [
+                      "owner",
+                      "admin"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "role"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationMember"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Un admin prova ad aggiungere un owner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "L'organizzazione o l'utente non esistono, o chi chiama non è membro",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "L'utente è già membro",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/{id}/members/{userId}": {
+      "patch": {
+        "tags": [
+          "Organizzazioni"
+        ],
+        "summary": "Cambia il ruolo di un membro",
+        "description": "**Stato:** disponibile\n\nSolo un owner. L'ultimo owner non si può declassare.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "enum": [
+                      "owner",
+                      "admin"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationMember"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chi chiama è admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "L'organizzazione non esiste, chi chiama non è membro, o l'utente non è membro",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Si declasserebbe l'ultimo owner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Organizzazioni"
+        ],
+        "summary": "Toglie un membro, o esce",
+        "description": "**Stato:** disponibile\n\nCon il proprio `userId` si esce dall'organizzazione. Un owner toglie chiunque, un admin solo admin. L'ultimo owner non esce.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Fatto, nessun contenuto"
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Un admin prova a togliere un owner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "L'organizzazione non esiste, chi chiama non è membro, o l'utente non è membro",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Uscirebbe l'ultimo owner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tournaments": {
+      "get": {
+        "tags": [
+          "Tornei"
+        ],
+        "summary": "Elenco dei tornei",
+        "description": "**Stato:** disponibile\n\nPubblico. Senza `organizationId`: i tornei pubblicati di tutte le organizzazioni. Con `organizationId`: quelli dell'organizzazione, bozze comprese se chi chiama ne è membro. Dal più recente.",
+        "x-status": "available",
+        "security": [],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "default": "25"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+$",
+              "default": "0"
+            }
+          },
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Paginated_TournamentSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tornei"
+        ],
+        "summary": "Crea un torneo",
+        "description": "**Stato:** disponibile\n\nOwner e admin dell'organizzazione. Nasce in bozza (`draft`), visibile solo all'organizzazione. `startsAt` è l'orario locale nel fuso del torneo (`2026-11-29T10:00`); `timezone` vale `Europe/Rome` se manca.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 120
+                  },
+                  "game": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "description": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "timezone": {
+                    "type": "string",
+                    "default": "Europe/Rome"
+                  },
+                  "startsAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
+                        "description": "Orario locale nel fuso del torneo, senza fuso né secondi",
+                        "examples": [
+                          "2026-11-29T10:00"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "maxParticipants": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 2,
+                        "maximum": 1024
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "location": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "minLength": 2,
+                            "maxLength": 120
+                          },
+                          "position": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "maxLength": 500
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  }
+                },
+                "required": [
+                  "organizationId",
+                  "name",
+                  "game"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tournament"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "L'organizzazione non esiste, o chi chiama non ne è membro",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tournaments/{id}": {
+      "get": {
+        "tags": [
+          "Tornei"
+        ],
+        "summary": "Un torneo",
+        "description": "**Stato:** disponibile\n\nPubblico da `published` in poi; una bozza la vede solo l'organizzazione.",
+        "x-status": "available",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tournament"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Il torneo non esiste, o è una bozza e chi chiama non è dell'organizzazione",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Tornei"
+        ],
+        "summary": "Modifica un torneo",
+        "description": "**Stato:** disponibile\n\nOwner e admin dell'organizzazione. Un campo assente resta com'è, `null` lo svuota. Cambiare solo `timezone` mantiene l'orario locale di inizio.",
+        "x-status": "available",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 120
+                  },
+                  "game": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "description": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "startsAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
+                        "description": "Orario locale nel fuso del torneo, senza fuso né secondi",
+                        "examples": [
+                          "2026-11-29T10:00"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "maxParticipants": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 2,
+                        "maximum": 1024
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "location": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "minLength": 2,
+                            "maxLength": 120
+                          },
+                          "position": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "maxLength": 500
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tournament"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dati non validi: i messaggi per campo sono in `data`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticazione richiesta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Il torneo non esiste, o chi chiama non è dell'organizzazione",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Il torneo è concluso o annullato",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer"
+          },
+          "statusMessage": {
+            "type": "string",
+            "description": "La reason phrase HTTP, in inglese: non mostrarla all'utente"
+          },
+          "message": {
+            "type": "string",
+            "description": "Il testo in italiano per l'utente"
+          },
+          "data": {}
+        },
+        "required": [
+          "statusCode",
+          "statusMessage",
+          "message"
+        ]
+      },
+      "ValidationError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ApiErrorData"
+              }
+            },
+            "required": [
+              "data"
+            ]
+          }
+        ]
+      },
+      "ApiErrorData": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "not": {}
+                }
+              ]
+            },
+            "description": "Messaggi per campo, nella forma `{ email: ['Indirizzo email non valido'] }`"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Messaggi che non appartengono a nessun campo: body vuoto, non-oggetto o array. Senza di questi il client riceverebbe un 400 con `fields` vuoto e non avrebbe niente da mostrare."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Payload di `createError({ data })` per gli errori di validazione. Tipizzarlo serve al frontend: `useFetch` espone un `FetchError<ApiErrorData>` e i messaggi tornano nel form senza passare da `any`."
+      },
+      "Organization": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/OrganizationId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "ISO 8601"
+          },
+          "myRole": {
+            "$ref": "#/components/schemas/OrganizationRole",
+            "description": "Il ruolo di chi legge: le organizzazioni si leggono solo da membri"
+          }
+        },
+        "required": [
+          "createdAt",
+          "id",
+          "myRole",
+          "name",
+          "slug"
+        ],
+        "additionalProperties": false,
+        "description": "Un'organizzazione vista da un suo membro."
+      },
+      "OrganizationId": {
+        "type": "string"
+      },
+      "OrganizationMember": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserSummary"
+          },
+          "role": {
+            "$ref": "#/components/schemas/OrganizationRole"
+          },
+          "joinedAt": {
+            "type": "string",
+            "description": "ISO 8601: quando è entrato nell'organizzazione"
+          }
+        },
+        "required": [
+          "user",
+          "role",
+          "joinedAt"
+        ],
+        "additionalProperties": false
+      },
+      "OrganizationRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "admin"
+        ],
+        "description": "Ruoli di organizzazione: gli unici due, con pieno controllo sui tornei dell'organizzazione. Solo un owner aggiunge o promuove un owner; l'ultimo owner non può uscire né essere declassato."
+      },
+      "OrganizationSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/OrganizationId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ],
+        "additionalProperties": false,
+        "description": "Il minimo per nominare un'organizzazione: id, nome e slug (l'identificativo leggibile negli URL)."
+      },
+      "Paginated_Organization": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organization"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "additionalProperties": false,
+        "description": "Risposta di ogni endpoint di elenco: mai un array nudo, così la paginazione non è un cambio di forma successivo."
+      },
+      "Paginated_OrganizationMember": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationMember"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "additionalProperties": false,
+        "description": "Risposta di ogni endpoint di elenco: mai un array nudo, così la paginazione non è un cambio di forma successivo."
+      },
+      "Paginated_TournamentSummary": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TournamentSummary"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "additionalProperties": false,
+        "description": "Risposta di ogni endpoint di elenco: mai un array nudo, così la paginazione non è un cambio di forma successivo."
+      },
+      "Paginated_UserSummary": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserSummary"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "additionalProperties": false,
+        "description": "Risposta di ogni endpoint di elenco: mai un array nudo, così la paginazione non è un cambio di forma successivo."
+      },
+      "Tournament": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/TournamentId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "game": {
+            "type": "string",
+            "description": "Testo libero: il catalogo dei giochi arriverà con i preset"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TournamentStatus"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/OrganizationSummary"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Fuso IANA del torneo (`Europe/Rome`): date e orari si mostrano in questo fuso, non in quello del browser"
+          },
+          "startsAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 8601 in UTC; null finché l'organizzatore non fissa la data"
+          },
+          "startsAtLocal": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Lo stesso inizio come orario locale nel fuso del torneo, `2026-11-29T10:00`: è il valore da rimettere nel form, nella stessa forma in cui lo si invia."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "maxParticipants": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Posti disponibili; null = nessun limite"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TournamentLocation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "ISO 8601"
+          }
+        },
+        "required": [
+          "createdAt",
+          "description",
+          "game",
+          "id",
+          "location",
+          "maxParticipants",
+          "name",
+          "organization",
+          "startsAt",
+          "startsAtLocal",
+          "status",
+          "timezone"
+        ],
+        "additionalProperties": false
+      },
+      "TournamentId": {
+        "type": "string"
+      },
+      "TournamentLocation": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Per la mappa; il formato non è ancora fissato"
+          }
+        },
+        "required": [
+          "name",
+          "position"
+        ],
+        "additionalProperties": false
+      },
+      "TournamentStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "published",
+          "registration_open",
+          "checkin_open",
+          "running",
+          "finished",
+          "cancelled"
+        ],
+        "description": "Il ciclo di vita del glossario. La pausa non è uno stato del torneo: è del cronometro del round."
+      },
+      "TournamentSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/TournamentId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "game": {
+            "type": "string",
+            "description": "Testo libero: il catalogo dei giochi arriverà con i preset"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TournamentStatus"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/OrganizationSummary"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Fuso IANA del torneo (`Europe/Rome`): date e orari si mostrano in questo fuso, non in quello del browser"
+          },
+          "startsAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 8601 in UTC; null finché l'organizzatore non fissa la data"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "game",
+          "status",
+          "organization",
+          "timezone",
+          "startsAt"
+        ],
+        "additionalProperties": false,
+        "description": "Quanto basta per un elenco."
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/UserId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean",
+            "description": "Verificata via email: resta false finché non ci sarà un mailer"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "ISO 8601: le date non sopravvivono a JSON, la conversione a Date spetta al frontend"
+          }
+        },
+        "required": [
+          "createdAt",
+          "email",
+          "emailVerified",
+          "id",
+          "isActive",
+          "name"
+        ],
+        "additionalProperties": false,
+        "description": "Dati privati del proprio account, restituiti solo da /api/users/me."
+      },
+      "UserId": {
+        "type": "string"
+      },
+      "UserSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/UserId"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "description": "Contratto dell'API per l'utente: è questo che il frontend consuma, non la riga del database. I campi sono elencati uno a uno (allowlist): una colonna nuova in `users` non finisce qui da sola."
+      }
+    },
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "better-auth.session_token",
+        "description": "Il cookie di sessione di Better Auth, impostato da `POST /api/auth/sign-in/email`."
+      }
+    }
+  }
+}

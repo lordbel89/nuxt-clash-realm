@@ -22,6 +22,7 @@ con il metodo di sempre: **ricerca → domande → decisioni → conseguenze**. 
 | 12 | Glossario e lingua dei nomi | chiuso |
 | 13 | Perimetro della v1 e milestone | chiuso |
 | 14 | Allineamento con il modello del frontend | chiuso |
+| 15 | Moduli dell'applicazione e composizione libera | decisioni prese, punti aperti |
 
 ---
 
@@ -1940,3 +1941,120 @@ resto verrà quando servirà.
 risultati»), §11 · `glossario.md` (stato del torneo, pubblicazione dei risultati).
 
 **Argomento chiuso.**
+
+---
+
+## 15 · Moduli dell'applicazione e composizione libera
+
+Aperto il 2026-10-13. A differenza degli altri argomenti nasce da una discussione di architettura, non
+da una ricerca: non c'è una sezione *Ricerca*. La ricerca sulle postazioni limitate è rimandata a quando
+entreranno nella roadmap.
+
+### Il problema nel testo attuale
+
+- §0.5 e §3 descrivono i moduli come varianti di regola del motore: funzioni pure, parametri, numeri
+  in uscita.
+- Ma il software servirà giochi con esigenze che non sono regole del motore: il tempo (unico per il
+  round o per tavolo), l'arbitraggio (con judge o senza), quante partite si giocano insieme (tutte, o
+  solo quante sono le postazioni). Queste esigenze aggiungono entità, endpoint, permessi e interfaccia.
+- La quinta categoria del catalogo («moduli operativi») mescola le due cose: tipo di fase e di
+  abbinamento sono motore, regime di tempo e blocco delle liste sono applicazione.
+- Nessun modulo dichiara con quali altri sta insieme. Le incompatibilità sono sparse nel testo: la
+  patta disabilitata in eliminazione (§4), il cronometro informativo nelle stesse fasi (§7).
+- Il brainstorm non prevede tornei con **meno postazioni che match**: le arene contate di Beyblade, le
+  console contate di Smash Bros.
+
+### Discussione
+
+La proposta di partenza era «una struttura base e moduli agganciabili in combinazioni diverse a ogni
+torneo», e poi «un sistema di plugin con compatibilità, lasciando all'utente la possibilità di
+comporli».
+
+La composizione libera esiste già: è il torneo libero (argomento 3, decisione 6). Quello che resta da
+scegliere è **chi scrive i moduli e quando entrano nel sistema**:
+
+| | Catalogo chiuso | Plugin aperti |
+|---|---|---|
+| Chi scrive i moduli | lo sviluppo | chiunque, anche terzi |
+| Quando entrano | con un deploy, compilati | caricati a runtime |
+| Cosa vede l'organizzatore | moduli, parametri, compatibilità | lo stesso |
+
+Per l'organizzatore l'esperienza è la stessa. Per lo sviluppo tre ragioni vanno contro i plugin aperti:
+
+1. **La compatibilità non è un sì o un no.** I moduli si modificano a vicenda: la penalità si traduce
+   nella forma del risultato (§7), i tiebreak dipendono dal trattamento del bye (§8), le postazioni
+   limitate cambiano il ciclo di vita del round. Una tabella di compatibilità non contiene queste
+   interazioni. Per lasciarle a plugin sconosciuti servirebbero hook generici su round, risultati e
+   classifica, cioè un framework più grande dell'applicazione.
+2. **Verificabilità** (§0.4). Un round si verifica con `engine(input, seed)` alla versione che l'ha
+   prodotto. Con plugin che hanno versioni proprie, la firma di generazione dovrebbe congelare anche
+   quelle, e verificare un round vecchio vorrebbe dire ricostruire un ambiente intero.
+3. **Costo.** I plugin si ripagano quando li scrivono altri. Se li scrive comunque lo sviluppo, si
+   paga il framework senza averne il beneficio.
+
+I preset non tolgono niente alla composizione libera, ci stanno sopra: sono il punto di partenza
+corretto (riprodurre a mano le regole di Magic è un errore che aspetta di succedere) e sono la
+garanzia del circuito, che deve poter confrontare tornei diversi.
+
+### Decisioni
+
+1. **Due tipi di modulo, un solo meccanismo.** I *moduli del motore* calcolano: forma del risultato,
+   punti, tiebreak, fase, abbinamento. I *moduli dell'applicazione* accendono funzioni, con entità,
+   permessi e interfaccia propri: regime di tempo, arbitraggio, postazioni limitate, liste. Tutti si
+   scelgono nella composizione, si validano con lo schema generato dal catalogo e si congelano nella
+   copia del torneo.
+2. **Catalogo chiuso, non plugin.** I moduli li scrive lo sviluppo e arrivano con un deploy. Nessun
+   modulo si carica a runtime. L'organizzatore compone liberamente quelli che esistono, e i preset
+   restano.
+3. **Ogni modulo dichiara**, nello stesso posto: parametri e limiti, **ambito** (torneo o fase),
+   **dipendenze** e **incompatibilità**. Lo schema rifiuta la composizione che viola un vincolo, e i
+   preset passano dalla stessa validazione.
+4. **L'arbitraggio è una scelta per torneo.**
+5. **Postazioni limitate: dopo la v1, da tenere a mente.** La chiamata segue l'ordine di arrivo e di
+   disponibilità, e l'organizzatore può scegliere a mano quale match mandare in partita.
+
+### Conseguenze sul modello
+
+- **§0.5 e §3.** Il catalogo è chiuso; i moduli sono del motore o dell'applicazione; ogni modulo
+  dichiara ambito, dipendenze e incompatibilità.
+- **§7, ruoli.** Con l'arbitraggio spento non esistono head judge e judge, penalità né chiamata
+  arbitro, e lo staff è fatto di owner, admin e scorekeeper. Lo scorekeeper resta perché inserisce
+  risultati, non arbitra.
+- **§7, postazioni limitate.** Quando arriveranno:
+  - il ciclo di vita non sarà più solo del round: **ogni match avrà uno stato e un inizio propri**
+    (in coda, chiamato, in corso, refertato);
+  - in svizzera il round finisce con l'ultimo match in coda; in eliminazione un match diventa
+    giocabile appena i due che lo alimentano sono chiusi;
+  - il tempo per tavolo diventa il regime naturale, e il tempo globale di round probabilmente
+    un'incompatibilità;
+  - la postazione è un concetto fisico, **diverso dal numero di tavolo** (`table`, tavolo 1 = i più
+    forti) e dal tavolo delle squadre (`Board`): serve un terzo nome, `Station`.
+- **Glossario.** `Station`, `judging`, `scope`, `requires`, `conflicts`.
+
+### Proposte tecniche
+
+1. **Un modulo con varianti è un'unione discriminata** nel ruleset risolto (per esempio il regime di
+   tempo: `none`, `round`, `per_match`), gestita con `switch` esaustivi: una variante nuova non compila
+   finché ogni punto che la deve gestire non la gestisce. Niente booleani sparsi.
+2. **Nella v1 la forma tipata c'è da subito**, con le sole varianti della v1: tempo globale di round,
+   tutti i match insieme, arbitraggio spento. Il punto di aggancio esiste dal primo torneo, e la copia
+   congelata dei tornei giocati non va riscritta quando arrivano le varianti nuove.
+3. **La forma del ruleset risolto che il frontend legge** (cronometro sì o no, chiamata arbitro sì o
+   no) **sta in `shared/`**: è contratto fra backend e frontend, da concordare.
+
+### Punti aperti
+
+- **Arbitraggio e circuito.** Se l'arbitraggio si sceglie per torneo, un torneo di circuito può
+  accenderlo o spegnerlo restando sul preset non modificato? Cioè: l'arbitraggio sta fuori dal preset?
+- **Simulazione della composizione.** L'organizzatore prova una composizione su partecipanti finti,
+  con risultati casuali seedati, e guarda abbinamenti, classifica e avvisi round per round. Proposta,
+  non decisa.
+- **Ricerca sulle postazioni limitate** (start.gg *stations*, Challonge, tornei di Smash e di Beyblade)
+  prima di progettarle.
+
+### Applicato a `brainstorm.md`
+
+§0.5 (catalogo chiuso) · §3 (moduli del motore e dell'applicazione, vincoli dichiarati, arbitraggio e
+postazioni fra i moduli) · §7 (arbitraggio per torneo; nuova sottosezione *Postazioni limitate*) ·
+§11 (postazioni limitate dopo la v1, fuori sequenza) · `glossario.md` (`Station`, `judging`, `scope`,
+`requires`, `conflicts`).

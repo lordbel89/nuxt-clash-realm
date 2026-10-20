@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Match, Tournament } from '#shared/types/tournament';
+import type { LegacyMatch as Match, LegacyTournament as Tournament } from '#shared/types/legacy-tournament';
 
 definePageMeta({ layout: 'projector' });
 

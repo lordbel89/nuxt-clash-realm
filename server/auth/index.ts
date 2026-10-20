@@ -57,6 +57,9 @@ export function createAuth(db: Database, options: AuthOptions) {
       // Nessun mailer, quindi nessun link da spedire: si riaccende insieme a
       // `sendVerificationEmail` quando ci sarà
       requireEmailVerification: false,
+      // In v1 nessuno si iscrive da solo: gli account li crea `npm run user:create`
+      // (server/auth/accounts.ts). Il divieto vale anche per `auth.api.signUpEmail`
+      disableSignUp: true,
     },
 
     session: {

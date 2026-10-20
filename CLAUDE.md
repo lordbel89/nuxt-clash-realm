@@ -34,12 +34,17 @@ npm run dev            # http://localhost:3000 (port pinned in nuxt.config.ts)
 npm run build          # production build
 npm run preview        # preview the production build
 npx eslint .           # lint; `npm run format` = eslint --fix
+npm run test           # engine + backend + integration: no Docker, no server
 npm run test:backend   # node --test, no database and no Nuxt
+npm run test:concurrency   # Postgres in Docker (compose.test.yml)
+npm run test:scenario  # nuxt dev on a fresh PGlite, over HTTP
+npm run api:spec       # regenerate docs/api/openapi.json (reference on /_docs in dev)
+npm run user:create -- --email … --name …   # no public sign-up: accounts are made here
 ```
 
 Database commands (`db:*`) are in `.claude/rules/backend/database.md`.
 
-Node is pinned in `.nvmrc` to major `26`, required for native `Temporal`. Lint needs `.nuxt/eslint.config.mjs`, produced by `nuxt prepare` (runs on `postinstall`); run `npx nuxt prepare` if `.nuxt/` is missing.
+Node is pinned in `.nvmrc` to major `26`, required for native `Temporal`. Use the official build (nvm, the `node:26` image): Homebrew's `node` 26 is compiled without Temporal, and `tests/backend/runtime.test.ts` fails on it. Lint needs `.nuxt/eslint.config.mjs`, produced by `nuxt prepare` (runs on `postinstall`); run `npx nuxt prepare` if `.nuxt/` is missing.
 
 ## Domain
 

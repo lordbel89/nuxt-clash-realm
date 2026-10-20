@@ -1,5 +1,5 @@
 import type { Paginated } from '#shared/types/api';
-import type { Match, Participant, Round, Tournament, TournamentStatus } from '#shared/types/tournament';
+import type { LegacyMatch as Match, LegacyParticipant as Participant, LegacyRound as Round, LegacyTournament as Tournament, LegacyTournamentStatus as TournamentStatus } from '#shared/types/legacy-tournament';
 import { fakerIT as faker } from '@faker-js/faker';
 import { defineMock } from './define.ts';
 

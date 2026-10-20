@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tournament } from '#shared/types/tournament';
+import type { LegacyTournament as Tournament } from '#shared/types/legacy-tournament';
 
 defineProps<{ tournament: Tournament; }>();
 

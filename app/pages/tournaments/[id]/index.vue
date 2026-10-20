@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Match, Standing, Tournament } from '#shared/types/tournament';
+import type { LegacyMatch as Match, LegacyStanding as Standing, LegacyTournament as Tournament } from '#shared/types/legacy-tournament';
 
 definePageMeta({ title: 'Torneo' });
 
