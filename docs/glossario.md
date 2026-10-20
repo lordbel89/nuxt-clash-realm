@@ -100,3 +100,13 @@ termine italiano nella prosa e l'identificatore inglese dove parla di modello, t
 | Qualifica | `Qualification` | Diritto di iscriversi a un torneo di circuito: `{ playerId, circuitId, origin, expiresAt }`. Si consuma per intero. |
 | Credito bye | `ByeCredit` | Un bye premiale, una riga per bye: `{ playerId, circuitId, origin, expiresAt }`. |
 | Bye spesi | `byeRounds` | Quanti bye premiali il partecipante usa in quel torneo. |
+
+## Schermi e widget
+
+| Termine | Identificatore | Definizione |
+|---|---|---|
+| Schermo | `WidgetScreen` | Dove si mostra un layout: `monitor` (la TV o il proiettore della sala, pagina `/tournaments/:id/display`), `judge` (il telefono del judge), `player` (il telefono del giocatore). |
+| Widget | `WidgetType` | Un blocco di contenuto da mettere su uno schermo: `timer`, `tables`, `standings`, `judge_call`, `organizer_messages`. Al più uno per tipo su ogni schermo. |
+| Layout | `ScreenLayout` | La disposizione dei widget su uno schermo: una griglia (`columns`, `rows`) e le posizioni. La griglia è salvata col layout, così un layout resta valido se cambia quella di default. Da non confondere con i layout di Nuxt (`app/layouts/`). |
+| Posizione del widget | `WidgetPlacement` | `{ type, col, row, colSpan, rowSpan }`: colonne e righe partono da 1, come in CSS grid. I widget non si sovrappongono. |
+| Configurazione dei widget | `WidgetConfig` | Un layout per schermo. Una per torneo. |

@@ -1,14 +1,7 @@
 <script setup lang="ts">
-import type { Paginated } from '#shared/types/api';
-import type { LegacyTournament as Tournament } from '#shared/types/legacy-tournament';
-
 definePageMeta({ title: 'Tornei' });
 
-// Risponde `server/mocks/tournaments.mock.ts`: l'handler reale non esiste
-// ancora. Il generico serve proprio per questo — Nitro non conosce la rotta,
-// quindi non c'è niente da inferire. Quando l'endpoint arriverà va tolto,
-// come in `app/pages/hello.vue`.
-const { data, status, error } = await useFetch<Paginated<Tournament>>('/api/tournaments');
+const { data, status, error } = await useFetch('/api/tournaments');
 
 const tournaments = computed(() => data.value?.items ?? []);
 </script>

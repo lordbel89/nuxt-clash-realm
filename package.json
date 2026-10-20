@@ -13,7 +13,7 @@
     "test:concurrency": "docker compose -f compose.test.yml up -d --wait && node --test tests/concurrency/*.test.ts",
     "test:scenario": "node --test --test-concurrency=1 tests/scenario/*.test.ts",
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --port=3010",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",

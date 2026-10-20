@@ -1,76 +1,54 @@
 import type { Paginated } from '#shared/types/api';
-import type { LegacyMatch as Match, LegacyParticipant as Participant, LegacyRound as Round, LegacyTournament as Tournament, LegacyTournamentStatus as TournamentStatus } from '#shared/types/legacy-tournament';
+import type { OrganizationId, TournamentId } from '#shared/types/ids';
+import type { Tournament, TournamentStatus, TournamentSummary } from '#shared/types/tournament';
 import { fakerIT as faker } from '@faker-js/faker';
+import { toLocalDateTime } from '../mappers/tournament.ts';
 import { defineMock } from './define.ts';
 
 /**
- * Tornei finti: `server/api/tournaments/` non esiste ancora, queste rotte sono
- * l'unica cosa che risponde. Quando l'handler vero arriverà, `enabled: false`
- * qui sotto lo lascia passare: il file resta, ed è lo strumento con cui si
- * riproduce a comando uno stato che il database non ha.
+ * Tornei finti, uno per stato. Gli handler veri ci sono (F0.7), quindi il mock è spento:
+ * riaccenderlo serve a riprodurre a comando uno stato che il database non ha. Copre solo i due
+ * `GET`: `POST` e `PATCH` arrivano comunque agli handler, che questi id non li conoscono.
  */
 
 // Seed fisso: gli id sopravvivono ai riavvii del server, quindi i link a
 // /tournaments/:id salvati nel browser continuano a funzionare.
 faker.seed(20260913);
 
+const TIMEZONE = 'Europe/Rome';
 const GAMES = ['Magic: the Gathering', 'Warhammer 40.000', 'Blood Bowl', 'Catan'];
-const STATUSES: TournamentStatus[] = ['draft', 'ready', 'running', 'paused', 'finished'];
+const STATUSES: TournamentStatus[] = ['draft', 'published', 'registration_open', 'checkin_open', 'running', 'finished', 'cancelled'];
 
-function createParticipant(_: unknown, index: number): Participant {
+const organization = { id: faker.string.uuid() as OrganizationId, name: 'Negozio finto', slug: 'negozio-finto' };
+
+function createTournament(status: TournamentStatus, index: number): Tournament {
+  const startsAt = faker.date.soon({ days: 60 });
+  startsAt.setUTCSeconds(0, 0);
+
   return {
-    id: faker.string.uuid(),
-    name: faker.person.fullName(),
-    seed: index + 1,
-  };
-}
-
-function createRound(number: number, participants: Participant[]): Round {
-  const matches: Match[] = [];
-
-  for (let i = 0; i + 1 < participants.length; i += 2) {
-    matches.push({
-      id: faker.string.uuid(),
-      round: number,
-      table: `Tavolo ${i / 2 + 1}`,
-      status: 'pending',
-      home: participants[i],
-      away: participants[i + 1],
-    });
-  }
-
-  return { number, label: `Round ${number}`, durationMinutes: 50, matches };
-}
-
-function createTournament(index: number): Tournament {
-  const participants = Array.from({ length: faker.number.int({ min: 4, max: 12 }) }, createParticipant);
-
-  // ponytail: `startDate` è omesso di proposito. Il tipo lo dichiara `Date`,
-  // ma attraverso HTTP arriverebbe come stringa ISO (vedi `User.createdAt`):
-  // è una decisione che spetta al contratto reale, non a un mock.
-  return {
-    id: faker.string.uuid(),
+    id: faker.string.uuid() as TournamentId,
     name: `${faker.location.city()} Open`,
     game: GAMES[index % GAMES.length]!,
-    isTeam: faker.datatype.boolean(),
-    maxParticipants: 16,
+    status,
+    organization,
+    timezone: TIMEZONE,
+    startsAt: startsAt.toISOString(),
+    startsAtLocal: toLocalDateTime(startsAt, TIMEZONE),
     description: faker.lorem.sentence(),
-    location: { name: faker.company.name() },
-    status: STATUSES[index % STATUSES.length]!,
-    participants,
-    rounds: [createRound(1, participants)],
-    currentRound: 1,
+    maxParticipants: 16,
+    location: { name: faker.company.name(), position: null },
+    createdAt: faker.date.recent().toISOString(),
   };
 }
 
-const tournaments = Array.from({ length: 6 }, (_, index) => createTournament(index));
+const tournaments = STATUSES.map(createTournament);
 
 export default [
-  defineMock<Paginated<Tournament>>({
+  defineMock<Paginated<TournamentSummary>>({
     method: 'GET',
     path: '/api/tournaments',
     // A `false` la chiamata prosegue verso l'handler reale
-    enabled: true,
+    enabled: false,
     // Mezzo secondo di ritardo: senza, gli stati di caricamento non si vedono mai
     delay: 500,
     data: ({ query }) => {
@@ -89,7 +67,7 @@ export default [
   defineMock<Tournament>({
     method: 'GET',
     path: '/api/tournaments/:id',
-    enabled: true,
+    enabled: false,
     data: ({ params }) => {
       const tournament = tournaments.find(candidate => candidate.id === params.id);
 

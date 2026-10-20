@@ -1,33 +1,34 @@
 <script setup lang="ts">
-import type { USelectItem } from '~/types/components';
-import type { LegacyTournamentConfig as TournamentConfig } from '#shared/types/legacy-tournament';
+import type { FormSubmitEvent } from '@nuxt/ui';
+import type { TournamentFormData, TournamentFormState } from '~/utils/tournamentForm';
+import { DEFAULT_TIMEZONE } from '#shared/schemas/tournament';
+import { TournamentFormSchema } from '~/utils/tournamentForm';
 
-const model = defineModel<TournamentConfig>({ required: true });
+const model = defineModel<TournamentFormState>({ required: true });
 
-const emit = defineEmits<{ submit: [TournamentConfig]; }>();
+const emit = defineEmits<{ submit: [TournamentFormData]; }>();
 
 defineProps<{ submitLabel?: string; loading?: boolean; }>();
 
-const games: USelectItem<string>[] = [
-  { label: 'BeyBlade X', value: 'bbx' },
-  { label: 'Cyberpunk TCG', value: 'cyberpunk-tcg' },
-  { label: 'Altro', value: 'other' },
-];
+// Per il contratto un luogo senza nome non esiste: svuotare il nome toglie il luogo
+const locationName = computed({
+  get: () => model.value.location?.name ?? '',
+  set: (name: string) => {
+    model.value.location = name ? { name, position: model.value.location?.position ?? null } : null;
+  },
+});
 
-const leagues: USelectItem<string>[] = [
-  { label: 'Andycards Local', value: 'andylocal' },
-  { label: 'Lega del male', value: 'badleague' },
-];
-
-// ponytail: nessuno schema di validazione finché i campi non sono definitivi.
-// Aggiungere uno schema zod su `:schema` di UForm quando il modello dati è stabile.
+function onSubmit(event: FormSubmitEvent<TournamentFormData>) {
+  emit('submit', event.data);
+}
 </script>
 
 <template>
   <UForm
+    :schema="TournamentFormSchema"
     :state="model"
     class="space-y-4"
-    @submit="emit('submit', model)">
+    @submit="onSubmit">
     <UFormField
       label="Nome torneo"
       name="name"
@@ -42,84 +43,54 @@ const leagues: USelectItem<string>[] = [
         label="Gioco"
         name="game"
         required>
-        <USelect
+        <UInput
           v-model="model.game"
-          :items="games"
+          placeholder="Magic: the Gathering"
           class="w-full" />
       </UFormField>
 
       <UFormField
-        label="Lega"
-        name="league">
-        <div class="flex gap-2">
-          <USelect
-            v-model="model.leagueId"
-            :items="leagues"
-            class="w-full" />
-          <UButton
-            v-if="model.leagueId"
-            variant="outline"
-            icon="i-lucide-trash"
-            size="sm"
-            @click="model.leagueId = undefined" />
-        </div>
-      </UFormField>
-    </div>
-
-    <div class="grid gap-4 sm:grid-cols-4">
-      <UFormField
-        class="col-span-2"
         label="Partecipanti max"
         name="maxParticipants"
-      >
+        hint="Vuoto = nessun limite">
         <UInput
-          v-model.number="model.maxParticipants"
+          v-model.nullable="model.maxParticipants"
           type="number"
-          min="2"
           class="w-full" />
-      </UFormField>
-      <UFormField
-        label="A Squadre"
-        name="isTeam"
-        required>
-        <USwitch
-          class="self-center mt-3"
-        />
       </UFormField>
     </div>
 
     <UFormField
       label="Inizio torneo"
-      name="startDate"
-    >
-      <FormDatePicker
-        v-model="model.startDate"
+      name="startsAt"
+      :hint="model.timezone ?? DEFAULT_TIMEZONE">
+      <UInput
+        v-model.nullable="model.startsAt"
+        type="datetime-local"
         class="w-full" />
     </UFormField>
+
     <UFormField
       label="Descrizione"
-      name="description"
-    >
+      name="description">
       <UInput
-        v-model="model.description"
+        v-model.nullable="model.description"
         class="w-full" />
     </UFormField>
 
     <div class="flex gap-4">
       <UFormField
         label="Nome location"
-        name="locationName"
-      >
+        name="location.name">
         <UInput
-          v-model="model.location.name"
+          v-model="locationName"
           class="w-full" />
       </UFormField>
       <UFormField
         label="Posizione location (TODO Maps Widget)"
-        name="locationPosition"
-      >
+        name="location.position">
         <UInput
-          v-model="model.location.position"
+          :model-value="model.location?.position ?? ''"
           disabled
           class="w-full" />
       </UFormField>
