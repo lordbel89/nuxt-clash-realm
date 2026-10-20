@@ -52,6 +52,11 @@ const roundEndsAt = ref<string | undefined>();
           variant="ghost">
           Configura
         </UButton>
+        <UButton
+          :to="`/tournaments/${id}/widgets`"
+          variant="ghost">
+          Widget
+        </UButton>
       </div>
     </div>
 

@@ -29,7 +29,7 @@ What each endpoint returns, and the error shapes, are in `.claude/rules/contract
 
 Three layouts serve three audiences:
 
-- `default`: `UDashboardGroup` shell with collapsible sidebar. Page titles feed the navbar via `definePageMeta({ title })`, read by the layout from `route.meta.title`.
+- `default`: `UDashboardGroup` shell with collapsible sidebar. Page titles feed the navbar via `definePageMeta({ title })`, read by the layout from `route.meta.title`. `definePageMeta({ back: true })` adds a back arrow before the title: it goes back in history, or one path segment up when the page was opened directly. Use it instead of a "Torna a…" button in the page.
 - `auth`: centered card, used by `/login`.
 - `projector`: full-screen, **dark mode forced via a `.dark` class on its own root** so a projection stays dark while the app runs light. Used by `/tournaments/[id]/display`, which pairs with the oversized `text-screen` / `text-screen-lg` type scale for readability at a distance.
 

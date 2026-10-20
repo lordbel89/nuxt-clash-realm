@@ -43,7 +43,12 @@ async function onSubmit(payload: TournamentFormData) {
 
 <template>
   <div class="max-w-xl space-y-6">
-    <div class="flex justify-end">
+    <div class="flex justify-end gap-2">
+      <UButton
+        :to="`/tournaments/${id}/widgets`"
+        variant="ghost">
+        Widget
+      </UButton>
       <UButton
         :to="`/tournaments/${id}`"
         variant="ghost">

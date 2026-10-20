@@ -2,9 +2,17 @@
 import { appHeader, sideMenu, sideMenuFooter } from '~/config/navigation';
 
 const route = useRoute();
+const router = useRouter();
 
 // Titolo dell'header: definito dalla pagina con definePageMeta({ title }).
 const title = computed(() => (route.meta.title as string | undefined) ?? appHeader.title);
+
+// Freccia di ritorno accanto al titolo, per le pagine con definePageMeta({ back: true }).
+// Torna alla pagina da cui si è arrivati; aperta da un link diretto non c'è storia, e sale di un livello nel percorso.
+function goBack() {
+  if (window.history.state?.back) router.back();
+  else navigateTo(route.path.replace(/\/[^/]+$/, '') || '/');
+}
 </script>
 
 <template>
@@ -55,6 +63,16 @@ const title = computed(() => (route.meta.title as string | undefined) ?? appHead
     <UDashboardPanel>
       <template #header>
         <UDashboardNavbar :title="title">
+          <template
+            v-if="route.meta.back"
+            #leading>
+            <UButton
+              icon="i-lucide-arrow-left"
+              color="neutral"
+              variant="ghost"
+              aria-label="Indietro"
+              @click="goBack" />
+          </template>
           <template #right>
             <UNavigationMenu
               v-if="appHeader.links.length"
