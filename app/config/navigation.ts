@@ -100,7 +100,7 @@ export const sideMenu: NavigationMenuItem[][] = sideMenuDecorator([
     icon: 'i-lucide-wrench',
     defaultOpen: true,
     children: [
-      { label: 'Componenti', icon: 'i-lucide-cog', to: '/dev/components' },
+      { label: 'Showcase componenti', icon: 'i-lucide-cog', to: '/dev/components' },
       { label: 'Tabelle', icon: 'i-lucide-columns-3-cog', to: '/dev/tables' },
     ],
   },
