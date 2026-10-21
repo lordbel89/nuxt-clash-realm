@@ -14,7 +14,7 @@
 <script lang="ts" setup>
 import type { Component } from 'vue';
 import type { PropControl } from '~/types/components';
-import { FormDatePicker, RoundTimer } from '#components';
+import { DisplayRoundTimer, FormDatePicker } from '#components';
 
 definePageMeta({
   title: 'Componenti',
@@ -34,7 +34,7 @@ const items: {
   },
   {
     label: 'Round Timer',
-    component: RoundTimer,
+    component: DisplayRoundTimer,
     initial: { huge: true, endsAt: '2026-10-22T00:00:00.000Z' },
     overrides: { endsAt: 'datetime' },
   },

@@ -12,4 +12,13 @@
 @import "./tokens/light.css";
 @import "./tokens/dark.css";
 
-@import "./tokens/components.css"
+@import "./tokens/components.css";
+
+/* Tailwind 4 lascia ai <button> il cursore di default e il tema di UButton non lo cambia:
+ * senza questa regola solo i bottoni con `to` (che diventano <a>) hanno la manina. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}

@@ -18,12 +18,12 @@ aggiorna subito.
 Una voce in `items`:
 
 ```ts
-import { FormDatePicker, RoundTimer } from '#components';
+import { DisplayRoundTimer, FormDatePicker } from '#components';
 
 const items = [
   {
     label: 'Round Timer',
-    component: RoundTimer,
+    component: DisplayRoundTimer,
     initial: { huge: true, endsAt: '2026-10-22T00:00:00.000Z' },
     overrides: { endsAt: 'datetime' },
   },
@@ -39,7 +39,7 @@ const items = [
 ## Da dove vengono le prop
 
 Nessuno schema da scrivere: lo showcase legge le `props` runtime che Vue genera da `defineProps`.
-Per `RoundTimer`, `defineProps<{ endsAt?: string; huge?: boolean }>()` diventa
+Per `DisplayRoundTimer`, `defineProps<{ endsAt?: string; huge?: boolean }>()` diventa
 `{ endsAt: { type: String }, huge: { type: Boolean } }`, e ogni tipo diventa un controllo:
 
 | Tipo runtime | Controllo |

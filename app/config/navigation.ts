@@ -65,8 +65,14 @@ export const sideMenu: NavigationMenuItem[][] = sideMenuDecorator([
       defaultOpen: true,
       children: [
         {
+          label: 'Organizzazioni',
+          icon: 'i-lucide-building-2',
+          to: '/organizations',
+        },
+        {
           label: 'Utenti',
           icon: 'i-lucide-users',
+          to: '/users',
         },
         {
           label: 'Permessi',

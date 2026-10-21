@@ -31,7 +31,7 @@ const roundEndsAt = ref<string | undefined>();
       </div>
 
       <div class="flex items-center gap-3">
-        <RoundTimer :ends-at="roundEndsAt" />
+        <DisplayRoundTimer :ends-at="roundEndsAt" />
         <UButton variant="subtle">
           Avvia round
         </UButton>
