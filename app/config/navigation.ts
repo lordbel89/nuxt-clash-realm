@@ -115,5 +115,12 @@ export const sideMenu: NavigationMenuItem[][] = sideMenuDecorator([
 
 /** Voci ancorate in fondo alla sidebar */
 export const sideMenuFooter: NavigationMenuItem[] = [
-  { label: 'Esci', icon: 'i-lucide-log-out', to: '/login' },
+  {
+    label: 'Esci',
+    icon: 'i-lucide-log-out',
+    async onSelect() {
+      await authClient.signOut();
+      await navigateTo('/login');
+    },
+  },
 ];

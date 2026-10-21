@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="230 20 925 690" width="925" height="690">
+  <title>Corona su arena</title>
+  <defs>
+    <clipPath id="left"><rect x="0" y="0" width="693" height="800"/></clipPath>
+    <clipPath id="right"><rect x="693" y="0" width="800" height="800"/></clipPath>
+    <mask id="door" maskUnits="userSpaceOnUse" x="230" y="20" width="925" height="700">
+      <rect x="230" y="20" width="925" height="700" fill="#fff"/>
+      <path d="M645,700 V610 A48.5,48.5 0 0 1 742,610 V700 Z" fill="#000"/>
+    </mask>
+  </defs>
+  <g id="anello">
+    <path d="M253,345 A440,100 0 1 0 1133,345 A440,100 0 1 0 253,345 Z M353,338 A340,50 0 1 0 1033,338 A340,50 0 1 0 353,338 Z" fill="#0B5ED7" fill-rule="evenodd" clip-path="url(#left)"/>
+    <path d="M253,345 A440,100 0 1 0 1133,345 A440,100 0 1 0 253,345 Z M353,338 A340,50 0 1 0 1033,338 A340,50 0 1 0 353,338 Z" fill="#FF3B30" fill-rule="evenodd" clip-path="url(#right)"/>
+  </g>
+  <g id="corpo" mask="url(#door)">
+    <path d="M255,388 A438,77 0 0 0 445,451 L468,675 A402,90 0 0 1 288,600 Z" fill="#1677FF"/>
+    <path d="M472,454 A438,77 0 0 0 693,465 L693,690 A402,90 0 0 1 495,678 Z" fill="#0B5ED7"/>
+    <path d="M693,465 A438,77 0 0 0 918,454 L890,678 A402,90 0 0 1 693,690 Z" fill="#FF3B30"/>
+    <path d="M942,452 A438,77 0 0 0 1131,388 L1090,600 A402,90 0 0 1 917,675 Z" fill="#FF6B8B"/>
+  </g>
+  <path id="corona" d="M330,175 L460,238 L460,105 L592,202 L693,40 L796,202 L925,105 L925,238 L1057,175 L988,325 A300,52 0 0 1 400,335 Z" fill="#FFC629"/>
+</svg>

@@ -25,15 +25,17 @@ function goBack() {
       <template #header="{ collapsed }">
         <NuxtLink
           :to="appHeader.to"
-          class="flex items-center gap-2 font-bold text-accent">
-          <img
-            src="/assets/Logo%20Placeholder.png"
-            alt=""
-            width="400"
-            height="500"
-            class="mx-auto h-12 w-auto"
-          >
-          <span v-if="!collapsed">{{ appHeader.title }}</span>
+          class="flex items-center justify-center w-9/12 gap-2 ">
+          <DisplayLogo
+            variant="mono-xl"
+            :stroke-width="20"
+            class="mx-auto h-10 w-auto text-white" />
+          <!-- <DisplayLogo
+            variant="mono"
+            class="mx-auto h-10 w-auto text-orange-logo" /> -->
+          <span
+            v-if="!collapsed"
+            class="font-bold text-accent">{{ appHeader.title }}</span>
         </NuxtLink>
 
         <UDashboardSidebarCollapse class="ms-auto z-50" />
