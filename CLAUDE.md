@@ -15,12 +15,12 @@ Nuxt 4 full-stack app for running tabletop/esports tournaments. Two people work 
 
 ## Who owns what
 
-| Area | Owner | Paths | Instructions |
-|---|---|---|---|
-| Frontend | Marco | `app/`, `server/mocks/`, `server/middleware/mocks.ts`, `public/` | `.claude/rules/frontend/` |
-| Backend | Lord Bel | `server/` (except the mocks), `tests/backend/` | `.claude/rules/backend/` |
-| Tournament engine | Lord Bel | `server/engine/` | `.claude/rules/engine.md` |
-| API contract | both | `shared/` | `.claude/rules/contract.md` |
+| Area              | Owner    | Paths                                                            | Instructions                |
+| ----------------- | -------- | ---------------------------------------------------------------- | --------------------------- |
+| Frontend          | Marco    | `app/`, `server/mocks/`, `server/middleware/mocks.ts`, `public/` | `.claude/rules/frontend/`   |
+| Backend           | Lord Bel | `server/` (except the mocks), `tests/backend/`                   | `.claude/rules/backend/`    |
+| Tournament engine | Lord Bel | `server/engine/`                                                 | `.claude/rules/engine.md`   |
+| API contract      | both     | `shared/`                                                        | `.claude/rules/contract.md` |
 
 Rules for each area load on their own when Claude reads a file in that area. If you plan work in an area before opening any of its files, read its rules file first.
 
@@ -31,7 +31,7 @@ Rules for each area load on their own when Claude reads a file in that area. If 
 ## Commands
 
 ```bash
-npm run dev            # http://localhost:3000 (port pinned in nuxt.config.ts)
+npm run dev            # http://localhost:3010 (port pinned in nuxt.config.ts)
 npm run build          # production build
 npm run preview        # preview the production build
 npx eslint .           # lint; `npm run format` = eslint --fix

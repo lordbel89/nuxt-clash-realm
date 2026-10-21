@@ -24,22 +24,22 @@ npm run dev
 
 ### Applicazione
 
-| Comando | A cosa serve |
-|---|---|
-| `npm run dev` | Avvia il dev server con HMR su [http://localhost:3000](http://localhost:3000). La porta è fissata in `nuxt.config.ts` (`devServer.port`). |
-| `npm run build` | Build di produzione in `.output/`, server Nitro incluso. |
-| `npm run preview` | Serve la build appena prodotta in locale, per verificarla prima del deploy. Richiede un `build` precedente. |
-| `npm run generate` | Build statica (pre-rendering). Presente perché fa parte dello starter Nuxt, ma non è il target di deploy di questo progetto: le API hanno bisogno del server Nitro. |
+| Comando                       | A cosa serve                                                                                                                                                               |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                 | Avvia il dev server con HMR su [http://localhost:3010](http://localhost:3010). La porta è fissata in `nuxt.config.ts` (`devServer.port`).                                  |
+| `npm run build`               | Build di produzione in `.output/`, server Nitro incluso.                                                                                                                   |
+| `npm run preview`             | Serve la build appena prodotta in locale, per verificarla prima del deploy. Richiede un `build` precedente.                                                                |
+| `npm run generate`            | Build statica (pre-rendering). Presente perché fa parte dello starter Nuxt, ma non è il target di deploy di questo progetto: le API hanno bisogno del server Nitro.        |
 | `npm install` → `postinstall` | Lancia `nuxt prepare`: rigenera `.nuxt/` (tipi auto-importati, `.nuxt/eslint.config.mjs`). Da rieseguire a mano con `npx nuxt prepare` se `.nuxt/` manca o è disallineata. |
 
 ### Database
 
-| Comando | A cosa serve |
-|---|---|
+| Comando               | A cosa serve                                                                                                                                                                                                                                    |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm run db:generate` | `drizzle-kit generate`: confronta lo schema in `server/database/schema/` con le migrazioni esistenti e scrive il file SQL della differenza in `server/database/migrations/`. Non tocca il database. Da lanciare dopo ogni modifica allo schema. |
-| `npm run db:migrate` | Esegue `server/database/migrate.ts`: applica le migrazioni pendenti al database configurato in `.env`. |
-| `npm run db:seed` | Esegue `server/database/seed.ts`: popola il database con i dati di sviluppo. È rieseguibile, non duplica le righe. |
-| `npm run db:studio` | Apre Drizzle Studio, la UI web per ispezionare e modificare i dati del database configurato in `.env`. |
+| `npm run db:migrate`  | Esegue `server/database/migrate.ts`: applica le migrazioni pendenti al database configurato in `.env`.                                                                                                                                          |
+| `npm run db:seed`     | Esegue `server/database/seed.ts`: popola il database con i dati di sviluppo. È rieseguibile, non duplica le righe.                                                                                                                              |
+| `npm run db:studio`   | Apre Drizzle Studio, la UI web per ispezionare e modificare i dati del database configurato in `.env`.                                                                                                                                          |
 
 Tutti e quattro leggono la configurazione da `.env` tramite `server/database/env.ts` — girano come processi Node autonomi, fuori dal contesto Nuxt, quindi vedono l'ambiente descritto lì, non `runtimeConfig`.
 
@@ -64,11 +64,11 @@ Non è presente alcun setup di test in questo repository.
 
 Le variabili stanno in `.env` (vedi `.env.example`); i default sono in `server/database/env.ts` e alimentano sia `runtimeConfig` sia `drizzle.config.ts`.
 
-| Variabile | Default | Significato |
-|---|---|---|
-| `NUXT_DATABASE_DIALECT` | `pglite` | `pglite` in sviluppo, `postgres` in produzione. Sceglie il driver in `server/database/client.ts`. |
-| `NUXT_DATABASE_PGLITE_PATH` | `.data/pglite` | Cartella dati di PGlite. Usata solo con dialetto `pglite`. |
-| `NUXT_DATABASE_URL` | *(vuota)* | Stringa di connessione al Postgres di produzione. Usata solo con dialetto `postgres`. |
+| Variabile                   | Default        | Significato                                                                                       |
+| --------------------------- | -------------- | ------------------------------------------------------------------------------------------------- |
+| `NUXT_DATABASE_DIALECT`     | `pglite`       | `pglite` in sviluppo, `postgres` in produzione. Sceglie il driver in `server/database/client.ts`. |
+| `NUXT_DATABASE_PGLITE_PATH` | `.data/pglite` | Cartella dati di PGlite. Usata solo con dialetto `pglite`.                                        |
+| `NUXT_DATABASE_URL`         | _(vuota)_      | Stringa di connessione al Postgres di produzione. Usata solo con dialetto `postgres`.             |
 
 Per ripartire da un database pulito in locale basta cancellare la cartella dati di PGlite e rilanciare migrazioni e seed:
 
@@ -82,27 +82,34 @@ Dati finti serviti da Nitro **solo in sviluppo**: servono a lavorare su una pagi
 
 ```ts
 // server/mocks/tournaments.mock.ts
-import { fakerIT as faker } from '@faker-js/faker';
-import { defineMock } from './define.ts';
+import { fakerIT as faker } from "@faker-js/faker";
+import { defineMock } from "./define.ts";
 
 export default defineMock<Paginated<Tournament>>({
-  method: 'GET',
-  path: '/api/tournaments',
+  method: "GET",
+  path: "/api/tournaments",
   enabled: true,
   delay: 500,
-  data: () => ({ items: [/* faker… */], total: 6, limit: 25, offset: 0 }),
+  data: () => ({
+    items: [
+      /* faker… */
+    ],
+    total: 6,
+    limit: 25,
+    offset: 0,
+  }),
 });
 ```
 
 Poi una riga in `server/mocks/index.ts`, che è l'elenco dei mock esistenti. Un file può esportare un mock solo o un array, per tenere insieme le rotte di una stessa entità.
 
-| Campo | A cosa serve |
-|---|---|
-| `method` | `'GET'`, `'POST'`, `'PUT'`, `'PATCH'`, `'DELETE'`. |
-| `path` | Percorso dell'endpoint, con `:nome` per i parametri: `'/api/tournaments/:id'`. Arrivano in `data`. |
-| `enabled` | `false` spegne il singolo mock. Default `true`, ma nei file è scritto esplicitamente: è lì che si mette `false`. |
-| `delay` | Millisecondi di attesa: è così che si vedono gli stati di caricamento. |
-| `data` | Il corpo della risposta. Un valore per dati fissi, una funzione `({ params, query, event })` per generarli a ogni chiamata. |
+| Campo     | A cosa serve                                                                                                                |
+| --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `method`  | `'GET'`, `'POST'`, `'PUT'`, `'PATCH'`, `'DELETE'`.                                                                          |
+| `path`    | Percorso dell'endpoint, con `:nome` per i parametri: `'/api/tournaments/:id'`. Arrivano in `data`.                          |
+| `enabled` | `false` spegne il singolo mock. Default `true`, ma nei file è scritto esplicitamente: è lì che si mette `false`.            |
+| `delay`   | Millisecondi di attesa: è così che si vedono gli stati di caricamento.                                                      |
+| `data`    | Il corpo della risposta. Un valore per dati fissi, una funzione `({ params, query, event })` per generarli a ogni chiamata. |
 
 - **Accendere e spegnere una chiamata alla volta**: `enabled: false` e la richiesta prosegue verso l'handler reale — se non esiste, torna il suo 404. Nitro ricarica al salvataggio, non serve riavviare.
 - **Un mock spento non si cancella**: quando l'endpoint vero funziona, il file resta lì da spegnere e riaccendere. È lo strumento per riprodurre a comando un caso che il database non ha — duecento partecipanti, un 500, una risposta lenta — aggiornandone i dati il giorno che quel caso serve.

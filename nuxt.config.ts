@@ -48,7 +48,7 @@ export default defineNuxtConfig({
       environment: '',
     },
   },
-  devServer: { port: 3000 },
+  devServer: { port: 3010 },
   compatibilityDate: '2025-07-15',
   eslint: {
     config: {
