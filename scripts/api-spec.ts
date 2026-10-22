@@ -92,12 +92,20 @@ function operation(route: RouteSpec, responseRef: JsonSchema | undefined) {
       requestBody: { required: true, content: { 'application/json': { schema: inputSchema(route.body) } } },
     }),
     'responses': {
-      ...(responseRef
-        ? { 200: { description: 'OK', content: { 'application/json': { schema: responseRef } } } }
-        : { 204: { description: 'Fatto, nessun contenuto' } }),
+      ...successResponse(route, responseRef),
       ...errors,
     },
   };
+}
+
+function successResponse(route: RouteSpec, responseRef: JsonSchema | undefined) {
+  if (route.stream) {
+    return { 200: { description: route.stream, content: { 'text/event-stream': { schema: { type: 'string' } } } } };
+  }
+
+  return responseRef
+    ? { 200: { description: 'OK', content: { 'application/json': { schema: responseRef } } } }
+    : { 204: { description: 'Fatto, nessun contenuto' } };
 }
 
 function errorResponse(description: string, schema = 'ApiError') {

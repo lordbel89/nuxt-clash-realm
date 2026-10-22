@@ -44,6 +44,10 @@ export default defineNuxtConfig({
       url: DATABASE_DEFAULTS.url as string,
       pglitePath: DATABASE_DEFAULTS.pglitePath as string,
     },
+    // pg-boss (code e job). Spento in v1: nessuna funzione lo usa. Sovrascrivibile con NUXT_JOBS_ENABLED
+    jobs: {
+      enabled: false,
+    },
     public: {
       environment: '',
     },

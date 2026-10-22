@@ -85,6 +85,10 @@ Then `npm run db:migrate`, and `npm run db:seed` if you touched the seed. Steps 
 
 A junction table that carries its own columns (a seed, an enrolment date) is an entity in its own right, not a plain array in the DTO.
 
+## Tournament commands
+
+Every write to an existing tournament goes through `runTournamentCommand` (`server/services/tournament-commands.ts`): it locks the tournament row, and the history entries (`record`) and the live events (`emit`) are written in the same transaction. Check state on the `tournament` row it hands you, not on a read made before. The history is append-only and also records refused attempts, so a command that refuses with a return value still commits; only a thrown error rolls back. Creation (`createTournament`) is the one write outside it. See `docs/backend-structure.md`, *Comandi del torneo e storico*.
+
 ## Dates
 
 Calendar arithmetic (local days, recurrences, deadlines, a tournament's time zone) goes through `server/utils/time.ts` (Temporal, `compatible` disambiguation, deadlines as an exclusive end-of-day bound). Never add hours or days to a `Date`: across a DST night a day lasts 23 or 25 hours. `Date` exists only at the database boundary (`inTimeZone()` in, `toDate()` out).

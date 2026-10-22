@@ -19,7 +19,8 @@ function createPostgresDatabase(url: string) {
   }
 
   return drizzlePostgres({
-    client: postgres(url),
+    // I NOTICE di Postgres (es. «lo schema esiste già» a ogni migrazione) non sono errori e riempirebbero il log
+    client: postgres(url, { onnotice: () => {} }),
     relations,
   });
 }

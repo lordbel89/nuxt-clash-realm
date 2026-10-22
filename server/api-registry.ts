@@ -31,8 +31,11 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 /** Ciclo di vita di un endpoint: proposto (tipi e schemi pronti), disponibile (handler), deprecato. */
 export type RouteStatus = 'proposed' | 'available' | 'deprecated';
 
-/** Errori del dominio. 400 e 401 si deducono da input e accesso, quindi non si elencano. */
-export type DomainErrorStatus = 403 | 404 | 409;
+/**
+ * Errori che una rotta dichiara: quelli del dominio, più il 503 di un servizio che non risponde.
+ * 400 e 401 si deducono da input e accesso, quindi non si elencano.
+ */
+export type DomainErrorStatus = 403 | 404 | 409 | 503;
 
 export interface RouteSpec {
   method: HttpMethod;
@@ -52,9 +55,14 @@ export interface RouteSpec {
   body?: GenericSchema;
   /**
    * Il tipo di risposta come espressione TypeScript sui nomi di `shared/types`: `Paginated<UserSummary>`.
-   * `void` vuol dire `204` senza corpo.
+   * `void` vuol dire `204` senza corpo, salvo che la rotta sia un `stream`.
    */
   response: string;
+  /**
+   * La rotta risponde con un flusso `text/event-stream` (SSE), non con JSON: il testo descrive gli
+   * eventi. `response` resta `void`, perché l'handler non ritorna un valore.
+   */
+  stream?: string;
   /** Quando ciascun errore del dominio può capitare */
   errors?: Partial<Record<DomainErrorStatus, string>>;
 }
@@ -252,5 +260,35 @@ export const routes: RouteSpec[] = [
       404: 'Il torneo non esiste, o chi chiama non è dell\'organizzazione',
       409: 'Il torneo è concluso o annullato',
     },
+  },
+  {
+    method: 'GET',
+    path: '/api/tournaments/:id/stream',
+    tag: 'Tornei',
+    summary: 'Gli eventi live di un torneo (SSE)',
+    description: 'Una connessione che resta aperta (`text/event-stream`): usa `EventSource`, che si riconnette da solo. Stessa visibilità di `GET /api/tournaments/:id`. I messaggi portano solo identificativi: quando ne arriva uno, rileggi lo stato con una `GET`.',
+    status: 'available',
+    access: 'public',
+    params: TournamentIdParams,
+    response: 'void',
+    stream: [
+      'Eventi, ciascuno col suo nome e un `data` JSON:',
+      '- `hello` `{ now }`: alla connessione e dopo che il server ha perso degli eventi. `now` è l\'ora del server (ISO). Rileggi lo stato.',
+      '- `tournament.updated` `{ tournamentId }`: il torneo è cambiato.',
+      '- `ping` `{}`: ogni 30 secondi, per tenere aperta la connessione. Ignoralo.',
+      'Gli eventi non si conservano: chi si riconnette riparte da `hello` e rilegge.',
+    ].join('\n'),
+    errors: { 404: 'Il torneo non esiste, o è una bozza e chi chiama non è dell\'organizzazione' },
+  },
+  {
+    method: 'GET',
+    path: '/api/health',
+    tag: 'Servizio',
+    summary: 'Il servizio è in piedi?',
+    description: 'Controlla anche che il database risponda. Lo usa il controllo di salute del container; il frontend non ne ha bisogno.',
+    status: 'available',
+    access: 'public',
+    response: 'HealthStatus',
+    errors: { 503: 'Il database non risponde' },
   },
 ];

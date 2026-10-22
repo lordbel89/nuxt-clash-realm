@@ -79,9 +79,6 @@ server/
     tiebreaks/       OMW%, GW%, OGW%… (moduli del catalogo)
     phases/          svizzera, eliminazione, gate, linearizzazione, eredità
     pairing/         pesi lessicografici, bye, tavoli, avvisi
-    signature.ts     firma di generazione e verifica
-    cli.ts           verifica di un round da riga di comando
-    version.ts       ENGINE_VERSION
   services/          casi d'uso: permessi, transazione, storico, traduzione righe ↔ motore
   api/               handler: sessione, validazione, servizio, 404
   realtime/          notifier LISTEN/NOTIFY e fan-out SSE
@@ -200,7 +197,7 @@ Tutto il mio lato si prova senza interfaccia.
 
 | Livello | Cartella | Comando | Cosa | Con cosa |
 |---|---|---|---|---|
-| [M] motore | `tests/engine/` | `npm run test:engine` | abbinamento, classifica, tiebreak, fasi, firma | `node --test`, fixture JSON, **fast-check** per le proprietà |
+| [M] motore | `tests/engine/` | `npm run test:engine` | abbinamento, classifica, tiebreak, fasi | `node --test`, fixture JSON, **fast-check** per le proprietà |
 | [U] unitari | `tests/backend/` | `npm run test:backend` | mapper, validazione, matrice dei permessi, macchine a stati | `node --test`, dipendenze finte (come oggi) |
 | [I] integrazione | `tests/integration/` | `npm run test:integration` | servizi e comandi su un database vero | PGlite in memoria, migrazioni applicate a ogni file di test |
 | [C] concorrenza | `tests/concurrency/` | `npm run test:concurrency` | capienza, comandi paralleli sullo stesso torneo, LISTEN/NOTIFY | Postgres in Docker (`compose.test.yml`) |
@@ -312,8 +309,9 @@ transazione. In v1 nessuna funzione usa i job. *Test:* [I] e [C], un job accodat
 annullata non esiste. *Fatto:* esito documentato.
 
 **F0.11 · Deploy su CapRover.** `captain-definition` e `Dockerfile` (Node 26, `node-server`); il
-Postgres come app CapRover a sé; variabili `NUXT_*`; migrazioni applicate al rilascio; template nginx
-dell'app con `proxy_read_timeout` alto e buffering spento per SSE; `GET /api/health`. In produzione,
+Postgres come app CapRover a sé; variabili `NUXT_*`; migrazioni applicate al rilascio; SSE dietro
+l'nginx predefinito di CapRover, senza template: `ping` ogni 30 secondi sotto il `proxy_read_timeout`
+di 60, buffering spento da `X-Accel-Buffering: no` (vedi `docs/deploy.md`); `GET /api/health`. In produzione,
 il ruolo Postgres dell'app ha solo `INSERT` e `SELECT` su `history_entries`. Prova di
 `LISTEN/NOTIFY` dietro l'nginx di CapRover. *Test:* [S] ridotto contro l'istanza di produzione
 (health, login, SSE che resta aperto oltre 60 secondi). *Fatto:* il criterio della fase.
@@ -322,9 +320,9 @@ il ruolo Postgres dell'app ha solo `INSERT` e `SELECT` su `history_entries`. Pro
 
 È indipendente da F0: si può iniziare subito. Fatto quando: dati partecipanti, risultati e
 composizione, il motore produce abbinamenti di qualunque round e la classifica con OMW%, GW% e OGW%,
-in modo deterministico e verificabile, tutto con [M].
+in modo deterministico, tutto con [M].
 
-**F1.1 · Scheletro.** Cartelle, `version.ts`, tipi d'ingresso e d'uscita del motore. Una regola
+**F1.1 · Scheletro.** Cartelle, tipi d'ingresso e d'uscita del motore. Una regola
 ESLint `no-restricted-imports` su `server/engine/**` rende il confine un errore di lint, non una
 buona intenzione. *Test:* [M] banale. *Fatto:* un import da `server/database` nel motore non passa
 il lint.
@@ -395,14 +393,6 @@ rivincita evitabile.
 previsti, dice se si è oltre il limite (§5): serve all'avviso quando si impostano o aggiungono round e
 a ogni drop. *Test:* [M] l'esempio del §10 (otto iscritti, quattro round, due drop). *Fatto:*
 l'avviso scatta dove deve.
-
-**F1.13 · Firma e verifica.** `generate(input, seed)` produce l'esito e la firma
-`{ engineVersion, seed, input }` con l'input serializzato in forma canonica; `verify(firma, esito
-salvato)`; `node server/engine/cli.ts verify <file.json>`. Una versione vecchia si verifica
-riprendendo dal repository il motore di quella versione (un tag git per versione) e lanciando la sua
-CLI. *Test:* [M] verifica positiva, e negativa su un esito alterato. *Fatto:* la CLI verifica una
-firma salvata.
-
 ## F2 · Giocatori, torneo, iscrizioni (M1)
 
 Fatto quando: via API si crea un torneo con la sua composizione, si iscrivono giocatori creati al
@@ -463,7 +453,7 @@ dopo l'avvio la prima fase è pronta per generare il round 1.
 Fatto quando: via API si gioca una svizzera completa, con override, contestazioni, drop, correzioni,
 annullamenti, cronometro e classifica a ogni round.
 
-**F3.1 · Schema.** `rounds` (numero, stato, `seed`, firma di generazione in `jsonb`, cronometro:
+**F3.1 · Schema.** `rounds` (numero, stato, `seed`, cronometro:
 `timerStatus`, `endsAt`, `pausedAt`, `pausedMs`), `matches` (`kind`, `table`, `status` con `disputed`,
 `endsAt` proprio per le estensioni, `cancelledAt`), `match_slots` (`participantId`, `result`, `rank`,
 `forfeit`, `score`). Il conteggio delle partite di un best-of sta in `score`; la tabella `games` arriva
@@ -472,7 +462,7 @@ quando serve la singola partita (penalità *game loss*, F10). *Test:* [I] migraz
 
 **F3.2 · Traduzione e `generate`.** Il servizio costruisce l'input del motore (partecipanti in
 gioco, punti, coppie già incontrate, bye già ricevuti, configurazione della fase), genera il seed del
-round con un generatore crittografico, chiama il motore e salva match e firma. Il round nasce `draft`,
+round con un generatore crittografico, chiama il motore e salva match e seed. Il round nasce `draft`,
 visibile solo allo staff, e la risposta porta gli avvisi del motore. Richiede il round precedente
 chiuso. Endpoint: `POST /api/phases/:id/rounds`, `GET /api/rounds/:id`, `GET /api/phases/:id/rounds`.
 **[contratto]** *Test:* [I]. *Fatto:* rigenerare con lo stesso input dà lo stesso abbinamento.
@@ -504,7 +494,7 @@ finché il round successivo non è generato. A ogni drop si ricalcola l'avviso s
 rivincite. **[contratto]** *Test:* [I]. *Fatto:* l'annullamento dopo la generazione risponde 409.
 
 **F3.8 · Chiusura e snapshot.** `POST /api/rounds/:id/close` richiede tutti i risultati. Calcola la
-classifica col motore e la salva in `standings_snapshots` (round, vista, valori, versione del motore).
+classifica col motore e la salva in `standings_snapshots` (round, vista, valori).
 **Decisione da prendere qui:** un match `disputed` blocca la chiusura? (Proposta: sì, perché il §9 già
 chiede zero contestati per pubblicare.) Endpoint di lettura: `GET /api/rounds/:id/standings` e
 `GET /api/tournaments/:id/standings` (l'ultimo snapshot). **[contratto]** *Test:* [I]. *Fatto:* la
@@ -532,9 +522,9 @@ in corsa, con l'avviso sul limite delle rivincite. **[contratto]** *Test:* [I]. 
 round già giocato risponde 409.
 
 **F3.13 · Letture di servizio.** `GET /api/tournaments/:id/history?entity=&entityId=` (staff),
-`GET /api/rounds/:id/verification` (staff: rilancia il motore sulla firma e confronta),
 `POST /api/tournaments/:id/standings/recompute` (riparazione esplicita, con `reason`).
-**[contratto]** *Test:* [I]. *Fatto:* la verifica di un round alterato a mano in database fallisce.
+**[contratto]** *Test:* [I]. *Fatto:* il ricalcolo esplicito finisce nello storico, con la
+motivazione.
 
 **F3.14 · Fine della fase.** Chiudere l'ultimo round della svizzera chiude la fase e salva il suo
 elenco ordinato in uscita. Se è l'ultima fase, il torneo passa a `finished`. *Test:* [I] e il primo
@@ -634,7 +624,7 @@ quanto si impara nella v1; ognuno si spezza in step atomici quando la fase comin
 ## F7 · Job, mailer, push, risultati dai giocatori
 
 - **F7.1 · pg-boss in produzione.** Code, worker nel plugin Nitro, ritentativi, job accodati nella
-  transazione (o fuori, secondo l'esito di F0.10), monitoraggio delle code fallite.
+  transazione con `fromDrizzle(tx, sql)` (esito di F0.10: funziona anche su PGlite), monitoraggio delle code fallite.
 - **F7.2 · Mailer.** SMTP con `NUXT_MAIL_*`, invio solo da un job, modelli in italiano; verifica
   email e reset password di Better Auth; inviti dell'organizzazione via email. Lo schema GET →
   conferma → POST vale per ogni link monouso. **[contratto]**
@@ -698,10 +688,6 @@ quanto si impara nella v1; ognuno si spezza in step atomici quando la fase comin
 - **F11.6 · [brainstorm] Simulazione della composizione.** Punto aperto dell'argomento 15: provare
   una composizione su partecipanti finti con risultati seedati. Il motore puro la rende quasi
   gratuita: è lo scenario runner senza database.
-
-Ogni modulo nuovo, nel motore, è una versione nuova: le firme dei round già giocati restano
-verificabili.
-
 ## F12 · Multi-formato e liste
 
 - **F12.1 · `Decklist`.** Per membro e per fase, con gli stati da `missing` a `valid`/`invalid`,
@@ -783,9 +769,6 @@ verificabili.
 - **F19.4 · Rimozione = anonimizzazione.** Il `Player` diventa «giocatore rimosso», i fatti del
   torneo restano.
 - **F19.5 · 2FA TOTP**, dalla roadmap dell'autenticazione.
-- **F19.6 · Motore come pacchetto.** L'estrazione in un pacchetto con versione propria, se il tag git
-  per versione (F1.13) non basta più.
-
 ---
 
 ## Riepilogo degli endpoint della v1
@@ -807,7 +790,7 @@ Bozza: ogni rotta si fissa nello step che la introduce, ed è il registro di F0.
 | Abbinamenti | `PUT /api/rounds/:id/pairings`, `GET /api/rounds/:id/repairing-proposal`, `POST …/accept` | F3.5, F3.11 |
 | Match | `POST/PUT /api/matches/:id/result`, `POST /api/matches/:id/extension` | F3.4, F3.6 |
 | Classifiche | `GET /api/rounds/:id/standings`, `GET /api/tournaments/:id/standings`, `POST /api/tournaments/:id/standings/recompute` | F3.8, F3.13, F5.8 |
-| Storico e verifica | `GET /api/tournaments/:id/history`, `GET /api/rounds/:id/verification` | F3.13 |
+| Storico | `GET /api/tournaments/:id/history` | F3.13 |
 
 ## Decisioni da prendere lungo la strada
 
