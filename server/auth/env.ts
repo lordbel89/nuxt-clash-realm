@@ -9,7 +9,7 @@ import { loadEnvFile } from '../database/env.ts';
 
 export const AUTH_DEFAULTS = {
   secret: '',
-  url: 'http://localhost:3000',
+  url: 'http://localhost:3010',
 } as const;
 
 /**

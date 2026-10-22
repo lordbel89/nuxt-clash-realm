@@ -18,7 +18,7 @@ import { accounts, sessions, users, verifications } from '../database/schema/ind
 export interface AuthOptions {
   /** Firma i cookie di sessione: cambiarlo invalida tutte le sessioni attive */
   secret: string;
-  /** Origine dell'applicazione, es. http://localhost:3000 */
+  /** Origine dell'applicazione, es. http://localhost:3010 */
   url: string;
 }
 

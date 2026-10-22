@@ -9,12 +9,12 @@ Qui c'è il funzionamento interno e la manutenzione.
 
 ## I file
 
-| File | Ruolo |
-|---|---|
-| `server/mocks/define.ts` | I tipi (`Mock`, `MockContext`, `MockMethod`) e `defineMock`, che è un'identità: esiste per avere il controllo del contratto e l'autocompletamento dentro l'oggetto letterale. |
-| `server/mocks/index.ts` | Il registro: l'elenco esplicito dei mock, il router `rou3` e `serveMock(event)`, che risolve la risposta. |
-| `server/mocks/*.mock.ts` | Un file per entità. Esporta un mock o un array di mock. |
-| `server/middleware/mocks.ts` | Il punto di innesto: cinque righe, chiama `serveMock` e ne restituisce il risultato. |
+| File                         | Ruolo                                                                                                                                                                         |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `server/mocks/define.ts`     | I tipi (`Mock`, `MockContext`, `MockMethod`) e `defineMock`, che è un'identità: esiste per avere il controllo del contratto e l'autocompletamento dentro l'oggetto letterale. |
+| `server/mocks/index.ts`      | Il registro: l'elenco esplicito dei mock, il router `rou3` e `serveMock(event)`, che risolve la risposta.                                                                     |
+| `server/mocks/*.mock.ts`     | Un file per entità. Esporta un mock o un array di mock.                                                                                                                       |
+| `server/middleware/mocks.ts` | Il punto di innesto: cinque righe, chiama `serveMock` e ne restituisce il risultato.                                                                                          |
 
 Dipendenze, entrambe **devDependencies**: `@faker-js/faker` per i dati,
 `rou3` per il matching delle rotte (è lo stesso router che usa Nitro).
@@ -128,9 +128,9 @@ motivo per cui la prossima persona lo cancella invece di usarlo.
 Con `npm run dev` attivo:
 
 ```bash
-curl -i "http://localhost:3000/api/tournaments?limit=2&offset=1"   # 200 paginato, con MOCK_DATA: true
-curl -i "http://localhost:3000/api/tournaments/pippo"              # 404 dal mock, con MOCK_DATA: true
-curl -i "http://localhost:3000/api/users"                          # 401 e nessun MOCK_DATA
+curl -i "http://localhost:3010/api/tournaments?limit=2&offset=1"   # 200 paginato, con MOCK_DATA: true
+curl -i "http://localhost:3010/api/tournaments/pippo"              # 404 dal mock, con MOCK_DATA: true
+curl -i "http://localhost:3010/api/users"                          # 401 e nessun MOCK_DATA
 ```
 
 L'ultima è il controllo che conta: il middleware vede ogni richiesta, e una

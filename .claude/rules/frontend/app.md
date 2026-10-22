@@ -43,7 +43,7 @@ Sidebar and header items are data, not markup: `app/config/navigation.ts` export
 
 Auto-imported with directory prefixes: `app/components/tournament/Card.vue` → `<TournamentCard>`, `app/components/match/Card.vue` → `<MatchCard>`. `TournamentForm` is shared by `/tournaments/new` and `/tournaments/[id]/settings` via `defineModel` + a `submit` emit, so form fields change in one place.
 
-`RoundTimer` starts its clock in `onMounted` and keeps `now` as `null` until then, deliberately, to avoid an SSR hydration mismatch. Preserve that pattern in any other time-dependent component.
+`DisplayRoundTimer` starts its clock in `onMounted` and keeps `now` as `null` until then, deliberately, to avoid an SSR hydration mismatch. Preserve that pattern in any other time-dependent component.
 
 ## Known gaps
 

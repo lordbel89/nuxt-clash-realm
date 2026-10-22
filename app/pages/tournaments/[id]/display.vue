@@ -15,7 +15,7 @@ const roundEndsAt = ref<string | undefined>();
   <WidgetWrapper :layout="layout">
     <template #timer>
       <div class="flex h-full items-center justify-center">
-        <RoundTimer
+        <DisplayRoundTimer
           :ends-at="roundEndsAt"
           huge />
       </div>

@@ -65,8 +65,14 @@ export const sideMenu: NavigationMenuItem[][] = sideMenuDecorator([
       defaultOpen: true,
       children: [
         {
+          label: 'Organizzazioni',
+          icon: 'i-lucide-building-2',
+          to: '/organizations',
+        },
+        {
           label: 'Utenti',
           icon: 'i-lucide-users',
+          to: '/users',
         },
         {
           label: 'Permessi',
@@ -100,7 +106,7 @@ export const sideMenu: NavigationMenuItem[][] = sideMenuDecorator([
     icon: 'i-lucide-wrench',
     defaultOpen: true,
     children: [
-      { label: 'Componenti', icon: 'i-lucide-cog', to: '/dev/components' },
+      { label: 'Showcase componenti', icon: 'i-lucide-cog', to: '/dev/components' },
       { label: 'Tabelle', icon: 'i-lucide-columns-3-cog', to: '/dev/tables' },
     ],
   },
@@ -109,5 +115,12 @@ export const sideMenu: NavigationMenuItem[][] = sideMenuDecorator([
 
 /** Voci ancorate in fondo alla sidebar */
 export const sideMenuFooter: NavigationMenuItem[] = [
-  { label: 'Esci', icon: 'i-lucide-log-out', to: '/login' },
+  {
+    label: 'Esci',
+    icon: 'i-lucide-log-out',
+    async onSelect() {
+      await authClient.signOut();
+      await navigateTo('/login');
+    },
+  },
 ];

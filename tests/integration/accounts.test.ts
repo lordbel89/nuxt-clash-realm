@@ -7,7 +7,7 @@ import { users } from '../../server/database/schema/index.ts';
 import { createTestDatabase } from '../support/database.ts';
 
 const db = await createTestDatabase();
-const auth = createAuth(db, { secret: 'segreto-dei-test-di-integrazione', url: 'http://localhost:3000' });
+const auth = createAuth(db, { secret: 'segreto-dei-test-di-integrazione', url: 'http://localhost:3010' });
 after(() => closeDatabase(db));
 
 test('un account creato a mano fa login con la sua password', async () => {
