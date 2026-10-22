@@ -8,19 +8,19 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <!-- L'SVG fa da maschera su uno sfondo bg-current: con <img> il CSS non arriverebbe ai fill -->
+  <!-- mono e mono-xl: l'SVG fa da maschera su uno sfondo bg-current, con <img> il CSS non arriverebbe ai fill -->
+  <!-- outline: inline e non maschera, perché lo spessore delle linee sia una prop -->
+  <!-- Niente commenti tra i rami del v-if: in dev Vue li tiene e il ramo smette di ereditare class -->
   <span
     v-if="variant === 'mono'"
     aria-hidden="true"
     class="block aspect-925/690 bg-current mask-[url(/assets/logo-monocromatico.svg)] mask-contain mask-center mask-no-repeat"
   />
-  <!-- L'SVG fa da maschera su uno sfondo bg-current: con <img> il CSS non arriverebbe ai fill -->
   <span
     v-else-if="variant === 'mono-xl'"
     aria-hidden="true"
     class="block aspect-925/690 bg-current mask-[url(/assets/logo-monocromatico-spazio-2xl.svg)] mask-contain mask-center mask-no-repeat"
   />
-  <!-- Inline e non maschera, perché lo spessore delle linee sia una prop -->
   <svg
     v-else-if="variant === 'outline'"
     aria-hidden="true"
