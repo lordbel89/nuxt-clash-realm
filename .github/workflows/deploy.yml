@@ -1,4 +1,4 @@
-# Deploy su CapRover a ogni push sul ramo `production`.
+# Deploy su CapRover a ogni push sul ramo `release/prod`.
 #
 # Prima si verifica tutto, poi si invia il codice: se un controllo fallisce, CapRover non riceve
 # niente, quindi nessun build, nessuna migrazione e nessun container nuovo. Le migrazioni girano
@@ -8,12 +8,12 @@ name: Deploy
 
 on:
   push:
-    branches: [production]
+    branches: [release/prod]
   workflow_dispatch:
 
 # Due deploy insieme si pesterebbero le migrazioni: il secondo aspetta il primo
 concurrency:
-  group: deploy-production
+  group: deploy-release/prod
   cancel-in-progress: false
 
 permissions:
@@ -63,8 +63,8 @@ jobs:
 
   deploy:
     needs: [verify, image]
-    # «Run workflow» lascia scegliere qualunque ramo: online va solo `production`
-    if: github.ref == 'refs/heads/production'
+    # «Run workflow» lascia scegliere qualunque ramo: online va solo `release/prod`
+    if: github.ref == 'refs/heads/release/prod'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
